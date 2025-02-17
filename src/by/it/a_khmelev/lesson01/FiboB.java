@@ -1,7 +1,6 @@
 package by.it.a_khmelev.lesson01;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 
 /*
  * Вам необходимо выполнить способ вычисления чисел Фибоначчи со вспомогательным массивом
@@ -14,7 +13,7 @@ public class FiboB {
 
     public static void main(String[] args) {
         //вычисление чисел простым быстрым методом
-        FiboB fibo = new FiboB();
+        by.it.a_khmelev.lesson01.FiboB fibo = new by.it.a_khmelev.lesson01.FiboB();
         int n = 55555;
         System.out.printf("fastB(%d)=%d \n\t time=%d \n\n", n, fibo.fastB(n), fibo.time());
     }
@@ -29,4 +28,3 @@ public class FiboB {
     }
 
 }
-
