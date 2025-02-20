@@ -23,9 +23,10 @@ public class FiboB {
         return System.currentTimeMillis() - startTime;
     }
 
-    BigInteger fastB(Integer n) {
+    public BigInteger fastB(Integer n) {
         //здесь нужно реализовать вариант с временем O(n) и памятью O(n)
         return BigInteger.valueOf(-1L);
     }
 
 }
+
