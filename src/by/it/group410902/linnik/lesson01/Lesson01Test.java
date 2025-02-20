@@ -2,7 +2,7 @@ package by.it.group410902.linnik.lesson01;
 
 import by.it.group410902.linnik.lesson01.FiboA;
 import by.it.group410902.linnik.lesson01.FiboB;
-import by.it.a_khmelev.lesson01.FiboC;
+import by.it.group410902.linnik.lesson01.FiboC;
 import org.junit.Test;
 
 import java.math.BigInteger;
@@ -39,7 +39,7 @@ public class Lesson01Test {
 
     @Test(timeout = 2000)
     public void checkC_faster() throws Exception {
-        by.it.a_khmelev.lesson01.FiboC fibo = new FiboC();
+        by.it.group410902.linnik.lesson01.FiboC fibo = new FiboC();
         assertTrue("fasterC failed 1", fibo.fasterC(10, 2) == 1L);
         assertTrue("fasterC failed 2", fibo.fasterC(1, 2) == 1L);
         assertTrue("fasterC failed 3", fibo.fasterC(999999999, 321) == 34L);

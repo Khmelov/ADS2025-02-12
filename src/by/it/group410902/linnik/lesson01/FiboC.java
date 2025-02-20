@@ -27,11 +27,29 @@ public class FiboC {
         long cur = 1;
         long prev = 0;
         int period = 0;
-        for(int i =2; i<=n; i++){
-            a = a+b;
-            b = a-b;
+        while (true){
+            long oldCur = cur;
+            cur = (cur + prev) % m;
+            prev = oldCur;
+            if (cur == 0 && prev ==1) break;
+            period += 1;
+
         }
-        return a;
+        period = period +2;
+        System.out.printf("%d\t",period);
+        n = n % period;
+        if (n <= 1) return n;
+
+        cur = 1;
+        prev = 0;
+
+        for (int i = 2; i < n+1; i++){
+            long oldCur = cur;
+            cur = (cur + prev) % m;
+            prev = oldCur;
+        }
+        //cur = cur % m;
+        return cur;
     }
 
 
