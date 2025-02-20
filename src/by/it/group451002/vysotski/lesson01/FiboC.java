@@ -6,12 +6,12 @@ package by.it.group451002.vysotski.lesson01;
  * время расчета должно быть не более 2 секунд
  */
 
-public class fiboC {
+public class FiboC {
 
     private long startTime = System.currentTimeMillis();
 
     public static void main(String[] args) {
-        fiboC fibo = new fiboC();
+        FiboC fibo = new FiboC();
         int n = 55555;
         int m = 1000;
         System.out.printf("fasterC(%d)=%d \n\t time=%d \n\n", n, fibo.fasterC(n, m), fibo.time());

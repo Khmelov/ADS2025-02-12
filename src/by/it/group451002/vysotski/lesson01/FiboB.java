@@ -7,13 +7,13 @@ import java.math.BigInteger;
  * без ограничений на размер результата (BigInteger)
  */
 
-public class fibob {
+public class FiboB {
 
     private long startTime = System.currentTimeMillis();
 
     public static void main(String[] args) {
         //вычисление чисел простым быстрым методом
-        fibob fibo = new fibob();
+        FiboB fibo = new FiboB();
         int n = 55555;
         System.out.printf("fastB(%d)=%d \n\t time=%d \n\n", n, fibo.fastB(n), fibo.time());
     }

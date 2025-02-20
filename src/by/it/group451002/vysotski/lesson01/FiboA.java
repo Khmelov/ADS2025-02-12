@@ -6,18 +6,18 @@ import java.math.BigInteger;
  * Вам необходимо выполнить рекурсивный способ вычисления чисел Фибоначчи
  */
 
-public class fiboA {
+public class FiboA {
 
 
     private long startTime = System.currentTimeMillis();
 
     public static void main(String[] args) {
-        fiboA fibo = new fiboA();
+        FiboA fibo = new FiboA();
         int n = 33;
         System.out.printf("calc(%d)=%d \n\t time=%d \n\n", n, fibo.calc(n), fibo.time());
 
         //вычисление чисел фибоначчи медленным методом (рекурсией)
-        fibo = new fiboA();
+        fibo = new FiboA();
         n = 34;
         System.out.printf("slowA(%d)=%d \n\t time=%d \n\n", n, fibo.slowA(n), fibo.time());
     }
