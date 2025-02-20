@@ -21,7 +21,7 @@ public class FiboC {
         return System.currentTimeMillis() - startTime;
     }
 
-    public long fasterC(long n, int m) {
+    long fasterC(long n, int m) {
         //Интуитивно найти решение не всегда просто и
         //возможно потребуется дополнительный поиск информации
         return -1L;
@@ -29,4 +29,3 @@ public class FiboC {
 
 
 }
-

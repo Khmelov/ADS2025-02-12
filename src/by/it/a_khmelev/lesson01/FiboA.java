@@ -36,7 +36,7 @@ public class FiboA {
     }
 
 
-    public BigInteger slowA(Integer n) {
+    BigInteger slowA(Integer n) {
         //рекурсия
         //здесь нужно реализовать вариант без ограничения на размер числа,
         //в котором код совпадает с математическим определением чисел Фибоначчи
@@ -48,4 +48,3 @@ public class FiboA {
 
 
 }
-
