@@ -1,4 +1,4 @@
-package by.it.group451001.smalian;
+package by.it.group451001.smalian.lesson1;
 
 /*
  * Даны целые числа 1<=n<=1E18 и 2<=m<=1E5,
@@ -28,7 +28,7 @@ public class FiboC {
         int k=0;
         for (int i=2;i<=m*m;i++){
             fibo[i] = (fibo[i-2]+fibo[i-1])%m;
-            if ((fibo[i]==1)&&(fibo[i-1]==0)) {
+            if ((fibo[i-1]==0)&&(fibo[i]==1)) {
                 k = i-1;
                 break;
             }

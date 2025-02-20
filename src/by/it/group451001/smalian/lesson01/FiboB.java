@@ -1,4 +1,4 @@
-package by.it.group451001.smalian;
+package by.it.group451001.smalian.lesson1;
 
 import java.math.BigInteger;
 
