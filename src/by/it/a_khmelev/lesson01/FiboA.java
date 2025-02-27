@@ -36,14 +36,22 @@ public class FiboA {
     }
 
 
+    private BigInteger recCalc(BigInteger prev1, BigInteger prev2, Integer nCount, Integer n) {
+        nCount++;
+        return nCount.equals(n) ? prev1.add(prev2) : recCalc(prev2, prev1.add(prev2), nCount, n);
+    }
+
     BigInteger slowA(Integer n) {
         //рекурсия
         //здесь нужно реализовать вариант без ограничения на размер числа,
         //в котором код совпадает с математическим определением чисел Фибоначчи
         //время O(2^n)
 
-
-        return BigInteger.ZERO;
+        Integer nCount = 2;
+        if (n < 3)
+            return BigInteger.ONE;
+        else
+            return recCalc(BigInteger.ONE, BigInteger.ONE, nCount, n);
     }
 
 
