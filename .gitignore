@@ -21,7 +21,7 @@ bin/
 /dist/
 /nbdist/
 /.nb-gradle/
-
+/src/by/it/group451002/kureichuk
 ### VS Code ###
 .vscode/
 

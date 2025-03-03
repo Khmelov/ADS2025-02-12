@@ -1,7 +1,8 @@
-package by.it.a_khmelev.lesson02;
+package by.it.group410902.podryabinkin.lesson02;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays; //добавим для быстрой сортировки
 /*
 Даны события events
 реализуйте метод calcStartTimes, так, чтобы число включений регистратора на
@@ -30,6 +31,14 @@ public class A_VideoRegistrator {
         //Подготовка к жадному поглощению массива событий
         //hint: сортировка Arrays.sort обеспечит скорость алгоритма
         //C*(n log n) + C1*n = O(n log n)
+        Arrays.sort(events);
+        Double prev_start = -1.0;
+        for( ; i < events.length; i++){
+            if (events[i] > prev_start + workDuration){
+                result.add(events[i]);
+                prev_start = events[i];
+            }
+        }
 
         //пока есть незарегистрированные события
         //получим одно событие по левому краю

@@ -1,4 +1,4 @@
-package by.it.a_khmelev.lesson02;
+package by.it.group410902.podryabinkin.lesson02;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +32,38 @@ public class B_Sheduler {
         List<Event> result;
         result = new ArrayList<>();
         //ваше решение.
+//        for(int i = 0; i < events.length; i++) System.out.println(events[i].start + " " + events[i].stop);
+        //отсортируем по окончанию
+        for(int i = 1; i < events.length; i++){
+            if(events[i].stop < events[i-1].stop){
+                Event temp = events[i];
+                events[i] = events[i-1];
+                events[i-1] = temp;
+                i = 1;
+
+            }
+        }
+        for(int i = 1; i < events.length; i++){
+            if(events[i].stop == events[i-1].stop){
+                if(events[i].start < events[i-1].start){
+                    Event temp = events[i];
+                    events[i] = events[i-1];
+                    events[i-1] = temp;
+                    i = 1;
+
+                }
+            }
+
+        }
+//        for(int i = 0; i < events.length; i++) System.out.println(events[i].start + " " + events[i].stop);
+
+        double cur_end = from;
+        for(int i = 0; i < events.length && events[i].stop <= to; i++){
+            if(events[i].start >= cur_end){
+                result.add(events[i]);
+                cur_end = events[i].stop;
+            }
+        }
 
 
         return result;          //вернем итог
