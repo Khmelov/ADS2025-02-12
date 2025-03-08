@@ -1,4 +1,4 @@
- package by.group451002.Osadchy.lesson01;
+package by.it.group451002.Osadchy.lesson01;
 
 import java.math.BigInteger;
 
@@ -23,9 +23,9 @@ public class FiboA {
     }
 
     private long time() {
-        long res = System.currentTimeMillis() - startTime;
+        long res1 = System.currentTimeMillis() - startTime;
         startTime = System.currentTimeMillis();
-        return res;
+        return res1;
     }
 
     private int calc(int n) {
@@ -51,4 +51,3 @@ public class FiboA {
 
 
 }
-

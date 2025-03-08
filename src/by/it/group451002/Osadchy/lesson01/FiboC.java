@@ -54,4 +54,3 @@ public class FiboC {
         return (n == 0) ? previous : current;
     }
 }
-

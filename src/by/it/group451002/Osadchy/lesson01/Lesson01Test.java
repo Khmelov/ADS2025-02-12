@@ -1,4 +1,4 @@
-package by.group451002.Osadchy.lesson01;
+package by.it.group451002.Osadchy.lesson01;
 
 import org.junit.Test;
 
