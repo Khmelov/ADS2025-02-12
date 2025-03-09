@@ -32,7 +32,7 @@ public class FiboC {
         long prev2 = 0;
         long prev1 = 1;
         long num;
-       for (int i = 2; i < 6*m*m+2; i++){
+       for (int i = 2; i < m*m+3; i++){
            num = prev1 + prev2;
            prev2 = prev1;
            prev1 = num;
