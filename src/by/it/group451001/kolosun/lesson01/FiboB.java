@@ -26,11 +26,6 @@ public class FiboB {
         BigInteger[] N = new BigInteger[3];
         N[0] = BigInteger.ONE;
         N[1] = BigInteger.ONE;
-
-        /*for(int i = 2; i < n;i++)
-        {
-            N[i] = N[i-1].add(N[i-2]);
-        }*/
         for(int i = 2; i < n;i++)
         {
             N[2] = N[0].add(N[1]);

@@ -6,10 +6,11 @@ package by.it.group410902.sivtsov.lesson01;
  * время расчета должно быть не более 2 секунд
  */
 
+import java.math.BigInteger;
+
 public class FiboC {
 
     private long startTime = System.currentTimeMillis();
-
     public static void main(String[] args) {
         FiboC fibo = new FiboC();
         int n = 55555;
@@ -24,7 +25,34 @@ public class FiboC {
     long fasterC(long n, int m) {
         //Интуитивно найти решение не всегда просто и
         //возможно потребуется дополнительный поиск информации
-        return -1L;
+        long cur = 1;
+        long prev = 0;
+        int period = 0;
+        while(true){
+            long oldcur = cur;
+            cur = (prev + cur) % m;
+            prev = oldcur;
+            if(cur == 1 && prev == 0){
+                break;
+            }
+            period++;
+        }
+
+        period = period + 2;
+        n = n % period;
+        if (n <= 1) {
+            return n;
+        }
+            cur = 1;
+            prev = 0;
+
+            for(int i = 2; i <= n; i++){
+                long oldcur = cur;
+                cur = (prev + cur) % m;
+                prev = oldcur;
+            }
+
+        return cur;
     }
 
 
