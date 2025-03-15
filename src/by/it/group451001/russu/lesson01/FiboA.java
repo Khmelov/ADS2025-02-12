@@ -48,6 +48,7 @@ public class FiboA {
             case 0 ->
             {
                 return BigInteger.ZERO;
+
             }
             case 1 ->
             {
