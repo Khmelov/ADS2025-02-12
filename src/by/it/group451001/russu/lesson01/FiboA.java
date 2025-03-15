@@ -45,18 +45,9 @@ public class FiboA {
         //время O(2^n)
         switch (n)
         {
-            case 0 ->
-            {
-                return BigInteger.ZERO;
-            }
-            case 1 ->
-            {
-                return BigInteger.ONE;
-            }
-            default ->
-            {
-                return slowA(n-1).add(slowA(n-2));
-            }
+            case 0 -> { return BigInteger.ZERO;}
+            case 1 -> {return BigInteger.ONE;}
+            default ->{return slowA(n-1).add(slowA(n-2));}
         }
     }
 }
