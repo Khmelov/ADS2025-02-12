@@ -37,7 +37,6 @@ public class FiboC {
             {
                 fiblist.add( (fiblist.get(i-1) + (fiblist.get(i-2))) % m );
 
-
                 if ((fiblist.get(i) == 1) && (fiblist.get(i-1) == 0))
                     break;
             }
