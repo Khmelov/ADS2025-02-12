@@ -49,8 +49,10 @@ public class C_GreedyKnapsack {
         //кроме того, можете описать свой компаратор в классе Item
 
         //ваше решение.
-
-
+        Item item1 =  new Item(3, 5);
+        Item item2 =  new Item(4, 6);
+        int result1 = item1.compareTo(item2);
+        System.out.println("result1 = "+ result1);
         System.out.printf("Удалось собрать рюкзак на сумму %f\n", result);
         return result;
     }
@@ -72,10 +74,18 @@ public class C_GreedyKnapsack {
                    '}';
         }
 
+        public  int compare(int x, int y) {
+            if (x<y) {
+                return -1;
+            } else if (x==y) {
+                return 0;
+            } else
+                return 1;
+        }
         @Override
         public int compareTo(Item o) {
             //тут может быть ваш компаратор
-
+            int result = compare(this.cost,o.cost);
 
             return 0;
         }
