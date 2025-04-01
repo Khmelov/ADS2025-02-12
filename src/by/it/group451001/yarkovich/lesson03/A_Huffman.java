@@ -136,7 +136,6 @@ public class A_Huffman {
         Node right; //правый ребенок бинарного дерева
 
         //для этого дерева не существует внутренних узлов без обоих детей
-        //поэтому вот такого конструктора будет достаточно
         InternalNode(Node left, Node right) {
             super(left.frequence + right.frequence);
             this.left = left;
