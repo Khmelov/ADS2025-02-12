@@ -53,7 +53,8 @@ public class C_GreedyKnapsack {
         // Сортировка по стоимости за 1 кг
         for (int i = 0; i < priority.length-1; i++) {
             for (int j = i+1; j < priority.length; j++) {
-                if (priority[i].compareTo(priority[j]) > priority[j].compareTo(priority[i])) {
+                // Если у объекта i цена за 1 кг > чем у объекта j
+                if (priority[i].compareTo(priority[j]) < 0) {
                     tempSwap = priority[i];
                     priority[i] = priority[j];
                     priority[j] = tempSwap;
@@ -63,7 +64,9 @@ public class C_GreedyKnapsack {
 
         // Записываем в result
         int k = 0;
+        // Всего 4 предмета
         for (int i = 0; i < 4; i++) {
+            // Заполняем весь рюкзак по сортированному массиву
             for (int j = 0; (j < priority[i].weight) && (0 < 60-k); j++, k++) {
                 result += (double) priority[i].cost /priority[i].weight;
             }
@@ -92,8 +95,11 @@ public class C_GreedyKnapsack {
 
         @Override
         public int compareTo(Item o) {
-            //тут может быть ваш компаратор
-            return o.cost / o.weight;
+            // i-ый объект
+            double thisCostPerKg = (double) this.cost / this.weight;
+            // j-ый объект
+            double otherCostPerKg = (double) o.cost / o.weight;
+            return Double.compare(thisCostPerKg, otherCostPerKg);
         }
     }
 }
