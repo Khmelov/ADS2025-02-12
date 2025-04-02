@@ -1,7 +1,9 @@
-package by.it.a_khmelev.lesson02;
+package by.it.group410901.kliaus.lesson02;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
+
 /*
 Даны события events
 реализуйте метод calcStartTimes, так, чтобы число включений регистратора на
@@ -20,25 +22,38 @@ public class A_VideoRegistrator {
     }
 
     //модификаторы доступа опущены для возможности тестирования
-    List<Double> calcStartTimes(double[] events, double workDuration) {
+    List<Double> calcStartTimes(double[] eventArray, double duration) {
         //events - события которые нужно зарегистрировать
         //timeWorkDuration время работы видеокамеры после старта
-        List<Double> result;
-        result = new ArrayList<>();
-        int i = 0;                              //i - это индекс события events[i]
+        List<Double> startPoints;
+        startPoints = new ArrayList<>();
+        int currentIndex = 0;
+
         //Комментарии от проверочного решения сохранены для подсказки, но вы можете их удалить.
         //Подготовка к жадному поглощению массива событий
         //hint: сортировка Arrays.sort обеспечит скорость алгоритма
         //C*(n log n) + C1*n = O(n log n)
 
+        Arrays.sort(eventArray);
+
         //пока есть незарегистрированные события
-        //получим одно событие по левому краю
-        //и запомним время старта видеокамеры
-        //вычислим момент окончания работы видеокамеры
-        //и теперь пропустим все покрываемые события
-        //за время до конца работы, увеличивая индекс
+        while (currentIndex < eventArray.length) {
+            double currentStart = eventArray[currentIndex];
+            startPoints.add(currentStart);
+            double endTime = currentStart + duration;
 
+            //получим одно событие по левому краю
+            //и запомним время старта видеокамеры
+            //вычислим момент окончания работы видеокамеры
+            //и теперь пропустим все покрываемые события
+            //за время до конца работы, увеличивая индекс
+            while ((currentIndex < eventArray.length)
+                    && (eventArray[currentIndex] <= endTime)) {
+                currentIndex++;
+            }
+        }
 
-        return result;                        //вернем итог
+        return startPoints;
     }
+
 }
