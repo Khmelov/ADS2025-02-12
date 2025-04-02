@@ -57,35 +57,80 @@ public class A_Huffman {
     }
 
     //!!!!!!!!!!!!!!!!!!!!!!!!!     НАЧАЛО ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
-    String encode(InputStream inputStream) throws FileNotFoundException {
-        //прочитаем строку для кодирования из тестового файла
+    /*String encode(InputStream inputStream) throws FileNotFoundException {
         Scanner scanner = new Scanner(inputStream);
         String s = scanner.next();
 
-        //все комментарии от тестового решения были оставлены т.к. это задание A.
-        //если они вам мешают их можно удалить
-
+        //1. "таблица соответствия" char и int
         Map<Character, Integer> count = new HashMap<>();
-        //1. переберем все символы по очереди и рассчитаем их частоту в Map count
-        //для каждого символа добавим 1 если его в карте еще нет или инкремент если есть.
+        for (char a: s.toCharArray()) {
+            count.put(a, count.getOrDefault(a, 0)+1);
+        }
 
         //2. перенесем все символы в приоритетную очередь в виде листьев
         PriorityQueue<Node> priorityQueue = new PriorityQueue<>();
-
-        //3. вынимая по два узла из очереди (для сборки родителя)
-        //и возвращая этого родителя обратно в очередь
-        //построим дерево кодирования Хаффмана.
-        //У родителя частоты детей складываются.
-
+        for (Map.Entry<Character, Integer> entry : count.entrySet()) {
+            priorityQueue.add(new LeafNode(entry.getValue(), entry.getKey()));
+        }
+        //3.построим дерево кодирования Хаффмана.
+        while (priorityQueue.size()>1){
+            Node left= priorityQueue.poll();
+            Node right = priorityQueue.poll();
+            InternalNode parent = new InternalNode(left, right);
+            priorityQueue.add(parent);
+        }
         //4. последний из родителей будет корнем этого дерева
-        //это будет последний и единственный элемент оставшийся в очереди priorityQueue.
+        Node root=priorityQueue.poll();
         StringBuilder sb = new StringBuilder();
+        root.fillCodes("");
+        sb.append();
+
+        //StringBuilder sb = new StringBuilder();
         //.....
 
         return sb.toString();
         //01001100100111
         //01001100100111
+    }*/
+    String encode(InputStream inputStream) throws FileNotFoundException {
+        Scanner scanner = new Scanner(inputStream);
+        String s = scanner.next();
+
+        // 1. Таблица частот символов
+        Map<Character, Integer> count = new HashMap<>();
+        for (char a : s.toCharArray()) {
+            count.put(a, count.getOrDefault(a, 0) + 1);
+        }
+
+        // 2. Создание приоритетной очереди
+        PriorityQueue<Node> priorityQueue = new PriorityQueue<>();
+        for (Map.Entry<Character, Integer> entry : count.entrySet()) {
+            priorityQueue.add(new LeafNode(entry.getValue(), entry.getKey()));
+        }
+
+        // 3. Построение дерева Хаффмана
+        while (priorityQueue.size() > 1) {
+            Node left = priorityQueue.poll();
+            Node right = priorityQueue.poll();
+            InternalNode parent = new InternalNode(left, right);
+            priorityQueue.add(parent);
+        }
+
+        // 4. Генерация кодов
+        Node root = priorityQueue.poll();
+        if (root != null) {
+            root.fillCodes("");
+        }
+
+        // 5. Кодирование строки
+        StringBuilder sb = new StringBuilder();
+        for (char c : s.toCharArray()) {
+            sb.append(codes.get(c));
+        }
+
+        return sb.toString();
     }
+
 
     //Изучите классы Node InternalNode LeafNode
     abstract class Node implements Comparable<Node> {
@@ -114,12 +159,10 @@ public class A_Huffman {
     ////////////////////////////////////////////////////////////////////////////////////
     //расширение базового класса до внутреннего узла дерева
     private class InternalNode extends Node {
-        //внутренный узел дерева
         Node left;  //левый ребенок бинарного дерева
         Node right; //правый ребенок бинарного дерева
 
         //для этого дерева не существует внутренних узлов без обоих детей
-        //поэтому вот такого конструктора будет достаточно
         InternalNode(Node left, Node right) {
             super(left.frequence + right.frequence);
             this.left = left;
@@ -138,14 +181,12 @@ public class A_Huffman {
     ////////////////////////////////////////////////////////////////////////////////////
     //расширение базового класса до листа дерева
     private class LeafNode extends Node {
-        //лист
         char symbol; //символы хранятся только в листах
 
         LeafNode(int frequence, char symbol) {
             super(frequence);
             this.symbol = symbol;
         }
-
         @Override
         void fillCodes(String code) {
             //добрались до листа, значит рекурсия закончена, код уже готов
