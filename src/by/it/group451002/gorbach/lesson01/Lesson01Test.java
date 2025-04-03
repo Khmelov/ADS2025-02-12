@@ -15,6 +15,7 @@ public class Lesson01Test {
     Test kind:          All in package
     Package:            by.it.группа.a_khmelev (тут ваша фамилия)
     Search for test:    In whole project
+
     */
 
     @Test(timeout = 2000)
