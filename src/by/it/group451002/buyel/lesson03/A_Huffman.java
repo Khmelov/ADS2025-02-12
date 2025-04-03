@@ -95,14 +95,13 @@ public class A_Huffman {
         //это будет последний и единственный элемент оставшийся в очереди priorityQueue.
 
         Node root = pq.poll(); // Взять первый элемент
-        if (root != null) {
-            // Если у элемента структура, как у листа (без родительских узлов)
-            if (root instanceof LeafNode) {
-                root.fillCodes("0");
-            } else {
-                root.fillCodes("");
-            }
+        // Если у элемента структура, как у листа (без родительских узлов)
+        if (root instanceof LeafNode) {
+            root.fillCodes("0");
+        } else {
+            root.fillCodes("");
         }
+
 
         // Для вывода закодированной строки
         StringBuilder sb = new StringBuilder();
