@@ -27,7 +27,7 @@ public class A_VideoRegistrator {
 
         List<Double> result = new ArrayList<>();
         Arrays.sort(events); // сортируем события
-        int i = 0;                              //i - это индекс события events[i]
+        int i = 0;     //i - это индекс события events[i]
         int n = events.length; // количество событий
 
         //Комментарии от проверочного решения сохранены для подсказки, но вы можете их удалить.
