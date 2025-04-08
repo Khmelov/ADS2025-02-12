@@ -1,6 +1,5 @@
 package by.it.group451002.koltsov.lesson02;
 
-
 import org.junit.Test;
 
 import java.io.InputStream;
@@ -29,8 +28,7 @@ public class Lesson02Test {
     }
 
     @Test(timeout = 2000)
-    public void checkB_sheduler()
-    {
+    public void checkB_sheduler() {
         B_Sheduler instance = new B_Sheduler();
         B_Sheduler.Event[] events = {new B_Sheduler.Event(0, 3), new B_Sheduler.Event(0, 1), new B_Sheduler.Event(1, 2), new B_Sheduler.Event(3, 5),
                 new B_Sheduler.Event(1, 3), new B_Sheduler.Event(1, 3), new B_Sheduler.Event(1, 3), new B_Sheduler.Event(3, 6),

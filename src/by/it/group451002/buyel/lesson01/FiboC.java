@@ -52,4 +52,3 @@ public class FiboC {
         return Curr % m;
     }
 }
-
