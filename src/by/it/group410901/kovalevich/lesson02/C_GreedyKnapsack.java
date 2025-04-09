@@ -1,62 +1,64 @@
 package by.it.group410901.kovalevich.lesson02;
-/*
-Даны
-1) объем рюкзака 4
-2) число возможных предметов 60
-3) сам набор предметов
-    100 50
-    120 30
-    100 50
-Все это указано в файле (by/it/a_khmelev/lesson02/greedyKnapsack.txt)
 
-Необходимо собрать наиболее дорогой вариант рюкзака для этого объема
-Предметы можно резать на кусочки (т.е. алгоритм будет жадным)
- */
-
-import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class C_GreedyKnapsack {
-    public static void main(String[] args) throws FileNotFoundException {
-        long startTime = System.currentTimeMillis();
-        InputStream inputStream = C_GreedyKnapsack.class.getResourceAsStream("greedyKnapsack.txt");
-        double costFinal = new C_GreedyKnapsack().calc(inputStream);
-        long finishTime = System.currentTimeMillis();
-        System.out.printf("Общая стоимость %f (время %d)", costFinal, finishTime - startTime);
+
+    public static void main(String[] args) {
+        try {
+            long startTime = System.currentTimeMillis();
+            InputStream inputStream = C_GreedyKnapsack.class.getResourceAsStream("greedyKnapsack.txt");
+            double costFinal = new C_GreedyKnapsack().calc(inputStream);
+            long finishTime = System.currentTimeMillis();
+            System.out.printf("Общая стоимость %f (время %d ms)%n", costFinal, finishTime - startTime);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    double calc(InputStream inputStream) throws FileNotFoundException {
+    double calc(InputStream inputStream) {
         Scanner input = new Scanner(inputStream);
-        int n = input.nextInt();      //сколько предметов в файле
-        int W = input.nextInt();      //какой вес у рюкзака
-        Item[] items = new Item[n];   //получим список предметов
-        for (int i = 0; i < n; i++) { //создавая каждый конструктором
+
+        int n = input.nextInt(); // количество предметов
+        int W = input.nextInt(); // вместимость рюкзака
+
+        Item[] items = new Item[n];
+        for (int i = 0; i < n; i++) {
             items[i] = new Item(input.nextInt(), input.nextInt());
         }
-        //покажем предметы
+
+        // Показать предметы
         for (Item item : items) {
             System.out.println(item);
         }
-        System.out.printf("Всего предметов: %d. Рюкзак вмещает %d кг.\n", n, W);
+        System.out.printf("Всего предметов: %d. Рюкзак вмещает %d кг.%n", n, W);
 
-        //тут необходимо реализовать решение задачи
-        //итогом является максимально воможная стоимость вещей в рюкзаке
-        //вещи можно резать на кусочки (непрерывный рюкзак)
-        double result = 0;
-        //тут реализуйте алгоритм сбора рюкзака
-        //будет особенно хорошо, если с собственной сортировкой
-        //кроме того, можете описать свой компаратор в классе Item
+        // Сортировка предметов по убыванию ценности на единицу веса
+        Arrays.sort(items);
 
-        //ваше решение.
-        Item item1 =  new Item(3, 5);
-        Item item2 =  new Item(4, 6);
-        int result1 = item1.compareTo(item2);
-        System.out.println("result1 = "+ result1);
-        System.out.printf("Удалось собрать рюкзак на сумму %f\n", result);
+        double result = 0; // Итоговая стоимость
+        int currentWeight = 0; // Текущий вес рюкзака
+
+        for (Item item : items) {
+            if (currentWeight + item.weight <= W) {
+                // Если предмет помещается целиком
+                currentWeight += item.weight;
+                result += item.cost;
+            } else {
+                // Если предмет помещается частично
+                int remainingWeight = W - currentWeight;
+                result += item.valuePerWeight() * remainingWeight;
+                break; // Рюкзак заполнен
+            }
+        }
+
+        System.out.printf("Удалось собрать рюкзак на сумму %f%n", result);
         return result;
     }
 
+    // Класс для хранения информации о предмете
     private static class Item implements Comparable<Item> {
         int cost;
         int weight;
@@ -66,28 +68,24 @@ public class C_GreedyKnapsack {
             this.weight = weight;
         }
 
+        // Стоимость на единицу веса
+        double valuePerWeight() {
+            return (double) cost / weight;
+        }
+
         @Override
         public String toString() {
             return "Item{" +
-                   "cost=" + cost +
-                   ", weight=" + weight +
-                   '}';
+                    "cost=" + cost +
+                    ", weight=" + weight +
+                    ", valuePerWeight=" + valuePerWeight() +
+                    '}';
         }
 
-        public  int compare(int x, int y) {
-            if (x<y) {
-                return -1;
-            } else if (x==y) {
-                return 0;
-            } else
-                return 1;
-        }
         @Override
         public int compareTo(Item o) {
-            //тут может быть ваш компаратор
-            int result = compare(this.cost,o.cost);
-
-            return 0;
+            // Сортировка по убыванию ценности на единицу веса
+            return Double.compare(o.valuePerWeight(), this.valuePerWeight());
         }
     }
 }
