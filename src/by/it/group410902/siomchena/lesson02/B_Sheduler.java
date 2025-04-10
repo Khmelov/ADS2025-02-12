@@ -33,10 +33,7 @@ public class B_Sheduler {
         //Начало и конец событий могут совпадать.
         List<Event> result;
         result = new ArrayList<>();
-        List<Event> mini;
-        mini = new ArrayList<>();
         Event temp;
-        int m=0;
         for (int i = 0; i < events.length; i++) {
             for (int j = 0; j < events.length - 1 - i; j++) {
                 if (events[j].stop > events[j + 1].stop) {
@@ -47,7 +44,7 @@ public class B_Sheduler {
             }
         }
         result.add(events[0]);
-        Event min=events[0];
+        Event min;
         for (int i=1; i<events.length-1; i++){
             if (events[i].start>=result.getLast().stop)
             {
