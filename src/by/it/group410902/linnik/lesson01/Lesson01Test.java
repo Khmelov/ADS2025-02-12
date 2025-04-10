@@ -1,8 +1,5 @@
 package by.it.group410902.linnik.lesson01;
 
-import by.it.group410902.linnik.lesson01.FiboA;
-import by.it.group410902.linnik.lesson01.FiboB;
-import by.it.group410902.linnik.lesson01.FiboC;
 import org.junit.Test;
 
 import java.math.BigInteger;
