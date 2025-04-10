@@ -1,4 +1,4 @@
-package by.it.group410901.konon;
+package by.it.group410901.konon.lesson01;
 
 /*
  * Даны целые числа 1<=n<=1E18 и 2<=m<=1E5,
