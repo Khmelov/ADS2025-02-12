@@ -15,8 +15,8 @@ public class FiboC {
 
     public static void main(String[] args) {
         FiboC fibo = new FiboC();
-        int n = 555555;
-        int m = 1000;
+        int n = 1;
+        int m = 2;
         System.out.printf("fasterC(%d)=%d \n\t time=%d \n\n", n, fibo.fasterC(n, m), fibo.time());
     }
 
@@ -25,7 +25,7 @@ public class FiboC {
     }
 
     long fasterC(long n, int m) {
-        int curr = 0;
+        int curr = 1;
         int prev = 1;
         int prevPrev = 0;
         for (int i = 2; i <= n; i++) {
