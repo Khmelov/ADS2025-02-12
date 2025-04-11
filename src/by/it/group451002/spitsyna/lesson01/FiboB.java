@@ -1,4 +1,4 @@
-package by.it.group451002.l_spitsyna.lesson01;
+package by.it.group451002.spitsyna.lesson01;
 
 import java.math.BigInteger;
 

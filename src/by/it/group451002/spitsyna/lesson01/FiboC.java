@@ -1,4 +1,4 @@
-package by.it.group451002.l_spitsyna.lesson01;
+package by.it.group451002.spitsyna.lesson01;
 
 /*
  * Даны целые числа 1<=n<=1E18 и 2<=m<=1E5,
