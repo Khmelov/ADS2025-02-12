@@ -8,7 +8,7 @@ import java.math.BigInteger;
 
 public class FiboA {
 
-    private long startTime = System.currentTimeMillis();
+    private final long startTime = System.currentTimeMillis();
 
     public static void main(String[] args) {
         FiboA fibo = new FiboA();
@@ -22,21 +22,19 @@ public class FiboA {
     }
 
     private long time() {
-        long res = System.currentTimeMillis() - startTime;
-        startTime = System.currentTimeMillis();
-        return res;
+        return System.currentTimeMillis() - startTime;
     }
 
-    private int calc(int n) {
-        // Простейший вариант рекурсивного вычисления чисел Фибоначчи
+    private int calc(int n) { // Вычисляет n-е число Фибоначчи с помощью рекурсии.
+        // Простейший вариант рекурсивного вычисления чисел Фибоначчи. Временная сложность: O(2^n)
         if (n <= 1) {
             return n;
         }
         return calc(n - 1) + calc(n - 2);
     }
 
-    BigInteger slowA(Integer n) {
-        // Рекурсивное вычисление чисел Фибоначчи с использованием BigInteger
+    BigInteger slowA(Integer n) { // Так же вычисляет n-е число Фибоначчи с помощью рекурсии, но использует класс BigInteger для работы с большими числами.
+        // Рекурсивное вычисление чисел Фибоначчи с использованием BigInteger. Временная сложность: O(2^n)
         if (n == 0) {
             return BigInteger.ZERO;
         }
