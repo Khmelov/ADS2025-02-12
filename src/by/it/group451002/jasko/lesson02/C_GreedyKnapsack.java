@@ -26,7 +26,7 @@ public class C_GreedyKnapsack {
         System.out.printf("Общая стоимость %f (время %d)", costFinal, finishTime - startTime); // Выводим результат
     }
 
-    double calc(InputStream inputStream) { // Удалил throws FileNotFoundException
+    double calc(InputStream inputStream) {
         Scanner input = new Scanner(inputStream);
         int n = input.nextInt();      // Считываем количество предметов из файла
         int W = input.nextInt();      // Считываем вместимость рюкзака
@@ -66,11 +66,13 @@ public class C_GreedyKnapsack {
         int cost; // Стоимость предмета
         int weight; // Вес предмета
 
+        // Конструктор для создания предмета с заданной стоимостью и весом
         Item(int cost, int weight) {
-            this.cost = cost;
-            this.weight = weight;
+            this.cost = cost; // Запоминаем стоимость
+            this.weight = weight; // Запоминаем вес
         }
 
+        // Метод для вывода информации о предмете в виде строки
         @Override
         public String toString() {
             return "Item{" +
