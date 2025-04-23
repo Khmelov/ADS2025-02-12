@@ -16,6 +16,7 @@ package by.it.group451004.kozlov.lesson02;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Scanner;
+import java.util.Arrays;
 
 public class C_GreedyKnapsack {
     public static void main(String[] args) throws FileNotFoundException {
@@ -40,16 +41,24 @@ public class C_GreedyKnapsack {
         }
         System.out.printf("Всего предметов: %d. Рюкзак вмещает %d кг.\n", n, W);
 
-        //тут необходимо реализовать решение задачи
-        //итогом является максимально воможная стоимость вещей в рюкзаке
-        //вещи можно резать на кусочки (непрерывный рюкзак)
-        double result = 0;
-        //тут реализуйте алгоритм сбора рюкзака
-        //будет особенно хорошо, если с собственной сортировкой
-        //кроме того, можете описать свой компаратор в классе Item
+        // Сортируем предметы по стоимости за единицу веса (убывание)
+        Arrays.sort(items);
 
-        //ваше решение.
+        double result = 0; // Общая стоимость
+        int remainingWeight = W; // Оставшийся вес рюкзака
 
+        for (Item item : items) {
+            if (remainingWeight == 0) break; // Если рюкзак заполнен, завершаем
+            if (item.weight <= remainingWeight) {
+                // Берём весь предмет
+                result += item.cost;
+                remainingWeight -= item.weight;
+            } else {
+                // Берём часть предмета
+                result += item.costPerWeight() * remainingWeight;
+                remainingWeight = 0;
+            }
+        }
 
         System.out.printf("Удалось собрать рюкзак на сумму %f\n", result);
         return result;
@@ -64,20 +73,22 @@ public class C_GreedyKnapsack {
             this.weight = weight;
         }
 
+        double costPerWeight() {
+            return (double) cost / weight;
+        }
+
         @Override
         public String toString() {
             return "Item{" +
-                   "cost=" + cost +
-                   ", weight=" + weight +
-                   '}';
+                    "cost=" + cost +
+                    ", weight=" + weight +
+                    '}';
         }
 
         @Override
         public int compareTo(Item o) {
-            //тут может быть ваш компаратор
-
-
-            return 0;
+            // Сортировка по стоимости за единицу веса (убывание)
+            return Double.compare(o.costPerWeight(), this.costPerWeight());
         }
     }
 }
