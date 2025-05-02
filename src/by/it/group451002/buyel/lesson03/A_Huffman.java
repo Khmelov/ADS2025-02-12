@@ -62,9 +62,6 @@ public class A_Huffman {
         Scanner scanner = new Scanner(inputStream);
         String s = scanner.next();
 
-        //все комментарии от тестового решения были оставлены т.к. это задание A.
-        //если они вам мешают их можно удалить
-
         Map<Character, Integer> count = new HashMap<>();
 
         //1. переберем все символы по очереди и рассчитаем их частоту в Map count
@@ -99,6 +96,7 @@ public class A_Huffman {
         if (root instanceof LeafNode) {
             root.fillCodes("0");
         } else {
+            assert root != null;
             root.fillCodes("");
         }
 

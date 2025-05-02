@@ -1,7 +1,9 @@
 package by.it.group451002.buyel.lesson03;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 // Lesson 3. B_Huffman.
@@ -42,22 +44,53 @@ import java.util.Scanner;
 
 public class B_Huffman {
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws IOException {
         InputStream inputStream = B_Huffman.class.getResourceAsStream("dataB.txt");
         B_Huffman instance = new B_Huffman();
         String result = instance.decode(inputStream);
         System.out.println(result);
     }
 
-    String decode(InputStream inputStream) throws FileNotFoundException {
+    String decode(InputStream inputStream) throws IOException {
         StringBuilder result = new StringBuilder();
         //прочитаем строку для кодирования из тестового файла
         Scanner scanner = new Scanner(inputStream);
-        Integer count = scanner.nextInt();
-        Integer length = scanner.nextInt();
+        int count = scanner.nextInt();
+        int length = scanner.nextInt();
+        scanner.nextLine();
         //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! НАЧАЛО ЗАДАЧИ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
         //тут запишите ваше решение
 
+        Map<String, Integer> hashCharacter = new HashMap<>();
+
+        String[] parts = new String[2];
+        byte i;
+        for (i = 0; i < count; i++) {
+            parts = scanner.nextLine().split(": ");
+            hashCharacter.put(parts[0], Integer.valueOf(parts[1]));
+        }
+
+        char[] check;
+        check = scanner.nextLine().toCharArray();
+
+        int ind = 0, j = ind;
+        while (j < length) {
+            do {
+                ind += 1;
+            } while ((check[ind-1] != '0') && (ind < check.length));
+
+            char[] elem = new char[ind-j/*+1*/];
+            for (byte k = 0; k < ind-j; k++) {
+                elem[k] = check[j+k];
+            }
+            for (var element : hashCharacter.entrySet()) {
+                // Если значение элемента совпала с массивом elem
+                if (Arrays.equals(elem, element.getValue().toString().toCharArray())) {
+                    result.append(element.getKey());
+                }
+            }
+            j = ind;
+        }
 
         //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! КОНЕЦ ЗАДАЧИ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
         return result.toString(); //01001100100111

@@ -44,11 +44,11 @@ public class C_HeapMax {
 
     //эта процедура читает данные из файла, ее можно не менять.
     Long findMaxValue(InputStream stream) {
-        Long maxValue = 0L;
+        long maxValue = 0L;
         MaxHeap heap = new MaxHeap();
         //прочитаем строку для кодирования из тестового файла
         Scanner scanner = new Scanner(stream);
-        Integer count = scanner.nextInt();
+        int count = scanner.nextInt();
         for (int i = 0; i < count; ) {
             String s = scanner.nextLine();
             if (s.equalsIgnoreCase("extractMax")) {
@@ -72,26 +72,55 @@ public class C_HeapMax {
         //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! НАЧАЛО ЗАДАЧИ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
         //тут запишите ваше решение.
         //Будет мало? Ну тогда можете его собрать как Generic и/или использовать в варианте B
-        private List<Long> heap = new ArrayList<>();
+            private List<Long> heap = new ArrayList<>();
 
-        int siftDown(int i) { //просеивание вверх
+            void insert(Long value) {
+                heap.add(value);
+                siftUp(heap.size() - 1);
+            }
 
-            return i;
-        }
+            Long extractMax() {
+                if (heap.isEmpty()) return null;
+                Long max = heap.get(0);
+                heap.set(0, heap.get(heap.size() - 1));
+                heap.remove(heap.size() - 1);
+                siftDown(0);
+                return max;
+            }
 
-        int siftUp(int i) { //просеивание вниз
+            void siftUp(int i) {
+                while (i > 0 && heap.get(i) > heap.get((i - 1) / 2)) {
+                    swap(i, (i - 1) / 2);
+                    i = (i - 1) / 2;
+                }
+            }
 
-            return i;
-        }
+            void siftDown(int i) {
+                int left, right, largest;
+                while (true) {
+                    left = i*2 + 1;
+                    right = i*2 + 2;
+                    largest = i;
 
-        void insert(Long value) { //вставка
-        }
+                    if (left < heap.size() && heap.get(left) > heap.get(largest)) {
+                        largest = left;
+                    }
+                    if (right < heap.size() && heap.get(right) > heap.get(largest)) {
+                        largest = right;
+                    }
 
-        Long extractMax() { //извлечение и удаление максимума
-            Long result = null;
+                    if (largest == i) break;
 
-            return result;
-        }
+                    swap(i, largest);
+                    i = largest;
+                }
+            }
+
+            private void swap(int a, int b) {
+                Long temp = heap.get(a);
+                heap.set(a, heap.get(b));
+                heap.set(b, temp);
+            }
         //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! КОНЕЦ ЗАДАЧИ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
     }
 
