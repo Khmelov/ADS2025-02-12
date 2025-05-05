@@ -1,4 +1,5 @@
-package by.it.a_khmelev.lesson02;
+
+package by.it.group410902.derzhavskaya_e.lesson02;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,8 +28,11 @@ public class A_VideoRegistrator {
         List<Double> result;
         result = new ArrayList<>();
         int i = 0;                              //i - это индекс события events[i]
-         Arrays.sort(events);                    //сортировка по времени событий
-
+        Arrays.sort(events);
+        //Комментарии от проверочного решения сохранены для подсказки, но вы можете их удалить.
+        //Подготовка к жадному поглощению массива событий
+        //hint: сортировка Arrays.sort обеспечит скорость алгоритма
+        //C*(n log n) + C1*n = O(n log n)
         while (i < events.length) {
             double start = events[i];           //время старта видеокамеры
             result.add(start);                  //добавляем в список включений
@@ -38,11 +42,6 @@ public class A_VideoRegistrator {
                 i++;
             }
         }
-        //Комментарии от проверочного решения сохранены для подсказки, но вы можете их удалить.
-        //Подготовка к жадному поглощению массива событий
-        //hint: сортировка Arrays.sort обеспечит скорость алгоритма
-        //C*(n log n) + C1*n = O(n log n)
-
         //пока есть незарегистрированные события
         //получим одно событие по левому краю
         //и запомним время старта видеокамеры
@@ -54,3 +53,4 @@ public class A_VideoRegistrator {
         return result;                        //вернем итог
     }
 }
+
