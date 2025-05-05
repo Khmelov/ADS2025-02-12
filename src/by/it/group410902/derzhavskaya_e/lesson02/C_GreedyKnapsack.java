@@ -16,6 +16,7 @@ package by.it.group410902.derzhavskaya_e.lesson02;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Scanner;
+import java.util.Arrays;
 
 public class C_GreedyKnapsack {
     public static void main(String[] args) throws FileNotFoundException {
@@ -49,10 +50,25 @@ public class C_GreedyKnapsack {
         //кроме того, можете описать свой компаратор в классе Item
 
         //ваше решение.
+        Arrays.sort(items); // сортировка по убыванию удельной ценности
 
+        int remainingWeight = W;
+        for (Item item : items) {
+            if (remainingWeight == 0) break;
+            if (item.weight <= remainingWeight) {
+                result += item.cost;
+                remainingWeight -= item.weight;
+            } else {
+                double fraction = (double) remainingWeight / item.weight;
+                result += item.cost * fraction;
+                remainingWeight = 0;
+            }
+        }
 
         System.out.printf("Удалось собрать рюкзак на сумму %f\n", result);
         return result;
+
+
     }
 
     private static class Item implements Comparable<Item> {
@@ -74,10 +90,13 @@ public class C_GreedyKnapsack {
 
         @Override
         public int compareTo(Item o) {
-            //тут может быть ваш компаратор
 
+            double thisRatio = (double) this.cost / this.weight;
+            double otherRatio = (double) o.cost / o.weight;
+            return Double.compare(otherRatio, thisRatio); // по убыванию
 
-            return 0;
         }
     }
 }
+
+

@@ -33,7 +33,25 @@ public class B_Sheduler {
         result = new ArrayList<>();
         //ваше решение.
 
+// события, которые попадают в интервал
+        List<Event> filtered = new ArrayList<>();
+        for (Event e : events) {
+            if (e.start >= from && e.stop <= to) {
+                filtered.add(e);
+            }
+        }
 
+        // сортируем события по времени окончания
+        filtered.sort((e1, e2) -> Integer.compare(e1.stop, e2.stop));
+
+        int currentTime = from;
+
+        for (Event e : filtered) {
+            if (e.start >= currentTime) {
+                result.add(e);
+                currentTime = e.stop;
+            }
+        }
         return result;          //вернем итог
     }
 
