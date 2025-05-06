@@ -1,4 +1,4 @@
-package by.it.group451002.Kita.lesson01;
+package by.it.group451002.kita.lesson01;
 
 /*
  * Даны целые числа 1<=n<=1E18 и 2<=m<=1E5,
@@ -6,7 +6,6 @@ package by.it.group451002.Kita.lesson01;
  * время расчета должно быть не более 2 секунд
  */
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 
 public class FiboC {

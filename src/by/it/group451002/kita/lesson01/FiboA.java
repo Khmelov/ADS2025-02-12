@@ -1,4 +1,4 @@
-package by.it.group451002.Kita.lesson01;
+package by.it.group451002.kita.lesson01;
 
 import java.math.BigInteger;
 
