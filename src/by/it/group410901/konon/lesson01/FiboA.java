@@ -1,4 +1,4 @@
-package by.it.group410901.konon;
+package by.it.group410901.konon.lesson01;
 
 import java.math.BigInteger;
 
@@ -46,7 +46,4 @@ public class FiboA {
         if(n==1) return BigInteger.ONE;
         return slowA(n-1).add(slowA(n-2));
     }
-
-
 }
-

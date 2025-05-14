@@ -1,4 +1,4 @@
-package by.it.group410901.konon;
+package by.it.group410901.konon.lesson01;
 
 import java.math.BigInteger;
 
@@ -36,6 +36,4 @@ public class FiboB {
         }
         return fibArr[n];
     }
-
 }
-
