@@ -63,6 +63,7 @@ public class B_Huffman {
 
         Map<String, Integer> hashCharacter = new HashMap<>();
 
+        // Распределение на <Char> <Integer>
         String[] parts = new String[2];
         byte i;
         for (i = 0; i < count; i++) {
@@ -75,14 +76,17 @@ public class B_Huffman {
 
         int ind = 0, j = ind;
         while (j < length) {
+            // Пока не 0
             do {
                 ind += 1;
             } while ((check[ind-1] != '0') && (ind < check.length));
 
-            char[] elem = new char[ind-j/*+1*/];
+            // Вносим в массив elem (этот массив = код символа)
+            char[] elem = new char[ind-j];
             for (byte k = 0; k < ind-j; k++) {
                 elem[k] = check[j+k];
             }
+
             for (var element : hashCharacter.entrySet()) {
                 // Если значение элемента совпала с массивом elem
                 if (Arrays.equals(elem, element.getValue().toString().toCharArray())) {
