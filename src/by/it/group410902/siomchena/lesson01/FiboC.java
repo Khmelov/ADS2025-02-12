@@ -11,7 +11,7 @@ public class FiboC {
     private long startTime = System.currentTimeMillis();
 
     public static void main(String[] args) {
-        by.it.group410902.siomchena.lesson01.FiboC fibo = new by.it.group410902.siomchena.lesson01.FiboC();
+        FiboC fibo = new FiboC();
         int n = 55555;
         int m = 1000;
         System.out.printf("fasterC(%d)=%d \n\t time=%d \n\n", n, fibo.fasterC(n, m), fibo.time());
