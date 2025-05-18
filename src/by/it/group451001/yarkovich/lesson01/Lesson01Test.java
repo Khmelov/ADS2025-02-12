@@ -1,4 +1,4 @@
-package by.it.group451001.yarkovich;
+package by.it.group451001.yarkovich.lesson01;
 
 import org.junit.Test;
 
