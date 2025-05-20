@@ -42,7 +42,7 @@ public class FiboC {
         for (int i = 0; i < m * m; i++) {
             long temp = (num_before + num_after) % m;
             num_before = num_after;
-            num_after = temp;
+            num_after = temp; //p
 
             if (num_before == 0 && num_after == 1) {
                 return i + 1;
