@@ -1,8 +1,9 @@
-package by.it.a_khmelev.lesson05;
+package by.it.group410901.kvitchenko.lesson05;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Scanner;
+import java.util.Arrays;
 
 /*
 Видеорегистраторы и площадь.
@@ -68,10 +69,56 @@ public class A_QSort {
         }
         //тут реализуйте логику задачи с применением быстрой сортировки
         //в классе отрезка Segment реализуйте нужный для этой задачи компаратор
+        // сортируем отрезки по началу (и по окончанию если начала равны)
+        quickSort(segments, 0, segments.length - 1);
 
+        // для каждой точки проверяем сколько отрезков её содержат
+        for (int i = 0; i < m; i++) {
+            int count = 0;
+            for (Segment segment : segments) { 
+                if (points[i] < segment.start) {
+                    // так как отрезки отсортированы, дальше можно не проверять
+                    break;
+                }
+                if (points[i] >= segment.start && points[i] <= segment.stop) {
+                    count++;
+                }
+            }
+            result[i] = count;
+        }
 
         //!!!!!!!!!!!!!!!!!!!!!!!!!     КОНЕЦ ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
         return result;
+    }
+
+    private void quickSort(Segment[] array, int low, int high) {
+        if (low < high) {
+            int pi = partition(array, low, high);
+
+            quickSort(array, low, pi - 1);
+            quickSort(array, pi + 1, high);
+        }
+    }
+
+    private int partition(Segment[] array, int low, int high) {
+        Segment pivot = array[high];
+        int i = (low - 1);
+        for (int j = low; j < high; j++) {
+            if (array[j].compareTo(pivot) <= 0) {
+                i++;
+
+                // меняем местами элементы
+                Segment temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+            }
+        }
+
+        Segment temp = array[i + 1];
+        array[i + 1] = array[high];
+        array[high] = temp;
+
+        return i + 1;
     }
 
     //отрезок

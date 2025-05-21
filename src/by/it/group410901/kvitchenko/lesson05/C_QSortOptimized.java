@@ -1,4 +1,4 @@
-package by.it.a_khmelev.lesson05;
+package by.it.group410901.kvitchenko.lesson05;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -64,9 +64,62 @@ public class C_QSortOptimized {
         //тут реализуйте логику задачи с применением быстрой сортировки
         //в классе отрезка Segment реализуйте нужный для этой задачи компаратор
 
+        quickSort(segments, 0, n-1);
+        for (int i = 0; i < m; i++) {
+            int j = 0;
+            while (j<n && segments[j].start <= points[i]) {
+                if (segments[j].stop >= points[i]) {
+                    result[i] += 1;
+                }
+                j++;
+            }
 
+        }
         //!!!!!!!!!!!!!!!!!!!!!!!!!     КОНЕЦ ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
         return result;
+    }
+
+    public static void quickSort(Segment[] items, int low, int high) {
+        while (low < high) {
+            // Находим индекс pivot
+            int pivotIndex = partition(items, low, high);
+
+            // Рекурсивно сортируем левую и правую части
+            quickSort(items, low, pivotIndex - 1);
+            //quickSort(items, pivotIndex + 1, high);
+            low=pivotIndex+1;
+        }
+    }
+
+    private static int partition(Segment[] items, int low, int high) {
+        // Используем первый элемент как pivot
+        Segment pivot = items[low];
+        int j = low;
+
+        for (int i = low + 1; i < high; i++) {
+            // Если текущий элемент меньше или равен pivot
+            if (items[i].compareTo(pivot) < 0) {
+                j++;
+                // Меняем местами items[i] и items[j]
+                swap(items, j, i);
+            }
+            if (items[i].compareTo(pivot) == 0) {
+                j++;
+            }
+
+        }
+
+
+        // Меняем местами items[i + 1] и pivot (items[high])
+        swap(items, low, j);
+
+        return j; // Возвращаем индекс опорного элемента
+    }
+
+    private static void swap(Segment[] items, int i, int j) {
+        Segment temp = items[i];
+        items[i] = items[j];
+        items[j] = temp;
     }
 
     //отрезок

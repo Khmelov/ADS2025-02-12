@@ -1,4 +1,4 @@
-package by.it.a_khmelev.lesson05;
+package by.it.group410901.kvitchenko.lesson05;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -40,7 +40,22 @@ public class B_CountSort {
         }
         //тут реализуйте логику задачи с применением сортировки подсчетом
 
+        // Создаем массив для подсчета количества каждого числа
+        int[] count = new int[11];
 
+        // Сколько раз каждое число встречается
+        for (int i = 0; i < n; i++) {
+            count[points[i]]++;
+        }
+
+        // Перезаписываем исходный массив в отсортированном порядке
+        int index = 0;
+        for (int i = 0; i <= 10; i++) {
+            while (count[i] > 0) {
+                points[index++] = i;
+                count[i]--;
+            }
+        }
         //!!!!!!!!!!!!!!!!!!!!!!!!!     КОНЕЦ ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
         return points;
     }
