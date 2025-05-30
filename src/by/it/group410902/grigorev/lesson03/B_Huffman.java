@@ -1,4 +1,4 @@
-package by.it.group410902.kukhto.les3;
+package by.it.group410902.grigorev.lesson03;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -51,7 +51,7 @@ public class B_Huffman {
         System.out.println(result);
     }
 
-    String decode(InputStream inputStream) throws FileNotFoundException {
+    public String decode(InputStream inputStream) throws FileNotFoundException {
         StringBuilder result = new StringBuilder();
         //прочитаем строку для кодирования из тестового файла
         Scanner scanner = new Scanner(inputStream);
