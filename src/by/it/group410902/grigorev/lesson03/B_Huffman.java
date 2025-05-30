@@ -1,4 +1,4 @@
-package by.it.group410902.kukhto.les3;
+package by.it.group410902.grigorev.lesson03;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
