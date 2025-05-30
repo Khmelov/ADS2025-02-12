@@ -51,7 +51,7 @@ public class B_Huffman {
         System.out.println(result);
     }
 
-    public String decode(InputStream inputStream) throws FileNotFoundException {
+    String decode(InputStream inputStream) throws FileNotFoundException {
         StringBuilder result = new StringBuilder();
         //прочитаем строку для кодирования из тестового файла
         Scanner scanner = new Scanner(inputStream);
