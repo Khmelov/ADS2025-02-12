@@ -45,19 +45,18 @@ public class C_GreedyKnapsack {
 
         Arrays.sort(items, (o1, o2) -> Double.compare(o2.getCostPerWeight(), o1.getCostPerWeight()));
 
-        double result = 0;  // Общая стоимость набора предметов
+        double result = 0;
 
         for (Item item : items) {
             if (W == 0) break;
             if (item.weight <= W) {
-                // Берём весь предмет
                 result += item.cost;
                 W -= item.weight;
-                System.out.println("Берём полностью: " + item);
+                //System.out.println("Берём полностью: " + item);
             } else {
                 double fraction = (double) W / item.weight;
                 result += item.cost * fraction;
-                System.out.println("Берём " + (fraction * 100) + "% от предмета: " + item);
+                //System.out.println("Берём " + (fraction * 100) + "% от предмета: " + item);
                 W = 0;
             }
         }

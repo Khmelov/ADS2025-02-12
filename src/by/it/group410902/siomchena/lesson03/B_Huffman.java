@@ -2,6 +2,8 @@ package by.it.group410902.siomchena.lesson03;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 // Lesson 3. B_Huffman.
@@ -51,16 +53,39 @@ public class B_Huffman {
 
     String decode(InputStream inputStream) throws FileNotFoundException {
         StringBuilder result = new StringBuilder();
-        //прочитаем строку для кодирования из тестового файла
         Scanner scanner = new Scanner(inputStream);
-        Integer count = scanner.nextInt();
-        Integer length = scanner.nextInt();
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! НАЧАЛО ЗАДАЧИ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-        //тут запишите ваше решение
 
+        // Считываем количество различных букв и длину закодированной строки
+        int count = scanner.nextInt();
+        int length = scanner.nextInt();
+        scanner.nextLine(); // переходим на новую строку
 
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! КОНЕЦ ЗАДАЧИ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-        return result.toString(); //01001100100111
+        // Создаем таблицу для декодирования
+        Map<String, Character> codeMap = new HashMap<>();
+
+        // Считываем коды символов
+        for (int i = 0; i < count; i++) {
+            String line = scanner.nextLine();
+            String[] parts = line.split(": ");
+            char letter = parts[0].charAt(0);
+            String code = parts[1];
+            codeMap.put(code, letter);
+        }
+
+        // Считываем закодированную строку
+        String encodedString = scanner.nextLine();
+
+        // Декодируем строку
+        StringBuilder tempCode = new StringBuilder();
+        for (char bit : encodedString.toCharArray()) {
+            tempCode.append(bit);
+            if (codeMap.containsKey(tempCode.toString())) {
+                result.append(codeMap.get(tempCode.toString()));
+                tempCode.setLength(0); // очищаем временный код
+            }
+        }
+
+        return result.toString();
     }
 
 

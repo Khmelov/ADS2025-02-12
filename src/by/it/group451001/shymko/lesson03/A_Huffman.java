@@ -92,7 +92,6 @@ public class A_Huffman {
             InternalNode internalNode = new InternalNode(left, right);
             priorityQueue.add(internalNode);
         }
-
         //4. последний из родителей будет корнем этого дерева
         //это будет последний и единственный элемент оставшийся в очереди priorityQueue.
 

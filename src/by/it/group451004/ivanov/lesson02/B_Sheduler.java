@@ -1,6 +1,9 @@
 package by.it.group451004.ivanov.lesson02;
 
+import java.io.Console;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 /*
 Даны интервальные события events
@@ -24,17 +27,73 @@ public class B_Sheduler {
         System.out.println(starts);                                 //покажем рассчитанный график занятий
     }
 
+    public static void insertionSort(Event[] events) {
+        for (int i = 1; i < events.length; i++) {
+            Event current = events[i];
+            int j = i - 1;
+
+            while (j >= 0 && (events[j].start > current.start ||
+                    (events[j].start == current.start && events[j].stop > current.stop))) {
+                events[j + 1] = events[j];
+                j--;
+            }
+
+            events[j + 1] = current;
+        }
+    }
+
     List<Event> calcStartTimes(Event[] events, int from, int to) {
-        //Events - события которые нужно распределить в аудитории
-        //в период [from, int] (включительно).
-        //оптимизация проводится по наибольшему числу непересекающихся событий.
-        //Начало и конец событий могут совпадать.
         List<Event> result;
         result = new ArrayList<>();
-        //ваше решение.
+        int best = 0;
+        int bestSize = 0;
 
+        insertionSort(events);
 
-        return result;          //вернем итог
+        for (int i = 0; i < events.length-1; i++) {
+            if (events[i].start < from)
+                continue;
+
+            List<Event> tryArr;
+            tryArr = new ArrayList<>();
+
+            tryArr.add(events[i]);
+            int j = i + 1;
+            int time = events[i].stop;
+            while (j < events.length) {
+                if (events[j].stop > to)
+                    break;
+
+                if (events[j].start >= time) {
+                    time = events[j].stop;
+                    tryArr.add(events[j]);
+                }
+
+                j++;
+            }
+
+            if (tryArr.size() > bestSize) {
+                best = i;
+                bestSize = tryArr.size();
+            }
+
+        }
+
+        result.add(events[best]);
+        int j = best + 1;
+        int time = events[best].stop;
+        while (j < events.length) {
+            if (events[j].stop > to)
+                break;
+
+            if (events[j].start >= time) {
+                time = events[j].stop;
+                result.add(events[j]);
+            }
+            j++;
+        }
+
+        return result;
     }
 
     //событие у аудитории(два поля: начало и конец)
