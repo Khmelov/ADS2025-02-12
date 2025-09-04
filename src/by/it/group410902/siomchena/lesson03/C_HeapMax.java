@@ -69,31 +69,63 @@ public class C_HeapMax {
     }
 
     private class MaxHeap {
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! НАЧАЛО ЗАДАЧИ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-        //тут запишите ваше решение.
-        //Будет мало? Ну тогда можете его собрать как Generic и/или использовать в варианте B
         private List<Long> heap = new ArrayList<>();
 
-        int siftDown(int i) { //просеивание вверх
+        int siftDown(int i) { // Просеивание вниз
+            int leftChild, rightChild, largest;
+            while (2 * i + 1 < heap.size()) {
+                leftChild = 2 * i + 1;
+                rightChild = 2 * i + 2;
+                largest = i;
 
+                if (leftChild < heap.size() && heap.get(leftChild) > heap.get(largest)) {
+                    largest = leftChild;
+                }
+                if (rightChild < heap.size() && heap.get(rightChild) > heap.get(largest)) {
+                    largest = rightChild;
+                }
+                if (largest == i) break;
+
+                swap(i, largest);
+                i = largest;
+            }
             return i;
         }
 
-        int siftUp(int i) { //просеивание вниз
-
+        int siftUp(int i) { // Просеивание вверх
+            while (i > 0) {
+                int parent = (i - 1) / 2;
+                if (heap.get(i) <= heap.get(parent)) break;
+                swap(i, parent);
+                i = parent;
+            }
             return i;
         }
 
-        void insert(Long value) { //вставка
+        void insert(Long value) { // Вставка элемента
+            heap.add(value);
+            siftUp(heap.size() - 1);
         }
 
-        Long extractMax() { //извлечение и удаление максимума
-            Long result = null;
-
-            return result;
+        Long extractMax() { // Извлечение максимального элемента
+            if (heap.isEmpty()) return null;
+            long maxValue = heap.get(0);
+            heap.set(0, heap.get(heap.size() - 1));
+            heap.remove(heap.size() - 1);
+            if (!heap.isEmpty()) {
+                siftDown(0);
+            }
+            return maxValue;
         }
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! КОНЕЦ ЗАДАЧИ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+
+        private void swap(int i, int j) { // Вспомогательный метод для обмена элементов
+            long temp = heap.get(i);
+            heap.set(i, heap.get(j));
+            heap.set(j, temp);
+        }
     }
+
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! КОНЕЦ ЗАДАЧИ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
 
     // РЕМАРКА. Это задание исключительно учебное.
     // Свои собственные кучи нужны довольно редко.

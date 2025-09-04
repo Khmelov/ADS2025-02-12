@@ -3,8 +3,8 @@ package by.it.group451002.sidarchuk.lesson01;
 import java.math.BigInteger;
 
 /*
- * Вам необходимо выполнить способ вычисления чисел Фибоначчи со вспомогательным массивом
- * без ограничений на размер результата (BigInteger)
+ * Вам необходимо выполнить способ вычисления чисел Фибоначчи со вспомогательным массивом без
+ * ограничений на размер результата (BigInteger)
  */
 
 public class FiboB {
@@ -23,6 +23,7 @@ public class FiboB {
     }
 
     BigInteger fastB(Integer n) {
+
         //здесь нужно реализовать вариант с временем O(n) и памятью O(n)
         if (n<0){
             throw new IllegalArgumentException("n must be non-negative");
