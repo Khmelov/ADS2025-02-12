@@ -1,8 +1,9 @@
-package by.it.group410902.dziatko.lesson03;
-
+package by.it.group410902.vidilin.lesson03;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 // Lesson 3. B_Huffman.
@@ -58,61 +59,27 @@ public class B_Huffman {
         Integer length = scanner.nextInt();
         //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! НАЧАЛО ЗАДАЧИ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
         //тут запишите ваше решение
-        Node root = new Node(' ');
-        for(int i = 0;i<count;i++) {
-            String temp_sym = scanner.next();
-            Node temp_no = root;
-            String code = Integer.toString(scanner.nextInt());
-            for (int j = 0; j < code.length(); j++) {
-                if (code.charAt(j) == '0') {
-                    if(temp_no.left == null) {
-                        temp_no.left = new Node(' ');
-                    }
-                    temp_no = temp_no.left;
-                }else{
-                    if(temp_no.right == null) {
-                        temp_no.right = new Node(' ');
-                    }
-                    temp_no = temp_no.right;
-                }
-            }
-            temp_no.symbol = temp_sym.charAt(0);
+        Map<String, Character> codes = new HashMap<>();
+        for (int i = 0; i < count; i++) {
+            String line = scanner.next();
+            String[] parts = line.split(":");
+            char letter = parts[0].charAt(0);
+            String code = scanner.next();
+            codes.put(code, letter);
         }
-        String code = scanner.next();
-        Node temp_node = root;
-        for (int i = 0; i < code.length(); i++) {
-            if(temp_node.left == null && temp_node.right == null){
-                result.append(temp_node.symbol);
-                temp_node = root;
-                i--;
-            }else {
-                if (code.charAt(i) == '0') {
-                    temp_node = temp_node.left;
-                }else {
-                    temp_node = temp_node.right;
-                }
+        String encodedString = scanner.next();
+        StringBuilder currentCode = new StringBuilder();
+        for (int i = 0; i < encodedString.length(); i++) {
+            currentCode.append(encodedString.charAt(i));
+            if (codes.containsKey(currentCode.toString())) {
+                result.append(codes.get(currentCode.toString()));
+                currentCode = new StringBuilder();
             }
         }
-        result.append(temp_node.symbol);
-
-
-
-
-
 
         //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! КОНЕЦ ЗАДАЧИ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
         return result.toString(); //01001100100111
     }
 
-        class Node {
-            char symbol;
-            Node left;
-            Node right;
-
-            Node(char symbol_in){
-                this.symbol  = symbol_in;
-            }
-
-        }
 
 }
