@@ -48,10 +48,8 @@ public class A_EditDist {
         if (j == 0) return i;
 
         if (s1.charAt(i - 1) == s2.charAt(j - 1)) {
-            // Символы равны, двигаемся дальше без операции
             return editDistance(s1, s2, i - 1, j - 1);
         } else {
-            // Выбираем минимальную из трёх возможных операций
             int insert = editDistance(s1, s2, i, j - 1);     // вставка
             int delete = editDistance(s1, s2, i - 1, j);     // удаление
             int replace = editDistance(s1, s2, i - 1, j - 1); // замена
