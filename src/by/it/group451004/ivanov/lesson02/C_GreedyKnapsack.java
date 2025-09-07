@@ -26,6 +26,16 @@ public class C_GreedyKnapsack {
         System.out.printf("Общая стоимость %f (время %d)", costFinal, finishTime - startTime);
     }
 
+    void sortItemsByCoast(C_GreedyKnapsack.Item[] items) {
+        for (int i = 1; i < items.length; i++)
+            for (int j = i; (j > 0 &&
+                    (items[j-1].cost / items[j-1].weight) < (items[j].cost / items[j].weight)); j--) {
+                Item temp = items[j];
+                items[j] = items[j-1];
+                items[j-1] = temp;
+            }
+    }
+
     double calc(InputStream inputStream) throws FileNotFoundException {
         Scanner input = new Scanner(inputStream);
         int n = input.nextInt();      //сколько предметов в файле
@@ -48,7 +58,14 @@ public class C_GreedyKnapsack {
         //будет особенно хорошо, если с собственной сортировкой
         //кроме того, можете описать свой компаратор в классе Item
 
-        //ваше решение.
+        sortItemsByCoast(items);
+        int pointer = 0;
+        while (W > 0) {
+            double currentWeight = Math.min(items[pointer].weight, W);
+            result += items[pointer].cost * (currentWeight / items[pointer].weight);
+            W -= currentWeight;
+            pointer++;
+        }
 
 
         System.out.printf("Удалось собрать рюкзак на сумму %f\n", result);
