@@ -54,7 +54,6 @@ public class C_EditDist {
 
         int[][] dp = new int[n + 1][m + 1];
 
-        // Шаг 1: Заполнение таблицы расстояний
         for (int i = 0; i <= n; i++) dp[i][0] = i;
         for (int j = 0; j <= m; j++) dp[0][j] = j;
 
@@ -77,7 +76,7 @@ public class C_EditDist {
 
         while (i > 0 || j > 0) {
             if (i > 0 && j > 0 && one.charAt(i - 1) == two.charAt(j - 1)) {
-                result.insert(0, "#,"); // символы равны — копирование
+                result.insert(0, "#,");
                 i--;
                 j--;
             } else if (i > 0 && j > 0 && dp[i][j] == dp[i - 1][j - 1] + 1) {
@@ -92,7 +91,6 @@ public class C_EditDist {
                 i--;
             }
         }
-
         return result.toString();
         //!!!!!!!!!!!!!!!!!!!!!!!!!     КОНЕЦ ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
     }

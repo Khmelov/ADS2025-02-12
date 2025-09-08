@@ -13,50 +13,59 @@ import java.util.Scanner;
 Необходимо:
     Решить задачу МЕТОДАМИ ДИНАМИЧЕСКОГО ПРОГРАММИРОВАНИЯ
     Рекурсивно вычислить расстояние редактирования двух данных непустых строк
-    Sample Input 1:
-    ab
-    ab
-    Sample Output 1:
-    0
-    Sample Input 2:
-    short
-    ports
-    Sample Output 2:
-    3
-    Sample Input 3:
-    distance
-    editing
-    Sample Output 3:
-    5
 */
 
 public class A_EditDist {
 
-
+    // Рекурсивная функция для вычисления расстояния Левенштейна между двумя строками
     int getDistanceEdinting(String one, String two) {
         //!!!!!!!!!!!!!!!!!!!!!!!!!     НАЧАЛО ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
 
-
+        // Инициализируем результат большим числом (как "бесконечность")
         int result = 99999;
-        //System.out.println(one + ' ' + two);
-        int del = 99999, add = 99999, cng = 99999, diff = 1;
-        int n = one.length(), m = two.length();
-        if(one == "" || two == "")
-            return m + n;
-        if(one.charAt(n - 1) == two.charAt(m - 1)) diff = 0;
-        del = getDistanceEdinting(one.substring(0, n - 1), two.substring(0, m)) + 1;
-        add = getDistanceEdinting(one.substring(0, n), two.substring(0, m - 1)) + 1;
-        cng = getDistanceEdinting(one.substring(0, n - 1), two.substring(0, m - 1)) + diff;
+
+        // Получаем длины строк
+        int n = one.length();
+        int m = two.length();
+
+        // Базовый случай: если одна из строк пустая, расстояние равно длине другой строки
+        if (n == 0) {
+            return m;
+        }
+        if (m == 0) {
+            return n;
+        }
+
+        // Проверяем, совпадают ли последние символы строк
+        // Если да, то разница (diff) равна 0, иначе 1
+        int diff = (one.charAt(n - 1) == two.charAt(m - 1)) ? 0 : 1;
+
+        // Рекурсивно вычисляем стоимость трех возможных операций:
+        // 1. Удаление последнего символа из первой строки
+        int del = getDistanceEdinting(one.substring(0, n - 1), two) + 1;
+
+        // 2. Вставка последнего символа второй строки в первую
+        int add = getDistanceEdinting(one, two.substring(0, m - 1)) + 1;
+
+        // 3. Замена последнего символа первой строки на последний символ второй (если они разные)
+        int cng = getDistanceEdinting(one.substring(0, n - 1), two.substring(0, m - 1)) + diff;
+
+        // Выбираем минимальную стоимость из трех возможных операций
         result = Math.min(del, Math.min(add, cng));
+
         //!!!!!!!!!!!!!!!!!!!!!!!!!     КОНЕЦ ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
         return result;
     }
 
-
     public static void main(String[] args) throws FileNotFoundException {
-        InputStream stream = A_EditDist.class.getResourceAsStream("dataABC.txt");
+        // Создаем экземпляр класса для тестирования
         A_EditDist instance = new A_EditDist();
+
+        // Получаем входные данные из файла
+        InputStream stream = A_EditDist.class.getResourceAsStream("dataABC.txt");
         Scanner scanner = new Scanner(stream);
+
+        // Читаем и выводим результаты для трех пар строк
         System.out.println(instance.getDistanceEdinting(scanner.nextLine(), scanner.nextLine()));
         System.out.println(instance.getDistanceEdinting(scanner.nextLine(), scanner.nextLine()));
         System.out.println(instance.getDistanceEdinting(scanner.nextLine(), scanner.nextLine()));

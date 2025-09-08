@@ -76,7 +76,6 @@ public class C_LongNotUpSubSeq {
             }
         }
 
-        // Восстановление индексов (с конца в начало)
         int[] indices = new int[maxLength];
         int pos = maxLength - 1;
         while (lastIndex != -1) {
@@ -84,7 +83,6 @@ public class C_LongNotUpSubSeq {
             lastIndex = prev[lastIndex];
         }
 
-        // Печать результата
         System.out.println(maxLength);
         for (int i = 0; i < maxLength; i++) {
             System.out.print(indices[i] + " ");

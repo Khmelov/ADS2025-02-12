@@ -1,7 +1,5 @@
 package by.it.group410902.dziatko.lesson03;
 
-import org.graalvm.nativeimage.c.struct.CStruct;
-
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Scanner;
