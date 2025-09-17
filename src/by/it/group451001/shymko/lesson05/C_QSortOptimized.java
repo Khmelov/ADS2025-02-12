@@ -65,14 +65,28 @@ public class C_QSortOptimized {
         //в классе отрезка Segment реализуйте нужный для этой задачи компаратор
         QSort(segments, 0, n - 1);
         for (int i = 0; i < m; i++) {
+            int l = 0;
+            int r = n;
+            int k = -1;
+            while (l < r) {
+                int mid = (l + r) >> 1;
+                if (segments[mid].start < points[i]) {
+                    l = mid + 1;
+                }
+                else {
+                    r = mid;
+                }
+            }
+            k = l;
             int j = 0;
-            while(j < n && points[i] > segments[j].start) {
+            while(j < k && points[i] > segments[j].start) {
                 if(points[i] < segments[j].stop) {
                     result[i]++;
                 }
                 j++;
             }
         }
+
 
         //!!!!!!!!!!!!!!!!!!!!!!!!!     КОНЕЦ ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
         return result;
