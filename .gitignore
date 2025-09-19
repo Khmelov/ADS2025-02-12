@@ -56,3 +56,4 @@ TaskB.txt
 TaskC.txt
 
 .gitignore
+/src/by/it/group451001/tsurko/
