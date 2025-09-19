@@ -53,11 +53,9 @@ public class C_GreedyKnapsack {
             if (remainingWeight <= 0) break;
 
             if (item.weight <= remainingWeight) {
-                // Берем предмет целиком
                 result += item.cost;
                 remainingWeight -= item.weight;
             } else {
-                // Берем часть предмета
                 result += (item.cost * remainingWeight) / item.weight;
                 remainingWeight = 0;
             }
