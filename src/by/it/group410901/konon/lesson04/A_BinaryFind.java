@@ -58,7 +58,7 @@ public class A_BinaryFind {
             //тут реализуйте бинарный поиск индекса
             int left = 0;
             int right = n - 1;
-            int index = -1;
+            int index = -1; 
 
             while (left <= right) {
                 int mid = left + (right - left) / 2;//ищем среднее
