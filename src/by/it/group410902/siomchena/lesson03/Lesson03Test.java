@@ -1,5 +1,8 @@
 package by.it.group410902.siomchena.lesson03;
 
+import by.it.group410902.siomchena.lesson03.A_Huffman;
+import by.it.group410902.siomchena.lesson03.B_Huffman;
+import by.it.group410902.siomchena.lesson03.C_HeapMax;
 import org.junit.Test;
 
 import java.io.InputStream;
