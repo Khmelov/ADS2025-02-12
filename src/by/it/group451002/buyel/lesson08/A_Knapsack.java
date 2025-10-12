@@ -1,10 +1,8 @@
-package by.it.a_khmelev.lesson08;
+package by.it.group451002.buyel.lesson08;
 
-import by.it.a_khmelev.lesson07.A_EditDist;
-
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.Random;
 import java.util.Scanner;
 
 /*
@@ -43,13 +41,27 @@ public class A_Knapsack {
         Scanner scanner = new Scanner(stream);
         int w=scanner.nextInt();
         int n=scanner.nextInt();
-        int gold[]=new int[n];
+        int[] gold=new int[n];
         for (int i = 0; i < n; i++) {
             gold[i]=scanner.nextInt();
         }
 
+        int result;
 
-        int result = 0;
+        // Таблица, где индекс по X = текущая вместимость
+        int[][] scoreboard = new int[n+1][w+1];
+
+        // Проход по каждому значению веса слитка золота
+        for (int i = 1; i < n+1; i++) {
+            // Проход по текущему значению общей вместимости
+            for (int j = 1; j < w+1; j++) {
+                // Сколько можно засунуть текущего веса в рюкзак
+                int divResult = j / gold[i-1];
+                scoreboard[i][j] = Math.max(scoreboard[i][j-1], Math.max(gold[i-1] * divResult, scoreboard[i-1][j]));
+            }
+        }
+
+        result = scoreboard[n][w];
         //!!!!!!!!!!!!!!!!!!!!!!!!!     КОНЕЦ ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
         return result;
     }
