@@ -58,7 +58,6 @@ public class ListC<E> implements List<E>{
     @Override
     public E remove(int index) {
         if (size == 0) {
-            size = 0;
             return null;
         }
         size--;
