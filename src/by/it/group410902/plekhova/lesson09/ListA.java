@@ -7,31 +7,69 @@ import java.util.ListIterator;
 
 public class ListA<E> implements List<E> {
 
+
+
     //Создайте аналог списка БЕЗ использования других классов СТАНДАРТНОЙ БИБЛИОТЕКИ
+
+    private Object[] elements = new Object[10];
+    private int size = 0;
 
     /////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////
     //////               Обязательные к реализации методы             ///////
     /////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////
+
     @Override
     public String toString() {
-        return "";
+        if (size == 0) {
+            return "[]";
+        }
+
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < size; i++) {
+            sb.append(elements[i]);
+            if (i < size - 1) {
+                sb.append(", ");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
     }
 
     @Override
     public boolean add(E e) {
-        return false;
+        if (size == elements.length) {
+            Object[] newElements = new Object[elements.length * 2];
+            for (int i = 0; i < size; i++) {
+                newElements[i] = elements[i];
+            }
+            elements = newElements;
+        }
+        elements[size++] = e;
+        return true;
     }
 
     @Override
     public E remove(int index) {
-        return null;
+        if (index < 0 || index >= size) {  // Исправлено: добавлено
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
+        }
+
+        @SuppressWarnings("unchecked")
+        E removedElement = (E) elements[index];
+
+        for (int i = index; i < size - 1; i++) {
+            elements[i] = elements[i + 1];
+        }
+
+        elements[--size] = null;
+        return removedElement;
     }
 
     @Override
     public int size() {
-        return 0;
+        return size;
     }
 
     /////////////////////////////////////////////////////////////////////////
