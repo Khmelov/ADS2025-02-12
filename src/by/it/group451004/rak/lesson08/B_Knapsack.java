@@ -30,23 +30,24 @@ public class B_Knapsack {
         Scanner scanner = new Scanner(stream);
         int w = scanner.nextInt();
         int n = scanner.nextInt();
-        int[] gold = new int[n];
+        int[] goldArr = new int[n];
         for (int i = 0; i < n; i++) {
-            gold[i] = scanner.nextInt();
+            goldArr[i] = scanner.nextInt();
         }
         scanner.close();
+        int[] maxWeightByCapacity = new int[w + 1];
 
-        int[] dp = new int[w + 1];
-
-        for (int i = 0; i < n; i++) {
-            for (int j = w; j >= gold[i]; j--) {
-                dp[j] = Math.max(dp[j], dp[j - gold[i]] + gold[i]);
+        for (int gold: goldArr) {
+            for (int j = w; j >= gold; j--){
+                maxWeightByCapacity[j] = Math.max(
+                        maxWeightByCapacity[j],
+                        maxWeightByCapacity[j - gold] + gold
+                );
             }
         }
 
-        return dp[w];
+        return maxWeightByCapacity[w];
     }
-
 
     public static void main(String[] args) throws FileNotFoundException {
         InputStream stream = B_Knapsack.class.getResourceAsStream("dataB.txt");
@@ -54,5 +55,4 @@ public class B_Knapsack {
         int res=instance.getMaxWeight(stream);
         System.out.println(res);
     }
-
 }

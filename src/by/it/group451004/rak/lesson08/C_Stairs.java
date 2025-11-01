@@ -42,15 +42,14 @@ public class C_Stairs {
         }
         scanner.close();
 
-        if (n == 0) return 0;
         if (n == 1) return stairs[0];
 
-        int prev2 = stairs[0];          // для i-2
-        int prev1 = Math.max(stairs[0] + stairs[1], stairs[1]); // для i-1
-        int current = prev1;
+        int current = Math.max(stairs[0] + stairs[1], stairs[1]);
+        int prev1 = current;
+        int prev2 = stairs[0];
 
         for (int i = 2; i < n; i++) {
-            current = Math.max(prev1, prev2) + stairs[i];
+            current = Math.max(prev1, prev2) + stairs[i]; //на ступеньку i можно попасть либо с прошлой, либо с позапрошлой
             prev2 = prev1;
             prev1 = current;
         }
