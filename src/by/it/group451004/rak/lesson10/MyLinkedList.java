@@ -5,25 +5,6 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-/*
-    toString()
-    add(E element)
-    remove(int)
-    remove(E element)
-    size()
-
-    addFirst(E element)
-    addLast(E element)
-
-    element()
-    getFirst()
-    getLast()
-
-    poll()
-    pollFirst()
-    pollLast()
-*/
-
 public class MyLinkedList<E> implements Deque<E> {
 
     int size = 0;
@@ -195,8 +176,7 @@ public class MyLinkedList<E> implements Deque<E> {
         return pollFirst();
     }
 
-    //ДОПОЛНИТЕЛЬНО РЕАЛИЗОВАНО
-
+    //ЗАГЛУШКИ
 
     @Override
     public E remove() {
@@ -264,9 +244,6 @@ public class MyLinkedList<E> implements Deque<E> {
     public void clear() {
 
     }
-
-    //ЗАГЛУШКИ
-
 
     @Override
     public boolean removeLastOccurrence(Object o) {

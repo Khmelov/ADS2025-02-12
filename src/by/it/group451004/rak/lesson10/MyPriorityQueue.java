@@ -2,25 +2,6 @@ package by.it.group451004.rak.lesson10;
 
 import java.util.*;
 
-/*
-toString()
-size()
-clear()
-add(E element)
-remove()
-contains(E element)
-
-offer(E element)
-poll()
-peek()
-element()
-isEmpty()
-
-containsAll(Collection<E> c)
-addAll(Collection<E> c)
-removeAll(Collection<E> c)
-retainAll(Collection<E> c)
-*/
 public class MyPriorityQueue<E extends Comparable<E>> implements Queue<E> {
     private E[] elements;
     private int size = 0;
