@@ -14,14 +14,14 @@
     /////////////////////////////////////////////////////////////////////////
 
                 toString()
-                size()
-                clear()
-                isEmpty()
-                add(Object)
-                remove(Object)
-                contains(Object)
+                size() --
+                clear() --
+                isEmpty() --
+                add(Object) --
+                remove(Object) --
+                contains(Object) --
 
-                containsAll(Collection)
+                containsAll(Collection) --
                 addAll(Collection)
                 removeAll(Collection)
                 retainAll(Collection)
