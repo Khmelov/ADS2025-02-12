@@ -55,30 +55,30 @@ public class B_MergeSort {
 
     void mergeSort(int[] a, int left, int right) {
         if (left < right) {
-            int middle = left + (right - left) / 2;
+            int middle = left + (right - left) / 2; //нахождение середины
 
-            mergeSort(a, left, middle);
-            mergeSort(a, middle + 1, right);
+            mergeSort(a, left, middle);    // сортировка левой половины
+            mergeSort(a, middle + 1, right); // сортировка правой половины
 
-            merge(a, left, middle, right);
+            merge(a, left, middle, right);   // слияние отсортированных половин
         }
     }
 
     void merge(int[] a, int left, int middle, int right) {
-        int n1 = middle - left + 1;
-        int n2 = right - middle;
+        int n1 = middle - left + 1;  // размер левой части
+        int n2 = right - middle;   // размер правой части
 
         int[] leftArray = new int[n1];
         int[] rightArray = new int[n2];
 
         for (int i = 0; i < n1; i++) {
-            leftArray[i] = a[left + i];
+            leftArray[i] = a[left + i];  // заполнение левой части
         }
         for (int j = 0; j < n2; j++) {
-            rightArray[j] = a[middle + 1 + j];
+            rightArray[j] = a[middle + 1 + j];  // заполнение правой части
         }
 
-        int i = 0, j = 0, k = left;
+        int i = 0, j = 0, k = left; // сравниваем элементы - индексы для слияния
         while (i < n1 && j < n2) {
             if (leftArray[i] <= rightArray[j]) {
                 a[k] = leftArray[i];
@@ -90,13 +90,13 @@ public class B_MergeSort {
             k++;
         }
 
-        while (i < n1) {
+        while (i < n1) {     // копирование оставшихся элементов левой части
             a[k] = leftArray[i];
             i++;
             k++;
         }
 
-        while (j < n2) {
+        while (j < n2) {  // копирование оставшихся элементов правой части
             a[k] = rightArray[j];
             j++;
             k++;

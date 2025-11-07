@@ -49,9 +49,10 @@ public class B_CountSort {
 
         // Создаем отсортированный массив на основе подсчетов
         int index = 0;
-        for (int i = 0; i < counts.length; i++) {
-            for (int j = 0; j < counts[i]; j++) {
-                points[index++] = i;
+        for (int i = 0; i < counts.length; i++) { //цикл проходит по всем возможным значениям
+            for (int j = 0; j < counts[i]; j++) { //цикл отвечает за то,
+                // сколько раз текущее значение i должно быть добавлено в массив points.
+                points[index++] = i; //количество вхождений числа i в исходном массиве.
             }
         }
 
