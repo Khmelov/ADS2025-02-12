@@ -73,21 +73,21 @@ public class A_Huffman {
             count.put(c, count.getOrDefault(c, 0) + 1);
         }
         //2. перенесем все символы в приоритетную очередь в виде листьев
-        PriorityQueue<by.it.group451001.suprunovich.lesson03.A_Huffman.Node> priorityQueue = new PriorityQueue<>();
+        PriorityQueue<Node> priorityQueue = new PriorityQueue<>();
         for (Map.Entry<Character, Integer> entry : count.entrySet()) {
-            priorityQueue.add(new by.it.group451001.suprunovich.lesson03.A_Huffman.LeafNode(entry.getValue(), entry.getKey()));
+            priorityQueue.add(new LeafNode(entry.getValue(), entry.getKey()));
         }
         //3. вынимая по два узла из очереди (для сборки родителя)
         //и возвращая этого родителя обратно в очередь
-        //построим дерево кодирования Хаффмана.
+        //построим дерево кодированя Хаффмана.
         //У родителя частоты детей складываются.
         while (priorityQueue.size() > 1) {
-            by.it.group451001.suprunovich.lesson03.A_Huffman.Node left = priorityQueue.poll();
-            by.it.group451001.suprunovich.lesson03.A_Huffman.Node right = priorityQueue.poll();
-            priorityQueue.add(new by.it.group451001.suprunovich.lesson03.A_Huffman.InternalNode(left, right));
+            Node left = priorityQueue.poll();
+            Node right = priorityQueue.poll();
+            priorityQueue.add(new InternalNode(left, right));
         }
         if (!priorityQueue.isEmpty()) {
-            by.it.group451001.suprunovich.lesson03.A_Huffman.Node root = priorityQueue.poll();
+            Node root = priorityQueue.poll();
             root.fillCodes("");
         }
         //4. последний из родителей будет корнем этого дерева
@@ -103,7 +103,7 @@ public class A_Huffman {
     }
 
     //Изучите классы Node InternalNode LeafNode
-    abstract class Node implements Comparable<by.it.group451001.suprunovich.lesson03.A_Huffman.Node> {
+    abstract class Node implements Comparable<Node> {
         //абстрактный класс элемент дерева
         //(сделан abstract, чтобы нельзя было использовать его напрямую)
         //а только через его версии InternalNode и LeafNode
@@ -121,7 +121,7 @@ public class A_Huffman {
         //метод нужен для корректной работы узла в приоритетной очереди
         //или для сортировок
         @Override
-        public int compareTo(by.it.group451001.suprunovich.lesson03.A_Huffman.Node o) {
+        public int compareTo(Node o) {
             return Integer.compare(frequence, o.frequence);
         }
     }
