@@ -7,73 +7,71 @@ import java.util.ListIterator;
 
 public class ListA<E> implements List<E> {
 
-    //Создайте аналог списка БЕЗ использования других классов СТАНДАРТНОЙ БИБЛИОТЕКИ
-
+    // Внутренний массив для хранения элементов и переменная для отслеживания размера
     private static final int INITIAL_CAPACITY = 10;
     private Object[] elements;
     private int size;
 
+    // Конструктор инициализирует пустой массив с начальной емкостью
     public ListA() {
         elements = new Object[INITIAL_CAPACITY];
         size = 0;
     }
 
     /////////////////////////////////////////////////////////////////////////
+    // ОБЯЗАТЕЛЬНЫЕ МЕТОДЫ ИНТЕРФЕЙСА LIST
     /////////////////////////////////////////////////////////////////////////
-    //////               Обязательные к реализации методы             ///////
-    /////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////
+
+    // Преобразование списка в строку для вывода
     @Override
     public String toString() {
-        if (size == 0) {
-            return "[]";
-        }
+        if (size == 0) return "[]";
+
         StringBuilder sb = new StringBuilder("[");
         for (int i = 0; i < size; i++) {
             sb.append(elements[i]);
-            if (i < size - 1) {
-                sb.append(", ");
-            }
+            if (i < size - 1) sb.append(", ");
         }
-        sb.append("]");
-        return sb.toString();
+        return sb.append("]").toString();
     }
 
+    // Добавление элемента в конец списка
     @Override
     public boolean add(E e) {
-        ensureCapacity();
+        ensureCapacity(); // Проверка необходимости расширения массива
         elements[size++] = e;
         return true;
     }
 
+    // Удаление элемента по индексу со сдвигом оставшихся элементов
     @Override
     public E remove(int index) {
         checkIndex(index);
         E removedElement = (E) elements[index];
-        // Сдвигаем все элементы после удаляемого на одну позицию влево
+
         for (int i = index; i < size - 1; i++) {
             elements[i] = elements[i + 1];
         }
-        elements[--size] = null; // очищаем последнюю ссылку
+        elements[--size] = null;
         return removedElement;
     }
 
+    // Возврат текущего количества элементов
     @Override
     public int size() {
         return size;
     }
 
     /////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////
-    //////               Опциональные к реализации методы             ///////
-    /////////////////////////////////////////////////////////////////////////
+    // ОПЦИОНАЛЬНЫЕ МЕТОДЫ РЕАЛИЗАЦИИ
     /////////////////////////////////////////////////////////////////////////
 
+    // Вставка элемента по указанному индексу
     @Override
     public void add(int index, E element) {
         checkIndexForAdd(index);
         ensureCapacity();
-        // Сдвигаем все элементы начиная с index на одну позицию вправо
+
         for (int i = size; i > index; i--) {
             elements[i] = elements[i - 1];
         }
@@ -81,6 +79,7 @@ public class ListA<E> implements List<E> {
         size++;
     }
 
+    // Удаление первого вхождения объекта
     @Override
     public boolean remove(Object o) {
         for (int i = 0; i < size; i++) {
@@ -92,6 +91,7 @@ public class ListA<E> implements List<E> {
         return false;
     }
 
+    // Замена элемента по индексу
     @Override
     public E set(int index, E element) {
         checkIndex(index);
@@ -100,11 +100,13 @@ public class ListA<E> implements List<E> {
         return oldElement;
     }
 
+    // Проверка на пустоту списка
     @Override
     public boolean isEmpty() {
         return size == 0;
     }
 
+    // Очистка списка - обнуление всех ссылок
     @Override
     public void clear() {
         for (int i = 0; i < size; i++) {
@@ -113,45 +115,42 @@ public class ListA<E> implements List<E> {
         size = 0;
     }
 
+    // Поиск индекса первого вхождения элемента
     @Override
     public int indexOf(Object o) {
         for (int i = 0; i < size; i++) {
-            if (o.equals(elements[i])) {
-                return i;
-            }
+            if (o.equals(elements[i])) return i;
         }
         return -1;
     }
 
+    // Получение элемента по индексу
     @Override
     public E get(int index) {
         checkIndex(index);
         return (E) elements[index];
     }
 
+    // Проверка наличия элемента в списке
     @Override
     public boolean contains(Object o) {
         return indexOf(o) != -1;
     }
 
+    // Поиск индекса последнего вхождения элемента
     @Override
     public int lastIndexOf(Object o) {
         for (int i = size - 1; i >= 0; i--) {
-            if (o.equals(elements[i])) {
-                return i;
-            }
+            if (o.equals(elements[i])) return i;
         }
         return -1;
     }
 
     /////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////
-    ////////        Эти методы имплементировать необязательно    ////////////
-    ////////        но они будут нужны для корректной отладки    ////////////
-    /////////////////////////////////////////////////////////////////////////
+    // ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ ДЛЯ РАБОТЫ С ВНУТРЕННИМ МАССИВОМ
     /////////////////////////////////////////////////////////////////////////
 
-    // Вспомогательные методы
+    // Увеличение емкости массива при необходимости
     private void ensureCapacity() {
         if (size == elements.length) {
             Object[] newElements = new Object[elements.length * 2];
@@ -160,70 +159,55 @@ public class ListA<E> implements List<E> {
         }
     }
 
+    // Проверка корректности индекса для операций доступа
     private void checkIndex(int index) {
         if (index < 0 || index >= size) {
             throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
         }
     }
 
+    // Проверка корректности индекса для операций вставки
     private void checkIndexForAdd(int index) {
         if (index < 0 || index > size) {
             throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
         }
     }
 
-    // Методы, которые можно не реализовывать (оставлены заглушками)
+    /////////////////////////////////////////////////////////////////////////
+    // МЕТОДЫ, КОТОРЫЕ МОЖНО НЕ РЕАЛИЗОВЫВАТЬ (ЗАГЛУШКИ)
+    /////////////////////////////////////////////////////////////////////////
 
     @Override
-    public boolean containsAll(Collection<?> c) {
-        return false;
-    }
+    public boolean containsAll(Collection<?> c) { return false; }
 
     @Override
-    public boolean addAll(Collection<? extends E> c) {
-        return false;
-    }
+    public boolean addAll(Collection<? extends E> c) { return false; }
 
     @Override
-    public boolean addAll(int index, Collection<? extends E> c) {
-        return false;
-    }
+    public boolean addAll(int index, Collection<? extends E> c) { return false; }
 
     @Override
-    public boolean removeAll(Collection<?> c) {
-        return false;
-    }
+    public boolean removeAll(Collection<?> c) { return false; }
 
     @Override
-    public boolean retainAll(Collection<?> c) {
-        return false;
-    }
+    public boolean retainAll(Collection<?> c) { return false; }
 
     @Override
-    public List<E> subList(int fromIndex, int toIndex) {
-        return null;
-    }
+    public List<E> subList(int fromIndex, int toIndex) { return null; }
 
     @Override
-    public ListIterator<E> listIterator(int index) {
-        return null;
-    }
+    public ListIterator<E> listIterator(int index) { return null; }
 
     @Override
-    public ListIterator<E> listIterator() {
-        return null;
-    }
+    public ListIterator<E> listIterator() { return null; }
 
     @Override
-    public <T> T[] toArray(T[] a) {
-        return null;
-    }
+    public <T> T[] toArray(T[] a) { return null; }
 
     @Override
-    public Object[] toArray() {
-        return new Object[0];
-    }
+    public Object[] toArray() { return new Object[0]; }
 
+    // Простая реализация итератора для перебора элементов
     @Override
     public Iterator<E> iterator() {
         return new Iterator<E>() {
