@@ -85,24 +85,25 @@ public class B_EditDist {
                 // If first string is empty, the only option is to
                 // insert all characters of second string
                 if (i == 0)
-                    dp[i][j] = j;  // Min. operations = j
+                    dp[i][j] = j;  // Min. operations = j  расстояние от первых i символов строки one до пустой строки.
 
                     // If second string is empty, the only option is to
                     // remove all characters of second string
                 else if (j == 0)
-                    dp[i][j] = i; // Min. operations = i
+                    dp[i][j] = i; // Min. operations = i   расстояние от пустой строки до первых j символов строки two. Это равно j, потому что нам нужно вставить все j символов.
 
                     // If last characters are same, ignore last char
                     // and recur for remaining string
                 else if (one.charAt(i - 1) == two.charAt(j - 1))
                     dp[i][j] = dp[i - 1][j - 1];
 
-                    // If the last character is different, consider all
+                    //Если текущие символы обеих строк совпадают, то расстояние для этих строк будет равно расстоянию для строк,
+                    // лишенных последнего символа. Мы просто игнорируем этот символ.
                     // possibilities and find the minimum
                 else
-                    dp[i][j] = 1 + Math.min(dp[i][j - 1],        // Insert
-                            Math.min(dp[i - 1][j],        // Remove
-                                    dp[i - 1][j - 1])); // Replace
+                    dp[i][j] = 1 + Math.min(dp[i][j - 1],        // Вставка: добавляем символ из второй строки к первой.
+                            Math.min(dp[i - 1][j],        // Удаление: удаляем последний символ из первой строки.
+                                    dp[i - 1][j - 1])); // Замена: заменяем последний символ первой строки на последний символ второй строки.
             }
         }
 
