@@ -46,7 +46,7 @@ public class A_Knapsack {
             gold[i]=scanner.nextInt();
         }
 
-        int result = 0;
+
 
         int[] d = new int[w+1]; // Массив для хранения максимального веса для каждой вместимости рюкзака
 
