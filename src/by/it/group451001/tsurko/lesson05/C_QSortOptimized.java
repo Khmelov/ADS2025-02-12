@@ -14,6 +14,7 @@ public class C_QSortOptimized {
         for (int index : result) {
             System.out.print(index + " ");
         }
+
     }
 
     int[] getAccessory2(InputStream stream) throws FileNotFoundException {
