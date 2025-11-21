@@ -10,19 +10,19 @@ public class GraphC {
         scanner.close();// закрываем сканер для освобождения ресурсов
 
         // создаём прямой граф: вершина -> список вершин, в которые ведут стрелки
-        // например: "a" -> ["b", "c"] означает: из a есть стрелки в b и c
+        // например: a -> [b, c] означает: из a есть стрелки в b и c
         Map<String, List<String>> graph = new HashMap<>();
 
         Map<String, List<String>> reverseGraph = new HashMap<>(); // обратный граф: вершина -> список вершин, из которых ведут стрелки
 
         // входная строка разбивается на строки с запятыми
-        // "a->b, b->c" превращается в массив ["a->b", "b->c"]
+        // a->b, b->c превращается в массив [a->b, b->c]
         String[] edges = input.split("\\s*,\\s*");
 
         // обрабатываем каждое ребро в массиве
         for (String edge : edges) {
-            // разбиваем ребро на две части по стрелке "->"
-            // "a->b" превращается в массив ["a", "b"]
+            // разбиваем ребро на две части по стрелке ->
+            // a->b превращается в массив [a, b]
             String[] parts = edge.split("\\s*->\\s*");
             // извлекаем начальную вершину(откуда идёт стрелка)
             String from = parts[0];
@@ -65,7 +65,7 @@ public class GraphC {
             Collections.sort(sortedComponent);
 
             // создаем строку, объединяя все вершины компоненты
-            // например: ["a", "b", "c"] -> "abc"
+            // например: [a, b, c] -> abc
             StringBuilder sb = new StringBuilder();
             for (String vertex : sortedComponent) {
                 sb.append(vertex);
