@@ -22,8 +22,7 @@ public class FiboC {
     }
 
     long fasterC(long n, int m) {
-        //Интуитивно найти решение не всегда просто и
-        //возможно потребуется дополнительный поиск информации
+
         if (n == 0) return 0;
         if (n == 1) return 1;
         long[] pisanoPeriod = getPisanoPeriod(m);
