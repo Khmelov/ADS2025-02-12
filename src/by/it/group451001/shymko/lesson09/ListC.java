@@ -142,6 +142,9 @@ public class ListC<E> implements List<E> {
 
     @Override
     public boolean addAll(Collection<? extends E> c) {
+        if(c.isEmpty()) {
+            return false;
+        }
         if(size + c.size() > elementData.length) {
             Object[] newElementData = new Object[size + c.size()];
             System.arraycopy(elementData, 0, newElementData, 0, elementData.length);
@@ -154,6 +157,8 @@ public class ListC<E> implements List<E> {
 
     @Override
     public boolean addAll(int index, Collection<? extends E> c) {
+        if(c.size() == 0)
+            return false;
         if(size + c.size() > elementData.length) {
             Object[] newElementData = new Object[size + c.size()];
             System.arraycopy(elementData, 0, newElementData, 0, elementData.length);
