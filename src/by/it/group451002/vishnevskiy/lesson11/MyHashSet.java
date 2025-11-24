@@ -26,7 +26,7 @@ public class MyHashSet<E> implements Set<E> {
         }
     }
     private int DefaultSize = 100;  // начальный размер массива для хранения списков (100)
-    private int actSize= 0;  // отслеживает текущее количество элементов в MyHashSet
+    private int actSize = 0;  // отслеживает текущее количество элементов в MyHashSet
 
     // class MyList<E> представляет односвязный список с методами add,remove и contains,
     //чтобы управлять элементами в каждом сегменте хеш-таблицы.

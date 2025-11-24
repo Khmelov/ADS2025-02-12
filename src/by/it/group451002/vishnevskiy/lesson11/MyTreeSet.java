@@ -164,7 +164,7 @@ public class MyTreeSet<E> implements Set<E> {
         // если хотя бы один элемент был удалён.
         boolean[] u = new boolean[actSize];
         int kol = 0, cnt = 0;
-        for (int i = 0; i< actSize; i++)
+        for (int i = 0; i < actSize; i++)
             if (c.contains(mas[i])) {
                 u[i] = true;
                 kol++;
