@@ -216,7 +216,7 @@ public class MyLinkedHashSet<E> implements Set<E> {
     // Возвращает true,если хотя бы один элемент был удалён.
     public boolean removeAll(Collection<?> c) {
         int deleted = 0;
-        for (int i = 0; i < DefaultSize; i++) {
+        for (int i= 0;i < DefaultSize; i++) {
             MyList<E> newMyList = new MyList<>();
             LNode<E> curr = map[i].head;
             while (curr != null) {
