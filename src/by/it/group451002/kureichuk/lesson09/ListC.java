@@ -56,8 +56,8 @@ public class ListC<E> implements List<E> {
             elem[i] = elem[i+1];
         }
 
-        elem[size] = null;
         --size;
+        elem[size] = null;
         return removed;
     }
 
@@ -101,8 +101,9 @@ public class ListC<E> implements List<E> {
         for (int i = index; i < size - 1; i++) {
             elem[i] = elem[i+1];
         }
-        elem[size] = null;
         --size;
+        elem[size] = null;
+
         return true;
     }
 
@@ -184,10 +185,11 @@ public class ListC<E> implements List<E> {
         if (c == null) {
             throw new NullPointerException("Collection to add cannot be null");
         }
+        int s = size;
         for (E o : c) {
             this.add(o);
         }
-        return true;
+        return s != size;
     }
 
     @Override
@@ -196,12 +198,13 @@ public class ListC<E> implements List<E> {
             throw new NullPointerException("Collection to add cannot be null");
         }
         int i = index;
+        int s = size;
         for (E o : c) {
             this.add(i, o);
             i++;
         }
 
-        return true;
+        return s != size;
     }
 
     @Override
