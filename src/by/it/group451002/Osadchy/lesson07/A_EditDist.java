@@ -32,32 +32,35 @@ import java.util.Scanner;
 
 public class A_EditDist {
 
+    private Integer[][] memo;
+    private String str1;
+    private String str2;
 
     int getDistanceEdinting(String one, String two) {
         //!!!!!!!!!!!!!!!!!!!!!!!!!     НАЧАЛО ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
-
-        int m = one.length();
-        int n = two.length();
-        int[][] dp = new int[m + 1][n + 1];
-
-        for (int i = 0; i <= m; i++) {
-            for (int j = 0; j <= n; j++) {
-                if (i == 0) {
-                    dp[i][j] = j;  // Если первая строка пустая, расстояние равно длине второй
-                } else if (j == 0) {
-                    dp[i][j] = i;  // Если вторая строка пустая, расстояние равно длине первой
-                } else {
-                    int cost = (one.charAt(i - 1) == two.charAt(j - 1)) ? 0 : 1;
-                    // Минимальное количество операций для получения строки two из one
-                    dp[i][j] = Math.min(dp[i - 1][j] + 1, Math.min(dp[i][j - 1] + 1, dp[i - 1][j - 1] + cost));
-                }
-            }
-        }
-
-        //!!!!!!!!!!!!!!!!!!!!!!!!!     КОНЕЦ ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
-        return dp[m][n];
+        str1 = one;
+        str2 = two;
+        int m = str1.length();
+        int n = str2.length();
+        memo = new Integer[m + 1][n + 1];
+        return editDistance(m, n);
     }
 
+    private int editDistance(int i, int j) {
+        if (i == 0) return j;
+        if (j == 0) return i;
+        if (memo[i][j] != null) return memo[i][j];
+
+        int cost = (str1.charAt(i - 1) == str2.charAt(j - 1)) ? 0 : 1;
+
+        int del = editDistance(i - 1, j) + 1;
+        int ins = editDistance(i, j - 1) + 1;
+        int rep = editDistance(i - 1, j - 1) + cost;
+
+        memo[i][j] = Math.min(del, Math.min(ins, rep));
+        return memo[i][j];
+        //!!!!!!!!!!!!!!!!!!!!!!!!!     КОНЕЦ ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
+    }
 
     public static void main(String[] args) throws FileNotFoundException {
         InputStream stream = A_EditDist.class.getResourceAsStream("dataABC.txt");
