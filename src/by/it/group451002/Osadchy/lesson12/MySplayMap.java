@@ -136,8 +136,7 @@ public class MySplayMap implements NavigableMap<Integer, String> {
 
     @Override
     public String get(Object o) {
-        if (!(o instanceof Integer)) return null;
-        Integer key = (Integer) o;
+        if (!(o instanceof Integer key)) return null;
         Node node = find(key);
         if (node == null) return null;
         splay(node);
@@ -244,6 +243,9 @@ public class MySplayMap implements NavigableMap<Integer, String> {
         splay(node);
         return node.key;
     }
+
+
+
 
     @Override
     public Integer lowerKey(Integer key) {
