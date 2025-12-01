@@ -1,0 +1,8 @@
+A F
+A - B 4
+A - C 2
+B - D 5
+C - D 1
+C - E 3
+D - F 2
+E - F 4

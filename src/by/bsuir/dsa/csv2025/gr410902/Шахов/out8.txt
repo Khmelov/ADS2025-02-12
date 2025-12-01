@@ -1,0 +1,6 @@
+taskE 8
+taskC 6
+taskA 5
+taskB 4
+taskF 3
+taskD 1

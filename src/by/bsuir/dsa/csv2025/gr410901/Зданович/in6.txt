@@ -1,0 +1,4 @@
+K-L(2), L-M(2), M-N(2), N-K(2), K-M(10)
+2
+MST
+CONNECTED L N

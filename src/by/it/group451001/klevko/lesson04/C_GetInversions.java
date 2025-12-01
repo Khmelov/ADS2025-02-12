@@ -65,6 +65,7 @@ public class C_GetInversions {
         int size = 1;
         int start1, start2, end1, end2, leftElem, i;
         //строго до end и начиная включая с start
+
         while (size < n) {
             //
             start1 = 0;

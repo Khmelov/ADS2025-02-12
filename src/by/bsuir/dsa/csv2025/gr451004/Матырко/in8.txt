@@ -1,0 +1,1 @@
+add 3 add 1 add 2 add 5 add 4 add 6 sum del 5 sum
