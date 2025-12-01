@@ -1,0 +1,2 @@
+42
+Comparisons: 0, Swaps: 0

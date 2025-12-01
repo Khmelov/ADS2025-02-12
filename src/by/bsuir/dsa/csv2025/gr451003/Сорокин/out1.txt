@@ -1,0 +1,2 @@
+1 2 3 4 5
+Comparisons: 4, Swaps: 0

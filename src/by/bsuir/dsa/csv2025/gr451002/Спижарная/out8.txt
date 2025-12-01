@@ -1,0 +1,8 @@
+path sum: 1 path: 0 - 1
+path sum: 10 path: 0 - 1 - 2
+path sum: 9 path: 0 - 1 - 3
+path sum: 17 path: 0 - 1 - 3 - 4
+path sum: 10 path: 0 - 1 - 3 - 5
+path sum: 11 path: 0 - 1 - 2 - 6
+path sum: 14 path: 0 - 1 - 3 - 7
+path sum: 19 path: 0 - 1 - 3 - 4 - 8

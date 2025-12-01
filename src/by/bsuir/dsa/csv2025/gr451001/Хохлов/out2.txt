@@ -1,0 +1,35 @@
+=== LECTURE DATA INPUT ===
+Enter number of lectures: 2
+
+Lecture 1:
+Start time (hour 0-23): 9
+End time (hour 0-23): 11
+Number of students: 30
+Priority (1-high, 2-medium, 3-low): 1
+
+Lecture 2:
+Start time (hour 0-23): 13
+End time (hour 0-23): 15
+Number of students: 25
+Priority (1-high, 2-medium, 3-low): 2
+
+=== RESULTS ===
+Algorithm 1 (sort by end time):
+Selected lectures: 2
+Total value: 155.0
+Total students: 55
+Schedule:
+Lecture 1: 9-11, students: 30, priority: 1, value: 90.0
+Lecture 2: 13-15, students: 25, priority: 2, value: 65.0
+
+Algorithm 2 (sort by value density):
+Selected lectures: 2
+Total value: 155.0
+Total students: 55
+Schedule:
+Lecture 1: 9-11, students: 30, priority: 1, value: 90.0
+Lecture 2: 13-15, students: 25, priority: 2, value: 65.0
+
+=== RESULTS COMPARISON ===
+Algorithm 1: 2 lectures, value: 155.0, students: 55
+Algorithm 2: 2 lectures, value: 155.0, students: 55
