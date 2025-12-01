@@ -9,7 +9,7 @@ Minimum Maximum Load
 ## Problem
 
 You are given `n` processes and `m` identical machines (computational nodes).  
-Each process `i` requires `tasks[i]` units of time to complete.  
+Each process `i` requires `tasks[i]` units of time to complete.    
 
 Your task is to assign all processes to the machines so that the **maximum load on any machine is minimized**.
 
@@ -37,8 +37,6 @@ Machine 2: [4, 3] → load = 7
 The maximum load on any machine is 7, which is minimal.
 
 # Theory
-
-Theoretical Info
 
 ## Greedy Algorithms
 
