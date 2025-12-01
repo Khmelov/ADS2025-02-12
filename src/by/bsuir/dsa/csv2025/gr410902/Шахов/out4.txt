@@ -1,0 +1,4 @@
+beta 9
+delta 4
+alpha 3
+gamma 1

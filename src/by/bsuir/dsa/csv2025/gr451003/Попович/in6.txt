@@ -1,0 +1,1 @@
+nums = [42] maxValue = 100 maxCount = 1 maxMemory = 1

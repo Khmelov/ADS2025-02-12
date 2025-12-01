@@ -1,0 +1,1 @@
+add 9 add 8 add 10 del 8 min max

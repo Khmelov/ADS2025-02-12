@@ -1,0 +1,10 @@
+9
+add 3
+add 7
+add 11
+find 7
+del 7
+find 7
+del 3
+del 11
+find 3

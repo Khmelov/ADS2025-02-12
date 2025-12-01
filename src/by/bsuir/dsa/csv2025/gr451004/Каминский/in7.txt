@@ -1,0 +1,11 @@
+10
+add 100
+add 200
+add 300
+find 400
+del 200
+find 200
+del 500
+add 400
+find 400
+find 100

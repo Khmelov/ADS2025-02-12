@@ -1,0 +1,8 @@
+Original array 10 20 5 15 25 0 30
+After iteration 1 10 20 5 15 25 0 30
+After iteration 2 5 10 20 15 25 0 30
+After iteration 3 5 10 15 20 25 0 30
+After iteration 4 5 10 15 20 25 0 30
+After iteration 5 0 5 10 15 20 25 30
+After iteration 6 0 5 10 15 20 25 30
+Sorted array 0 5 10 15 20 25 30

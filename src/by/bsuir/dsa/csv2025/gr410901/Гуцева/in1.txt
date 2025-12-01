@@ -1,0 +1,9 @@
+3
+5 0 10
+6
+SUM 0 1 3
+ADD 0 2 7
+SUM 1 1 3
+CLONE 1
+MOVE 2 1 3 4
+SUM 2 1 3

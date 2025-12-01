@@ -1,0 +1,3 @@
+Заказ №9999 (SuperClient1) обработан потоком pool-1-thread-1
+Заказ №8888 (SuperClient2) обработан потоком pool-1-thread-2
+Заказ №7777 (SuperClient3) обработан потоком pool-1-thread-3
