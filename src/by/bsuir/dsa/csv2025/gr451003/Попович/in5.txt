@@ -1,0 +1,1 @@
+nums = [5,5,5,2,2,8,8,8,8,1] maxValue = 8 maxCount = 50 maxMemory = 20

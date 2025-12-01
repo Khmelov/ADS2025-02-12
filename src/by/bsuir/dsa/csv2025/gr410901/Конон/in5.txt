@@ -1,0 +1,11 @@
+4 10
+contact 1 2
+contact 3 4
+contact 1 3
+size 1
+undo
+size 1
+undo
+size 1
+undo
+size 1

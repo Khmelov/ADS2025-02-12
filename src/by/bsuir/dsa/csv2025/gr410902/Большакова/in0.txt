@@ -1,0 +1,6 @@
+5 2
+1001 Ivan
+1002 Maria
+1003 Petr
+1004 Anna
+1005 Sergey

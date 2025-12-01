@@ -1,0 +1,3 @@
+AGCTT: 0 9
+TTGCA: 4
+CGTAA: 14

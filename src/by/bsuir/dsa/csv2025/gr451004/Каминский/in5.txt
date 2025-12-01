@@ -1,0 +1,7 @@
+6
+add 42
+del 42
+find 42
+add 42
+add 42
+find 42

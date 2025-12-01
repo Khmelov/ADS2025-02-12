@@ -1,0 +1,2 @@
+Original array 42
+Sorted array 42
