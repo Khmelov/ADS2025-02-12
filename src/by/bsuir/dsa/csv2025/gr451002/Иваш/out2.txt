@@ -1,0 +1,1 @@
+You haven't entered anything. The heap is empty.

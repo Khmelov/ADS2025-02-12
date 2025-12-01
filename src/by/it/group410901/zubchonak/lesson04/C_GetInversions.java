@@ -90,7 +90,7 @@ public class C_GetInversions {
         int i = left;
         int j = mid + 1;
         int k = left;
-
+        //Сравнивает элементы из двух половин и вставляет их в временный массив temp.
         while (i <= mid && j <= right) {
             if (arr[i] <= arr[j]) {
                 temp[k++] = arr[i++];
@@ -99,7 +99,8 @@ public class C_GetInversions {
                 inversions += (mid - i + 1); // Ключевой момент подсчета инверсий
             }
         }
-
+       // Когда элемент из правой половины меньше, это означает,
+        // что все оставшиеся элементы в левой половине формируют инверсии с этим элементом.
         while (i <= mid) {
             temp[k++] = arr[i++];
         }
@@ -107,6 +108,7 @@ public class C_GetInversions {
         while (j <= right) {
             temp[k++] = arr[j++];
         }
+       // В конце временный массив копируется обратно в оригинальный массив.
 
         System.arraycopy(temp, left, arr, left, right - left + 1);
 

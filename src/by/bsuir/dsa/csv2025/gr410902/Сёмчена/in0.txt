@@ -1,0 +1,6 @@
+5
+Ivanov Ivan Ivanovich 4
+Petrova Maria Sergeevna 5
+Sidorov Alexey Petrovich 3
+Kuznetsova Elena Vladimirovna 5
+Smirnov Dmitry Alekseevich 4
