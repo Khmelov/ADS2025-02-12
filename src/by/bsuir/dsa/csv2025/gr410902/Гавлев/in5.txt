@@ -1,0 +1,22 @@
+6 15 6 1
+Station 1
+Victory_Square 2
+Nemiga 3
+Academy_of_Sciences 4
+Stone_Hill 5
+Chizhovka 6
+1 2 2
+1 3 9
+1 4 4
+1 5 7
+1 6 12
+2 3 3
+2 4 6
+2 5 8
+2 6 5
+3 4 1
+3 5 2
+3 6 9
+4 5 5
+4 6 3
+5 6 4
