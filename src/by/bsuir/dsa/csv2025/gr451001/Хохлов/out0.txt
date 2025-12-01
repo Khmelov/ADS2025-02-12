@@ -1,0 +1,19 @@
+=== LECTURE DATA INPUT ===
+Enter number of lectures: 0
+
+=== RESULTS ===
+Algorithm 1 (sort by end time):
+Selected lectures: 0
+Total value: 0.0
+Total students: 0
+Schedule:
+
+Algorithm 2 (sort by value density):
+Selected lectures: 0
+Total value: 0.0
+Total students: 0
+Schedule:
+
+=== RESULTS COMPARISON ===
+Algorithm 1: 0 lectures, value: 0.0, students: 0
+Algorithm 2: 0 lectures, value: 0.0, students: 0

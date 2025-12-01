@@ -1,0 +1,4 @@
+A-B(2), B-C(2), D-E(1)
+2
+MST
+CONNECTED A D
