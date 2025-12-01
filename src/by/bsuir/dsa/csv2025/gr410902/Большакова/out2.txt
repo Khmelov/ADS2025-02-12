@@ -1,0 +1,8 @@
+Заказ №1 (Olga) обработан потоком pool-1-thread-1
+Заказ №2 (Mike) обработан потоком pool-1-thread-1
+Заказ №3 (Katya) обработан потоком pool-1-thread-1
+Заказ №4 (Denis) обработан потоком pool-1-thread-1
+Заказ №5 (Sveta) обработан потоком pool-1-thread-1
+Заказ №6 (Igor) обработан потоком pool-1-thread-1
+Заказ №7 (Lena) обработан потоком pool-1-thread-1
+Заказ №8 (Pavel) обработан потоком pool-1-thread-1

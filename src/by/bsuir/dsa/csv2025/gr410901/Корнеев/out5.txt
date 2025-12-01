@@ -1,0 +1,5 @@
+Original array 7 7 7 7
+After iteration 1 7 7 7 7
+After iteration 2 7 7 7 7
+After iteration 3 7 7 7 7
+Sorted array 7 7 7 7

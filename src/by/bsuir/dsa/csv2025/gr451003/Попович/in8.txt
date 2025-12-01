@@ -1,0 +1,1 @@
+nums = [100,-100,50,-50,0] maxValue = 100 maxCount = 10 maxMemory = 250
