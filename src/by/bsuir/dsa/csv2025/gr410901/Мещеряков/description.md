@@ -91,9 +91,7 @@ Print all 0â€‘based starting indices of substrings matching the pattern, spaceâ€
 
 # Theory
 
-## Solution Overview
-
-### Pattern parsing
+## Pattern parsing
 
 The pattern is parsed into a list of *groups*, each representing one position:
 

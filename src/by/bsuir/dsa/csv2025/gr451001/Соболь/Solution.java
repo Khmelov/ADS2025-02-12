@@ -119,6 +119,8 @@ public class Solution {
         }
     }
 
+
+
     static void updateColor(int v, int tl, int tr, int pos, char newColor) {
         if (tl == tr) {
             tree[v].r = (newColor == 'r') ? 1 : 0;
@@ -213,61 +215,61 @@ public class Solution {
 
 
     @Test
-    void test1() throws Exception {
+    public void test1() throws Exception {
         runTest("5 4\n10 20 30 40 50\nr r g g b\n3 1 5\n1 2 4 -30\n3 2 4\n4 1 5 g\n",
                 "NO\nYES\n2\n");
     }
 
     @Test
-    void test2() throws Exception {
+    public void test2() throws Exception {
         runTest("5 12\n10 10 10 10 10\nr r r r r\n1 1 3 -10\n3 1 5\n3 4 5\n4 1 5 r\n2 3 g\n4 1 5 r\n4 1 5 g\n1 2 4 5\n3 1 1\n3 2 2\n3 3 3\n4 3 3 g\n",
                 "YES\nNO\n5\n4\n1\nYES\nNO\nNO\n1\n");
     }
 
     @Test
-    void test3() throws Exception {
+    public void test3() throws Exception {
         runTest("6 10\n100 100 100 100 100 100\nr g b r g b\n4 1 6 r\n4 1 6 g\n4 1 6 b\n2 1 b\n2 6 r\n4 1 6 r\n4 1 6 g\n4 1 6 b\n4 1 3 b\n4 4 6 r\n",
                 "2\n2\n2\n2\n2\n2\n2\n2\n");
     }
 
     @Test
-    void test4() throws Exception {
+    public void test4() throws Exception {
         runTest("3 9\n5 5 5\ng g g\n1 1 3 -5\n3 1 1\n3 2 2\n3 3 3\n1 2 2 1\n3 1 1\n3 2 2\n1 1 3 -100\n3 1 3\n",
                 "YES\nYES\nYES\nYES\nNO\nYES\n");
     }
 
     @Test
-    void test5() throws Exception {
+    public void test5() throws Exception {
         runTest("10 8\n20 20 20 20 20 20 20 20 20 20\nr r r r r b b b b b\n1 1 5 -25\n3 1 10\n3 6 10\n4 1 10 r\n4 1 10 b\n1 6 10 10\n3 6 10\n4 1 5 r\n",
                 "YES\nNO\n5\n5\nNO\n5\n");
     }
 
     @Test
-    void test6() throws Exception {
+    public void test6() throws Exception {
         runTest("1 10\n10\nr\n3 1 1\n1 1 1 -10\n3 1 1\n4 1 1 r\n2 1 b\n4 1 1 r\n4 1 1 b\n1 1 1 1\n3 1 1\n4 1 1 b\n",
                 "NO\nYES\n1\n0\n1\nNO\n1\n");
     }
 
     @Test
-    void test7() throws Exception {
+    public void test7() throws Exception {
         runTest("2 6\n5 5\nr r\n3 1 2\n1 1 1 -5\n3 1 2\n2 1 g\n4 1 2 g\n4 1 2 r\n",
                 "NO\nYES\n1\n1\n");
     }
 
     @Test
-    void test8() throws Exception {
+    public void test8() throws Exception {
         runTest("10 8\n0 0 0 0 0 0 0 0 0 0\nr r r r r r r r r r\n1 1 10 10\n1 2 9 10\n1 3 8 10\n1 4 7 10\n1 5 6 10\n3 1 10\n1 1 10 -25\n3 1 10\n",
                 "NO\nYES\n");
     }
 
     @Test
-    void test9() throws Exception {
+    public void test9() throws Exception {
         runTest("15 7\n10 10 10 10 10 10 10 10 10 10 10 10 10 10 10\nr g b r g b r g b r g b r g b\n4 1 15 r\n2 4 b\n4 1 15 r\n4 1 15 b\n1 1 15 -1000\n3 1 15\n4 2 14 g\n",
                 "5\n4\n6\nYES\n5\n");
     }
 
     @Test
-    void test10() throws Exception {
+    public void test10() throws Exception {
         runTest("10 10\n100 100 100 100 100 100 100 100 100 100\nr r r r r b b b b b\n1 1 2 -200\n1 3 4 -200\n1 5 6 -200\n3 1 2\n3 3 4\n3 5 6\n3 7 8\n4 1 10 r\n2 5 r\n4 1 10 r\n",
                 "YES\nYES\nYES\nNO\n5\n5\n");
     }

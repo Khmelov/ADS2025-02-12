@@ -1,311 +1,188 @@
 package by.it.group410901.borisdubinin.lesson10;
 
-
 import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class MyArrayDeque<E> implements Deque<E> {
+    private E[] array;    // Массив для хранения элементов
+    private int head;        // Индекс первого элемента
+    private int tail;        // Индекс следующего за последним элементом
+    private int size;        // Текущее количество элементов
+    private static final int DEFAULT_CAPACITY = 16;  // Начальная емкость по умолчанию
 
-    private static final int DEFAULT_CAPACITY = 32;
-    private Object[] array;
-    private int head;
-    private int tail;
-    private int size;
-
-    public MyArrayDeque() {
-        this(DEFAULT_CAPACITY);
-    }
-    public MyArrayDeque(int startCapacity){
-        if(startCapacity <= 1)
-            startCapacity = DEFAULT_CAPACITY;
-
-        array = new Object[startCapacity];
-        head = -1;                      //перед первым элементом, т.к. добавление сначала смещает head вперед
-        tail = array.length;                //то же самое
+    // Конструктор с заданной емкостью
+    @SuppressWarnings("unchecked")
+    public MyArrayDeque(int capacity) {
+        if (capacity < 1) capacity = DEFAULT_CAPACITY;  // Минимальная емкость
+        array = (E[]) new Object[capacity];
+        head = 0;
+        tail = 0;
         size = 0;
     }
 
-    private void increaseCapacity(){
-        Object[] newArray = new Object[array.length * 2];
-        for(int i = 0; i <= head; i++){
-            newArray[i] = array[i];
-        }
-        if(tail == array.length){
-            tail = newArray.length;
-        }
-        else {
-            int j = newArray.length-1;
-            for (int i = array.length-1; i >= tail; i--, j--) {
-                newArray[j] = array[i];
-            }
-            tail = j+1;
-        }
-        array = newArray;
+    // Конструктор по умолчанию
+    public MyArrayDeque() {
+        this(DEFAULT_CAPACITY);
     }
 
-    /// ////////////////////////////////////////////////////////////////////////////////////
-    /// ////////////////////////////////////////////////////////////////////////////////////
-    /// ////////////////////////////////////////////////////////////////////////////////////
+    // Возвращает текущую емкость массива
+    private int cap() { return array.length; }
 
+    // Проверяет необходимость увеличения массива
+    private void ensureCapacity() {
+        if (size == cap()) {
+            grow();  // Увеличиваем массив при заполнении
+        }
+    }
+
+    // Увеличивает размер массива в 2 раза
+    @SuppressWarnings("unchecked")
+    private void grow() {
+        int old = cap();      // Текущая емкость
+        int n = old << 1;     // Новая емкость = старая * 2 (битовый сдвиг влево)
+        E[] nArr = (E[]) new Object[n];
+
+        // Копируем элементы в новый массив, сохраняя порядок
+        for (int i = 0; i < size; i++) {
+            nArr[i] = array[(head + i) % old];  // Учитываем циклический буфер
+        }
+        array = nArr;
+        head = 0;            // Голова теперь в начале
+        tail = size % n;     // Хвост после последнего элемента
+    }
+
+    // Преобразование дека в строку для вывода
     @Override
-    public String toString(){
-        if(size == 0)
-            return "[]";
-
-        StringBuilder sb = new StringBuilder("[");
-        for(int i = head; i >= 0; i--){
-            sb.append(array[i]);
-            sb.append(", ");
+    public String toString() {
+        if (size == 0) return "[]";  // Пустой дек
+        StringBuilder sb = new StringBuilder();
+        sb.append('[');
+        // Проходим по всем элементам в порядке от head к tail
+        for (int i = 0; i < size; i++) {
+            E e = array[(head + i) % cap()];  // Учитываем циклический буфер
+            sb.append(String.valueOf(e));
+            if (i != size - 1) sb.append(", ");  // Запятая между элементами
         }
-        for(int i = array.length-1; i >= tail; i--){
-            sb.append(array[i]);
-            sb.append(", ");
-        }
-
-        if(sb.length() > 1) {
-            sb.setLength(sb.length() - 2);
-        }
-        sb.append("]");
-
+        sb.append(']');
         return sb.toString();
     }
+
+    // Возвращает количество элементов в деке
     @Override
-    public int size(){
+    public int size() {
         return size;
     }
 
+    // Добавление элемента в конец дека
     @Override
-    public boolean add(E element){
-        if(element == null)
-            throw new NullPointerException("Null элементы не разрешены");
-
+    public boolean add(E element) {
         addLast(element);
         return true;
     }
-    @Override
-    public void addFirst(E element){
-        if(element == null)
-            throw new NullPointerException("Null элементы не разрешены");
 
-        if(++size > array.length)
-            increaseCapacity();
-        array[++head] = element;
-    }
+    // Добавление элемента в начало дека
     @Override
-    public void addLast(E element){
-        if(element == null)
-            throw new NullPointerException("Null элементы не разрешены");
-
-        if(++size > array.length)
-            increaseCapacity();
-        array[--tail] = element;
+    public void addFirst(E element) {
+        if (element == null) throw new NullPointerException();  // Null не допускается
+        ensureCapacity();  // Проверяем/увеличиваем емкость
+        // Сдвигаем head назад по кругу (циклический буфер)
+        head = (head - 1 + cap()) % cap();
+        array[head] = element;
+        size++;
     }
 
+    // Добавление элемента в конец дека
+    @Override
+    public void addLast(E element) {
+        if (element == null) throw new NullPointerException();  // Null не допускается
+        ensureCapacity();  // Проверяем/увеличиваем емкость
+        array[tail] = element;
+        // Сдвигаем tail вперед по кругу (циклический буфер)
+        tail = (tail + 1) % cap();
+        size++;
+    }
+
+    // Получение первого элемента без удаления (с исключением если пусто)
     @Override
     public E element() {
-        if(size == 0)
-            return null;
         return getFirst();
     }
+
+    // Получение первого элемента
     @Override
     public E getFirst() {
-        if(size == 0)
-            throw new NoSuchElementException("Коллекция пуста");
-
-        int first;
-        if(head == -1)
-            first = array.length-1;
-        else
-            first = head;
-
-        return (E)array[first];
+        if (size == 0) throw new NoSuchElementException();
+        return array[head];
     }
+
+    // Получение последнего элемента
     @Override
     public E getLast() {
-        if(size == 0)
-            throw new NoSuchElementException("Коллекция пуста");
-
-        int last;
-        if(tail == array.length)
-            last = 0;
-        else
-            last = tail;
-
-        return (E)array[last];
+        if (size == 0) throw new NoSuchElementException();
+        // tail указывает на следующую позицию, поэтому берем предыдущую
+        int idx = (tail - 1 + cap()) % cap();
+        return array[idx];
     }
 
+    // Извлечение первого элемента с удалением (возвращает null если пусто)
     @Override
     public E poll() {
         return pollFirst();
     }
+
+    // Извлечение первого элемента
     @Override
     public E pollFirst() {
-        if(size == 0)
-            throw new NoSuchElementException("Коллекция пуста");
-
+        if (size == 0) return null;  // Пустой дек - возвращаем null
+        E r = array[head];        // Сохраняем элемент
+        array[head] = null;       // Очищаем ячейку (помощь GC)
+        // Сдвигаем head вперед по кругу
+        head = (head + 1) % cap();
         size--;
-        if(head == -1){
-            E first = (E)array[array.length-1];
-            for(int i = array.length-2; i >= tail; i--)
-                array[i+1] = array[i];
-            tail++;
-            return first;
-        }
-        else {
-            head--;
-            return (E)array[head+1];
-        }
-
+        // Если дек стал пустым, сбрасываем индексы
+        if (size == 0) { head = tail = 0; }
+        return r;
     }
+
+    // Извлечение последнего элемента
     @Override
     public E pollLast() {
-        if(size == 0)
-            throw new NoSuchElementException("Коллекция пуста");
-
+        if (size == 0) return null;  // Пустой дек - возвращаем null
+        // Сдвигаем tail назад (tail указывает на следующую позицию)
+        tail = (tail - 1 + cap()) % cap();
+        E r = array[tail];        // Сохраняем элемент
+        array[tail] = null;       // Очищаем ячейку (помощь GC)
         size--;
-        if(tail == array.length){
-            E last = (E)array[0];
-            for(int i = 1; i <= head; i++)
-                array[i-1] = array[i];
-            head--;
-            return last;
-        }
-        else {
-            tail++;
-            return (E)array[tail-1];
-        }
+        // Если дек стал пустым, сбрасываем индексы
+        if (size == 0) { head = tail = 0; }
+        return r;
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////
-
-
-    @Override
-    public boolean isEmpty() {
-        return false;
-    }
-
-    @Override
-    public Iterator<E> iterator() {
-        return null;
-    }
-
-    @Override
-    public Object[] toArray() {
-        return new Object[0];
-    }
-
-    @Override
-    public <T> T[] toArray(T[] a) {
-        return null;
-    }
-
-    @Override
-    public Iterator<E> descendingIterator() {
-        return null;
-    }
-
-    @Override
-    public boolean offer(E e) {
-        return false;
-    }
-
-    @Override
-    public E remove() {
-        return null;
-    }
-
-    @Override
-    public E peek() {
-        return null;
-    }
-
-    @Override
-    public boolean addAll(Collection<? extends E> c) {
-        return false;
-    }
-
-    @Override
-    public boolean removeAll(Collection<?> c) {
-        return false;
-    }
-
-    @Override
-    public boolean retainAll(Collection<?> c) {
-        return false;
-    }
-
-    @Override
-    public void clear() {
-
-    }
-
-    @Override
-    public void push(E e) {
-
-    }
-
-    @Override
-    public E pop() {
-        return null;
-    }
-
-    @Override
-    public boolean remove(Object o) {
-        return false;
-    }
-
-    @Override
-    public boolean containsAll(Collection<?> c) {
-        return false;
-    }
-
-    @Override
-    public boolean contains(Object o) {
-        return false;
-    }
-
-    @Override
-    public boolean offerFirst(E e) {
-        return false;
-    }
-
-    @Override
-    public boolean offerLast(E e) {
-        return false;
-    }
-
-    @Override
-    public E removeFirst() {
-        return null;
-    }
-
-    @Override
-    public E removeLast() {
-        return null;
-    }
-
-    @Override
-    public E peekFirst() {
-        return null;
-    }
-
-    @Override
-    public E peekLast() {
-        return null;
-    }
-
-    @Override
-    public boolean removeFirstOccurrence(Object o) {
-        return false;
-    }
-
-    @Override
-    public boolean removeLastOccurrence(Object o) {
-        return false;
-    }
+    @Override public boolean offerFirst(E e) { throw new UnsupportedOperationException(); }
+    @Override public boolean offerLast(E e)  { throw new UnsupportedOperationException(); }
+    @Override public boolean offer(E e)      { throw new UnsupportedOperationException(); }
+    @Override public E peek()                { throw new UnsupportedOperationException(); }
+    @Override public E peekFirst()           { throw new UnsupportedOperationException(); }
+    @Override public E peekLast()            { throw new UnsupportedOperationException(); }
+    @Override public E remove()              { throw new UnsupportedOperationException(); }
+    @Override public E removeFirst()         { throw new UnsupportedOperationException(); }
+    @Override public E removeLast()          { throw new UnsupportedOperationException(); }
+    @Override public void push(E e)          { throw new UnsupportedOperationException(); }
+    @Override public E pop()                 { throw new UnsupportedOperationException(); }
+    @Override public boolean remove(Object o)                       { throw new UnsupportedOperationException(); }
+    @Override public boolean contains(Object o)                     { throw new UnsupportedOperationException(); }
+    @Override public Iterator<E> iterator()                         { throw new UnsupportedOperationException(); }
+    @Override public Iterator<E> descendingIterator()               { throw new UnsupportedOperationException(); }
+    @Override public boolean isEmpty()                              { throw new UnsupportedOperationException(); }
+    @Override public void clear()                                   { throw new UnsupportedOperationException(); }
+    @Override public boolean containsAll(Collection<?> c)           { throw new UnsupportedOperationException(); }
+    @Override public boolean addAll(Collection<? extends E> c)      { throw new UnsupportedOperationException(); }
+    @Override public boolean removeAll(Collection<?> c)             { throw new UnsupportedOperationException(); }
+    @Override public boolean retainAll(Collection<?> c)             { throw new UnsupportedOperationException(); }
+    @Override public Object[] toArray()                             { throw new UnsupportedOperationException(); }
+    @Override public <T> T[] toArray(T[] a)                         { throw new UnsupportedOperationException(); }
+    @Override public boolean removeFirstOccurrence(Object o)        { throw new UnsupportedOperationException(); }
+    @Override public boolean removeLastOccurrence(Object o)         { throw new UnsupportedOperationException(); }
 }

@@ -3,8 +3,7 @@ package by.it.group451004.struts.lesson10;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class MyLinkedList<E>
-        implements Deque<E>, List<E> {
+public class MyLinkedList<E> implements Deque<E> {
     public static class ListItem<E> {
         public E item;
         public ListItem<E> next;
@@ -57,7 +56,6 @@ public class MyLinkedList<E>
         return null;
     }
 
-    @Override
     public E remove(int index) {
         Iterator<E> iterator = iterator();
         E item = head.item;
@@ -67,31 +65,6 @@ public class MyLinkedList<E>
 
         iterator.remove();
         return item;
-    }
-
-    @Override
-    public int indexOf(Object o) {
-        return 0;
-    }
-
-    @Override
-    public int lastIndexOf(Object o) {
-        return 0;
-    }
-
-    @Override
-    public ListIterator<E> listIterator() {
-        return null;
-    }
-
-    @Override
-    public ListIterator<E> listIterator(int index) {
-        return null;
-    }
-
-    @Override
-    public List<E> subList(int fromIndex, int toIndex) {
-        return List.of();
     }
 
     @Override
@@ -194,26 +167,6 @@ public class MyLinkedList<E>
 
     @Override
     public void clear() {
-
-    }
-
-    @Override
-    public boolean addAll(int index, Collection<? extends E> c) {
-        return false;
-    }
-
-    @Override
-    public E get(int index) {
-        return null;
-    }
-
-    @Override
-    public E set(int index, E element) {
-        return null;
-    }
-
-    @Override
-    public void add(int index, E element) {
 
     }
 

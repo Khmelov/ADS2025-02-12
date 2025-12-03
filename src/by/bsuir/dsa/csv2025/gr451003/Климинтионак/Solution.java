@@ -3,12 +3,9 @@ package by.bsuir.dsa.csv2025.gr451003.Климинтионак;
 
 import org.junit.Test;
 
-import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
-import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 
 
 import java.util.*;
@@ -20,10 +17,18 @@ public class Solution {
     static final String EMPTY = "EMPTY";
     static final String DELETED = "DELETED";
 
+
     static int a, b, c, d;
     static int m;
     static String[] table;
     static int used;
+
+    static void reset() {
+        table = null;
+        used = 0;
+        m = 0;
+        a = b = c = d = 0;
+    }
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
@@ -149,296 +154,328 @@ public class Solution {
     }
 
     private String runProgram(String input) throws Exception {
-        ProcessBuilder pb = new ProcessBuilder(
-                "java",
-                "-cp",
-                "out/production/Hash",   // Путь к Solution.class
-                "Solution"
-        );
+        InputStream oldIn = System.in;
+        PrintStream oldOut = System.out;
 
-        pb.redirectErrorStream(true);
-        Process p = pb.start();
+        ByteArrayInputStream in = new ByteArrayInputStream(input.getBytes());
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        try (BufferedWriter writer = new BufferedWriter(
-                new OutputStreamWriter(p.getOutputStream(), StandardCharsets.UTF_8))) {
-            writer.write(input);
-        }
+        System.setIn(in);
+        System.setOut(new PrintStream(out));
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (InputStream is = p.getInputStream()) {
-            is.transferTo(baos);
-        }
+        Solution.main(new String[]{});
 
-        p.waitFor();
-        return baos.toString().replace("\r", "").trim();
+        System.setIn(oldIn);
+        System.setOut(oldOut);
+
+        return out.toString().replace("\r", "").trim();
     }
 
-
     private void assertRun(String input, String expected) throws Exception {
-        String out = runProgram(input).trim();
-        assertEquals(expected.trim(), out);
+        String actual = runProgram(input);
+        assertEquals(expected.trim(), actual.trim());
     }
 
     @Test
-    public void test1() throws Exception {
+    public void task0() throws Exception {
+        reset();
         assertRun(
-                "1 0 1 0 5\n" +
-                        "7\n" +
-                        "ADD 10\n" +
-                        "ADD 20\n" +
-                        "ADD 30\n" +
-                        "FIND 20\n" +
-                        "DEL 20\n" +
-                        "FIND 20\n" +
-                        "PRINT\n",
+                """
+                        1 0 1 0 5
+                        7
+                        ADD 10
+                        ADD 20
+                        ADD 30
+                        FIND 20
+                        DEL 20
+                        FIND 20
+                        PRINT
+                        """,
 
-                "1\n" +
-                        "-1\n" +
-                        "0 10\n" +
-                        "1 DELETED\n" +
-                        "2 EMPTY\n" +
-                        "3 30\n" +
-                        "4 EMPTY"
+                """
+                        1
+                        -1
+                        0 10
+                        1 DELETED
+                        2 EMPTY
+                        3 30
+                        4 EMPTY"""
+        );
+    }
+
+
+    @Test
+    public void test1() throws Exception {
+        reset();
+        assertRun(
+                """
+                        1 0 1 0 5
+                        5
+                        ADD 5
+                        ADD 15
+                        ADD 25
+                        PRINT
+                        FIND 15
+                        """,
+
+                """
+                        0 5
+                        1 EMPTY
+                        2 25
+                        3 EMPTY
+                        4 15
+                        4"""
         );
     }
 
 
     @Test
     public void test2() throws Exception {
+        reset();
         assertRun(
-                "1 0 1 0 5\n" +
-                        "5\n" +
-                        "ADD 5\n" +
-                        "ADD 15\n" +
-                        "ADD 25\n" +
-                        "PRINT\n" +
-                        "FIND 15\n",
+                """
+                        2 1 1 0 7
+                        6
+                        ADD 14
+                        ADD 28
+                        DEL 14
+                        ADD 35
+                        PRINT
+                        FIND 14
+                        """,
 
-                "0 5\n" +
-                        "1 EMPTY\n" +
-                        "2 25\n" +
-                        "3 EMPTY\n" +
-                        "4 15\n" +
-                        "4"
+                """
+                        0 EMPTY
+                        1 35
+                        2 EMPTY
+                        3 EMPTY
+                        4 EMPTY
+                        5 EMPTY
+                        6 28
+                        -1"""
         );
     }
 
 
     @Test
     public void test3() throws Exception {
+        reset();
         assertRun(
-                "2 1 1 0 7\n" +
-                        "6\n" +
-                        "ADD 14\n" +
-                        "ADD 28\n" +
-                        "DEL 14\n" +
-                        "ADD 35\n" +
-                        "PRINT\n" +
-                        "FIND 14\n",
+                """
+                        1 0 1 0 11
+                        6
+                        ADD 27
+                        ADD 16
+                        DEL 16
+                        DEL 100
+                        PRINT
+                        FIND 27
+                        """,
 
-                "0 EMPTY\n" +
-                        "1 35\n" +
-                        "2 EMPTY\n" +
-                        "3 EMPTY\n" +
-                        "4 EMPTY\n" +
-                        "5 EMPTY\n" +
-                        "6 28\n" +
-                        "-1"
+                """
+                        0 EMPTY
+                        1 DELETED
+                        2 EMPTY
+                        3 EMPTY
+                        4 EMPTY
+                        5 27
+                        6 EMPTY
+                        7 EMPTY
+                        8 EMPTY
+                        9 EMPTY
+                        10 EMPTY
+                        5"""
         );
     }
 
 
     @Test
     public void test4() throws Exception {
+        reset();
         assertRun(
-                "1 0 1 0 11\n" +
-                        "6\n" +
-                        "ADD 27\n" +
-                        "ADD 16\n" +
-                        "DEL 16\n" +
-                        "DEL 100\n" +
-                        "PRINT\n" +
-                        "FIND 27\n",
+                """
+                        3 1 2 1 5
+                        6
+                        ADD 4
+                        ADD 9
+                        ADD 14
+                        ADD 19
+                        PRINT
+                        FIND 14
+                        """,
 
-                "0 EMPTY\n" +
-                        "1 DELETED\n" +
-                        "2 EMPTY\n" +
-                        "3 EMPTY\n" +
-                        "4 EMPTY\n" +
-                        "5 27\n" +
-                        "6 EMPTY\n" +
-                        "7 EMPTY\n" +
-                        "8 EMPTY\n" +
-                        "9 EMPTY\n" +
-                        "10 EMPTY\n" +
-                        "5"
+                """
+                        0 14
+                        1 19
+                        2 9
+                        3 4
+                        4 EMPTY
+                        0"""
         );
     }
 
 
     @Test
     public void test5() throws Exception {
+        reset();
         assertRun(
-                "3 1 2 1 5\n" +
-                        "6\n" +
-                        "ADD 4\n" +
-                        "ADD 9\n" +
-                        "ADD 14\n" +
-                        "ADD 19\n" +
-                        "PRINT\n" +
-                        "FIND 14\n",
+                """
+                        1 1 1 1 5
+                        8
+                        ADD 1
+                        ADD 6
+                        DEL 6
+                        ADD 11
+                        ADD 16
+                        PRINT
+                        FIND 6
+                        FIND 16
+                        """,
 
-                "0 14\n" +
-                        "1 19\n" +
-                        "2 9\n" +
-                        "3 4\n" +
-                        "4 EMPTY\n" +
-                        "0"
+                """
+                        0 EMPTY
+                        1 DELETED
+                        2 1
+                        3 11
+                        4 16
+                        -1
+                        4"""
         );
     }
 
 
     @Test
     public void test6() throws Exception {
+        reset();
         assertRun(
-                "1 1 1 1 5\n" +
-                        "8\n" +
-                        "ADD 1\n" +
-                        "ADD 6\n" +
-                        "DEL 6\n" +
-                        "ADD 11\n" +
-                        "ADD 16\n" +
-                        "PRINT\n" +
-                        "FIND 6\n" +
-                        "FIND 16\n",
+                """
+                        3 0 1 0 9
+                        10
+                        ADD 12
+                        ADD 21
+                        ADD 30
+                        DEL 21
+                        ADD 39
+                        ADD 48
+                        ADD 57
+                        PRINT
+                        FIND 48
+                        FIND 21
+                        """,
 
-                "0 EMPTY\n" +
-                        "1 DELETED\n" +
-                        "2 1\n" +
-                        "3 11\n" +
-                        "4 16\n" +
-                        "-1\n" +
-                        "4"
+                """
+                        0 12
+                        1 48
+                        2 57
+                        3 EMPTY
+                        4 EMPTY
+                        5 EMPTY
+                        6 DELETED
+                        7 30
+                        8 39
+                        1
+                        -1"""
         );
     }
 
 
     @Test
     public void test7() throws Exception {
+        reset();
         assertRun(
-                "3 0 1 0 9\n" +
-                        "10\n" +
-                        "ADD 12\n" +
-                        "ADD 21\n" +
-                        "ADD 30\n" +
-                        "DEL 21\n" +
-                        "ADD 39\n" +
-                        "ADD 48\n" +
-                        "ADD 57\n" +
-                        "PRINT\n" +
-                        "FIND 48\n" +
-                        "FIND 21\n",
+                """
+                        5 0 3 0 7
+                        6
+                        ADD 7
+                        ADD 14
+                        ADD 21
+                        PRINT
+                        FIND 14
+                        FIND 100
+                        """,
 
-                "0 12\n" +
-                        "1 48\n" +
-                        "2 57\n" +
-                        "3 EMPTY\n" +
-                        "4 EMPTY\n" +
-                        "5 EMPTY\n" +
-                        "6 DELETED\n" +
-                        "7 30\n" +
-                        "8 39\n" +
-                        "1\n" +
-                        "-1"
+                """
+                        0 7
+                        1 14
+                        2 EMPTY
+                        3 EMPTY
+                        4 21
+                        5 EMPTY
+                        6 EMPTY
+                        1
+                        -1"""
         );
     }
 
 
     @Test
     public void test8() throws Exception {
+        reset();
         assertRun(
-                "5 0 3 0 7\n" +
-                        "6\n" +
-                        "ADD 7\n" +
-                        "ADD 14\n" +
-                        "ADD 21\n" +
-                        "PRINT\n" +
-                        "FIND 14\n" +
-                        "FIND 100\n",
+                """
+                        2 0 0 0 7
+                        7
+                        ADD 3
+                        ADD 10
+                        ADD 17
+                        ADD 24
+                        PRINT
+                        FIND 24
+                        FIND 1000
+                        """,
 
-                "0 7\n" +
-                        "1 14\n" +
-                        "2 EMPTY\n" +
-                        "3 EMPTY\n" +
-                        "4 21\n" +
-                        "5 EMPTY\n" +
-                        "6 EMPTY\n" +
-                        "1\n" +
-                        "-1"
+                """
+                        0 10
+                        1 17
+                        2 24
+                        3 EMPTY
+                        4 EMPTY
+                        5 EMPTY
+                        6 3
+                        2
+                        -1"""
         );
     }
 
 
     @Test
     public void test9() throws Exception {
+        reset();
         assertRun(
-                "2 0 0 0 7\n" +
-                        "7\n" +
-                        "ADD 3\n" +
-                        "ADD 10\n" +
-                        "ADD 17\n" +
-                        "ADD 24\n" +
-                        "PRINT\n" +
-                        "FIND 24\n" +
-                        "FIND 1000\n",
+                """
+                        1 0 1 0 7
+                        10
+                        ADD 7
+                        ADD 14
+                        ADD 21
+                        DEL 14
+                        ADD 28
+                        ADD 35
+                        DEL 7
+                        ADD 42
+                        PRINT
+                        FIND 42
+                        """,
 
-                "0 10\n" +
-                        "1 17\n" +
-                        "2 24\n" +
-                        "3 EMPTY\n" +
-                        "4 EMPTY\n" +
-                        "5 EMPTY\n" +
-                        "6 3\n" +
-                        "2\n" +
-                        "-1"
-        );
-    }
-
-
-    @Test
-    public void test10() throws Exception {
-        assertRun(
-                "1 0 1 0 7\n" +
-                        "10\n" +
-                        "ADD 7\n" +
-                        "ADD 14\n" +
-                        "ADD 21\n" +
-                        "DEL 14\n" +
-                        "ADD 28\n" +
-                        "ADD 35\n" +
-                        "DEL 7\n" +
-                        "ADD 42\n" +
-                        "PRINT\n" +
-                        "FIND 42\n",
-
-                "0 EMPTY\n" +
-                        "1 35\n" +
-                        "2 EMPTY\n" +
-                        "3 EMPTY\n" +
-                        "4 21\n" +
-                        "5 EMPTY\n" +
-                        "6 EMPTY\n" +
-                        "7 EMPTY\n" +
-                        "8 42\n" +
-                        "9 EMPTY\n" +
-                        "10 EMPTY\n" +
-                        "11 28\n" +
-                        "12 EMPTY\n" +
-                        "13 EMPTY\n" +
-                        "14 EMPTY\n" +
-                        "15 EMPTY\n" +
-                        "16 EMPTY\n" +
-                        "8"
+                """
+                        0 EMPTY
+                        1 35
+                        2 EMPTY
+                        3 EMPTY
+                        4 21
+                        5 EMPTY
+                        6 EMPTY
+                        7 EMPTY
+                        8 42
+                        9 EMPTY
+                        10 EMPTY
+                        11 28
+                        12 EMPTY
+                        13 EMPTY
+                        14 EMPTY
+                        15 EMPTY
+                        16 EMPTY
+                        8"""
         );
     }
 }
