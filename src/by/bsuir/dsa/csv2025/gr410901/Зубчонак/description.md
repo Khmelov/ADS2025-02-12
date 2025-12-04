@@ -4,8 +4,6 @@ Maximum Number of Completed Suits in Spider Solitaire After One Move
 
 # Task
 
-Maximum Number of Completed Suits in Spider Solitaire After One Move
-
 Consider simplified 1-suit Spider Solitaire (cards 1–13), starting with 10 piles: first 4 with 6 cards, others with 5 (total 54 cards).
 
 **Rules**:
