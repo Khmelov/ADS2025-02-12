@@ -1,0 +1,5 @@
+4
+add 5
+find 5
+del 5
+find 5

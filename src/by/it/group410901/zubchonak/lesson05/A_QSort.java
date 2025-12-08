@@ -2,8 +2,6 @@ package by.it.group410901.zubchonak.lesson05;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Scanner;
 
 /*
@@ -73,9 +71,13 @@ public class A_QSort {
         //тут реализуйте логику задачи с применением быстрой сортировки
         //в классе отрезка Segment реализуйте нужный для этой задачи компаратор
 
-        for (int i = 0; i < m; i++) {
-            int count = 0;
-            for (int j = 0; j < n; j++) {
+        for (int i = 0; i < m; i++) {   //m — это общее количество точек,
+            int count = 0; //Для каждой точки инициализируется счетчик count,
+            // который будет отслеживать, сколько камер записали эту точку.
+            for (int j = 0; j < n; j++) { //n — это общее количество отрезков.
+                //Если точка больше или равна началу отрезка (segments[j].start)
+                // и меньше или равна его концу (segments[j].stop), значит,
+                // эта камера записала событие в данный момент времени.
                 if (points[i] >= segments[j].start && points[i] <= segments[j].stop) {
                     count++;
                 }

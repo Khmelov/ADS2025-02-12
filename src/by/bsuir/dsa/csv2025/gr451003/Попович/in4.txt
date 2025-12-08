@@ -1,0 +1,1 @@
+nums = [9,7,5,3,1,8,6,4,2] maxValue = 9 maxCount = 100 maxMemory = 3

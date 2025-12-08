@@ -1,0 +1,11 @@
+5 5 1 5
+Station 1
+Victory_Square 2
+Nemiga 3
+Academy_of_Sciences 4
+Stone_Hill 5
+1 2 3
+2 3 4
+3 5 2
+1 4 10
+4 5 3
