@@ -29,7 +29,7 @@ public class MySplayMap implements Map<Integer, String> {
         return n == null ? 0 : n.height;
     }
 
-    // Фактор баланса узла (разница высот поддеревьев)
+    //Фактор баланса узла (разница высот поддеревьев)
     private int getBalance(Node n) {
         return n == null ? 0 : height(n.left) - height(n.right);
     }

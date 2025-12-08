@@ -70,7 +70,7 @@ public class MyAvlMap implements Map<Integer, String> {
     // Вставка ключа в дерево
     private Node insert(Node node, Integer key, String value) {
 
-        // Обычная вставка в бинарное дерево поиска
+        //Обычная вставка в бинарное дерево поиска
         if (node == null) {
             return new Node(key, value); // Новый узел
         }

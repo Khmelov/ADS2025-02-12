@@ -193,7 +193,7 @@ public class MyRbMap implements SortedMap<Integer, String> {
         throw new UnsupportedOperationException();
     }
 
-    // =================== Внутренние методы RBT ===================
+    //=================== Внутренние методы RBT ===================
 
     private Node getNode(Object key) {
         if (key == null) return null;
