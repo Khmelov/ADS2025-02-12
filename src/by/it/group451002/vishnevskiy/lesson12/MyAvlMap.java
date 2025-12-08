@@ -18,8 +18,8 @@ public class MyAvlMap implements Map<Integer, String> {
         int height;            // Высота поддерева в этом узле
 
         Node(Integer key, String value) {
-            this.key = key;    // Сохраняем ключ
-            this.value = value;// Сохраняем значение
+            this.key = key;    //Сохраняем ключ
+            this.value = value;//Сохраняем значение
             this.height = 1;   // Новый узел всегда высоты 1
         }
     }

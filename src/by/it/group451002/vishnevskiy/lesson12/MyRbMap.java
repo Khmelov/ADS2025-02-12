@@ -204,7 +204,7 @@ public class MyRbMap implements SortedMap<Integer, String> {
             int cmp = k.compareTo(p.key);
             if (cmp < 0) p = p.left;
             else if (cmp > 0) p = p.right;
-            else return p; // Нашли узел
+            else return p; //Нашли узел
         }
         return null;
     }

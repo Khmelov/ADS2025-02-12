@@ -20,7 +20,7 @@ public class MySplayMap implements Map<Integer, String> {
         Node(Integer key, String value) {
             this.key = key;
             this.value = value;
-            this.height = 1;  // новый узел имеет высоту 1
+            this.height = 1;  //новый узел имеет высоту 1
         }
     }
 
