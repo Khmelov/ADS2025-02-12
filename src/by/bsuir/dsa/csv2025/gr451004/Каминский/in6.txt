@@ -1,0 +1,9 @@
+8
+find 0
+add 0
+find 0
+add 999999999
+find 999999999
+del 0
+find 0
+find 123

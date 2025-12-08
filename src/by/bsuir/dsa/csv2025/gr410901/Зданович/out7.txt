@@ -1,0 +1,4 @@
+YES
+NO
+NO MST
+YES

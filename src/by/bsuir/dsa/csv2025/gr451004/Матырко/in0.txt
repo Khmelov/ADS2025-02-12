@@ -1,0 +1,1 @@
+add 8 add 4 add 12 add 4 sum del 4 sum

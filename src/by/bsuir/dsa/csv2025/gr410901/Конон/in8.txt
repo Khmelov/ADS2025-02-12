@@ -1,0 +1,9 @@
+5 8
+contact 1 2
+contact 3 4
+size 1
+undo
+size 3
+undo
+size 1
+undo

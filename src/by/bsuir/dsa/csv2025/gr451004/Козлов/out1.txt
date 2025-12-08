@@ -1,0 +1,5 @@
+Enter 3 bit positions to set:
+First bit position: Second bit position: Third bit position: 
+Setting bits 0, 63, 64:
+State: {0, 63, 64}
+Number of set bits: 3
