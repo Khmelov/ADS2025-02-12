@@ -1,150 +1,228 @@
 package by.it.group410902.jalilova.lesson15;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.charset.MalformedInputException;
 import java.nio.file.*;
 import java.util.*;
 
 public class SourceScannerC {
 
+    private static final int LIMIT = 9;
+
     public static void main(String[] args) {
+        String src = System.getProperty("user.dir")
+                + File.separator + "src" + File.separator;
 
-        long start = System.nanoTime(); // старт времени
+        List<FileText> files = new ArrayList<>();
 
-        String src = System.getProperty("user.dir") + File.separator + "src" + File.separator;
-        Path root = Paths.get(src);
-
-        Map<String, String> filesMap = new TreeMap<>();
-        Map<Integer, List<String>> hashMap = new HashMap<>(); // hash -> список путей
-
-        // --- Чтение и очистка файлов ---
         try {
-            Files.walk(root)
+            Files.walk(Paths.get(src))
+                    .filter(Files::isRegularFile)
                     .filter(p -> p.toString().endsWith(".java"))
-                    .forEach(p -> {
-                        String text;
+                    .forEach(path -> {
                         try {
-                            try {
-                                text = Files.readString(p);
-                            } catch (MalformedInputException e) {
-                                return; // игнорируем битые файлы
-                            }
+                            String text = read(path);
+                            if (text == null) return;
 
-                            if (text.contains("@Test") || text.contains("org.junit.Test")) return;
+                            if (text.contains("@Test") || text.contains("org.junit.Test"))
+                                return;
 
-                            String cleaned = cleanText(text);
-                            if (!cleaned.isEmpty()) {
-                                String relPath = root.relativize(p).toString();
-                                filesMap.put(relPath, cleaned);
+                            String cleaned = clean(text);
+                            if (cleaned.isEmpty()) return;
 
-                                // hash первых 50 символов для оптимизации
-                                int h = cleaned.substring(0, Math.min(50, cleaned.length())).hashCode();
-                                hashMap.computeIfAbsent(h, k -> new ArrayList<>()).add(relPath);
-                            }
-
-                        } catch (IOException ignored) {}
+                            files.add(new FileText(
+                                    path.toString().substring(src.length()),
+                                    cleaned));
+                        } catch (Exception ignored) {}
                     });
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {}
+
+        Map<Integer, List<FileText>> buckets = new HashMap<>();
+        for (FileText f : files) {
+            int len = f.text.length();
+            for (int d = -LIMIT; d <= LIMIT; d++) {
+                buckets.computeIfAbsent(len + d, k -> new ArrayList<>()).add(f);
+            }
         }
 
-        // --- Сравнение текстов ---
-        Map<String, List<String>> copies = new TreeMap<>();
+        Map<String, List<String>> result = new TreeMap<>();
 
-        for (List<String> group : hashMap.values()) {
-            for (int i = 0; i < group.size(); i++) {
-                String path1 = group.get(i);
-                String text1 = filesMap.get(path1);
+        for (FileText a : files) {
 
-                for (int j = i + 1; j < group.size(); j++) {
-                    String path2 = group.get(j);
-                    String text2 = filesMap.get(path2);
+            List<String> copies = new ArrayList<>();
+            int la = a.text.length();
 
-                    // фильтр по длине
-                    if (Math.abs(text1.length() - text2.length()) >= 20) continue;
+            List<FileText> bucket = buckets.get(la);
+            if (bucket == null) continue;
 
-                    int dist = levenshtein(text1, text2, 10);
-                    if (dist < 10) {
-                        copies.computeIfAbsent(path1, k -> new ArrayList<>()).add(path2);
-                    }
+            for (FileText b : bucket) {
+                if (a == b) continue;
+
+                if (!likelySimilar(a, b)) continue;
+
+                if (!prefixSimilar(a.text, b.text)) continue;
+
+                int dist = boundedLevenshtein(a.text, b.text, LIMIT);
+                if (dist <= LIMIT) {
+                    copies.add(b.path);
                 }
             }
-        }
 
-        // --- Вывод ---
-        for (String path : copies.keySet()) {
-            System.out.println(path);
-            for (String copy : copies.get(path)) {
-                System.out.println("    " + copy);
+            if (!copies.isEmpty()) {
+                Collections.sort(copies);
+                result.put(a.path, copies);
             }
         }
 
-        long end = System.nanoTime(); // конец времени
-        long durationMs = (end - start) / 1_000_000;
-        System.out.println("TIME = " + durationMs + " ms"); // вывод производительности
+        for (String p : result.keySet()) {
+            System.out.println(p);
+            for (String c : result.get(p)) {
+                System.out.println(c);
+            }
+        }
     }
 
-    private static String cleanText(String text) {
+    private static String read(Path p) {
+        try {
+            return Files.readString(p, Charset.defaultCharset());
+        } catch (MalformedInputException e) {
+            try {
+                return Files.readString(p, Charset.forName("UTF-8"));
+            } catch (Exception ex) {
+                return null;
+            }
+        } catch (Exception ignored) {
+            return null;
+        }
+    }
+
+    private static String clean(String s) {
         StringBuilder sb = new StringBuilder();
-        boolean inBlock = false;
-        for (String line : text.split("\n")) {
-            String s = line;
-
-            if (inBlock) {
-                if (s.contains("*/")) {
-                    s = s.substring(s.indexOf("*/") + 2);
-                    inBlock = false;
-                } else continue;
-            }
-
-            while (s.contains("/*")) {
-                int start = s.indexOf("/*");
-                int end = s.indexOf("*/", start + 2);
-                if (end >= 0) {
-                    s = s.substring(0, start) + s.substring(end + 2);
-                } else {
-                    s = s.substring(0, start);
-                    inBlock = true;
-                    break;
-                }
-            }
-
-            int idx = s.indexOf("//");
-            if (idx >= 0) s = s.substring(0, idx);
-
-            String t = s.strip();
-            if (t.isEmpty()) continue;
-            if (t.startsWith("package ") || t.startsWith("import ")) continue;
-
-            sb.append(t).append("\n");
+        for (String line : s.split("\n")) {
+            String t = line.trim();
+            if (t.startsWith("package") || t.startsWith("import"))
+                continue;
+            sb.append(line).append("\n");
         }
 
-        // Заменяем все символы <33 на пробел и trim
-        return sb.toString().replaceAll("[\\x00-\\x1F]+", " ").trim();
+        String noCom = delComments(sb.toString());
+
+        StringBuilder out = new StringBuilder(noCom.length());
+        for (char c : noCom.toCharArray()) {
+            out.append(c < 33 ? ' ' : c);
+        }
+
+        return out.toString().trim();
     }
 
-    // Расстояние Левенштейна с ранним выходом
-    private static int levenshtein(String a, String b, int threshold) {
-        if (a.equals(b)) return 0;
-        if (Math.abs(a.length() - b.length()) >= threshold) return threshold;
+    private static String delComments(String s) {
+        StringBuilder out = new StringBuilder();
+        boolean line = false, block = false;
+        int n = s.length();
 
-        int[] prev = new int[b.length() + 1];
-        int[] curr = new int[b.length() + 1];
+        for (int i = 0; i < n; i++) {
+            char c = s.charAt(i);
 
-        for (int j = 0; j <= b.length(); j++) prev[j] = j;
-
-        for (int i = 1; i <= a.length(); i++) {
-            curr[0] = i;
-            int min = curr[0];
-            for (int j = 1; j <= b.length(); j++) {
-                int cost = a.charAt(i - 1) == b.charAt(j - 1) ? 0 : 1;
-                curr[j] = Math.min(Math.min(curr[j - 1] + 1, prev[j] + 1), prev[j - 1] + cost);
-                min = Math.min(min, curr[j]);
+            if (line) {
+                if (c == '\n') {
+                    line = false;
+                    out.append(c);
+                }
+                continue;
             }
-            if (min >= threshold) return threshold;
+            if (block) {
+                if (c == '*' && i + 1 < n && s.charAt(i + 1) == '/') {
+                    block = false;
+                    i++;
+                }
+                continue;
+            }
+
+            if (c == '/' && i + 1 < n) {
+                char d = s.charAt(i + 1);
+                if (d == '/') { line = true; i++; continue; }
+                if (d == '*') { block = true; i++; continue; }
+            }
+
+            out.append(c);
+        }
+
+        return out.toString();
+    }
+
+    private static long hash64(String s) {
+        long h = 1125899906842597L;
+        for (int i = 0; i < s.length(); i++) {
+            h = (h ^ s.charAt(i)) * 146527;
+        }
+        return h;
+    }
+
+    private static boolean likelySimilar(FileText a, FileText b) {
+        if (Math.abs(a.text.length() - b.text.length()) > LIMIT)
+            return false;
+        return a.hash == b.hash || Math.abs(a.prefixHash - b.prefixHash) < 50000000;
+    }
+
+    private static boolean prefixSimilar(String a, String b) {
+        int k = Math.min(Math.min(a.length(), b.length()), 50);
+        return a.substring(0, k).equals(b.substring(0, k));
+    }
+
+    private static int boundedLevenshtein(String a, String b, int limit) {
+        int n = a.length(), m = b.length();
+        if (Math.abs(n - m) > limit) return limit + 1;
+
+        if (n > m) { String t = a; a = b; b = t; int tt = n; n = m; m = tt; }
+
+        int[] prev = new int[m + 1];
+        int[] curr = new int[m + 1];
+
+        for (int j = 0; j <= m; j++) prev[j] = j;
+
+        for (int i = 1; i <= n; i++) {
+            curr[0] = i;
+
+            int minRow = curr[0];
+            char ca = a.charAt(i - 1);
+
+            int start = Math.max(1, i - limit);
+            int end = Math.min(m, i + limit);
+
+            Arrays.fill(curr, start, m + 1, limit + 1);
+
+            for (int j = start; j <= end; j++) {
+                int cost = (ca == b.charAt(j - 1)) ? 0 : 1;
+
+                int del = prev[j] + 1;
+                int ins = curr[j - 1] + 1;
+                int sub = prev[j - 1] + cost;
+
+                curr[j] = Math.min(Math.min(del, ins), sub);
+
+                if (curr[j] < minRow) minRow = curr[j];
+            }
+
+            if (minRow > limit) return limit + 1;
+
             int[] tmp = prev; prev = curr; curr = tmp;
         }
-        return prev[b.length()];
+
+        return prev[m];
+    }
+
+    static class FileText {
+        String path;
+        String text;
+        long hash;
+        long prefixHash;
+
+        FileText(String p, String t) {
+            path = p;
+            text = t;
+            hash = hash64(t);
+            prefixHash = hash64(t.length() > 60 ? t.substring(0, 60) : t);
+        }
     }
 }

@@ -9,6 +9,17 @@ public class ListA<E> implements List<E> {
 
     //Создайте аналог списка БЕЗ использования других классов СТАНДАРТНОЙ БИБЛИОТЕКИ
 
+    private Object[] data = new Object[10]; // внутренний массив
+    private int size = 0; // текущее количество элементов
+
+    private void ensureCapacity() {
+        if (size == data.length) {
+            Object[] newData = new Object[data.length * 3 / 2 + 1];
+            System.arraycopy(data, 0, newData, 0, data.length);
+            data = newData;
+        }
+    }
+
     /////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////
     //////               Обязательные к реализации методы             ///////
@@ -16,22 +27,37 @@ public class ListA<E> implements List<E> {
     /////////////////////////////////////////////////////////////////////////
     @Override
     public String toString() {
-        return "";
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < size; i++) {
+            sb.append(data[i]);
+            if (i < size - 1) sb.append(", ");
+        }
+        sb.append("]");
+        return sb.toString();
     }
 
     @Override
     public boolean add(E e) {
-        return false;
+        ensureCapacity();
+        data[size++] = e;
+        return true;
     }
 
     @Override
     public E remove(int index) {
-        return null;
+        @SuppressWarnings("unchecked")
+        E old = (E) data[index];
+        int numMoved = size - index - 1;
+        if (numMoved > 0) {
+            System.arraycopy(data, index + 1, data, index, numMoved);
+        }
+        data[--size] = null; // очистка последней ячейки
+        return old;
     }
 
     @Override
     public int size() {
-        return 0;
+        return size;
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -39,7 +65,6 @@ public class ListA<E> implements List<E> {
     //////               Опциональные к реализации методы             ///////
     /////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////
-
     @Override
     public void add(int index, E element) {
 
@@ -137,7 +162,6 @@ public class ListA<E> implements List<E> {
     public Object[] toArray() {
         return new Object[0];
     }
-
     /////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////
     ////////        Эти методы имплементировать необязательно    ////////////

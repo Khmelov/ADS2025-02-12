@@ -1,49 +1,27 @@
 package by.bsuir.dsa.csv2025.gr410901.Гетманчук; ////////////////////////////////////////////////////// ТЕСТЫ_ТЕСТЫ //////////////////////////////////////////////////////
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import static org.junit.Assert.*;
 
 public class Test {
 
-    // Считывание тестовой строки по номеру из файла конфигурации/тестов
+    static final String[] CASES = new String[]{
+        "abacabad",
+        "xyzyxzyx",
+        "11223311",
+        "ababacac",
+        "mnomnomn",
+        "pqqrpqqr",
+        "a1b2a1b2",
+        "xyzxyzyz",
+        "11234112",
+        "abcdeabc"
+    };
+
+    // Считывание тестовой строки по номеру
     static String readCase(int index) throws Exception {
-        Path cfg = Paths.get("data.txt");
-        String testsFile = null;
-
-        // Чтение файла конфигурации и поиск параметра testsFile
-        if (Files.exists(cfg)) {
-            for (String line : Files.readAllLines(cfg)) {
-                int i = line.indexOf('=');
-                if (i > 0) {
-                    String k = line.substring(0, i).trim();
-                    String v = line.substring(i + 1).trim();
-                    if (k.equals("testsFile")) testsFile = v;
-                }
-            }
-        }
-
-        // Определение файла содержащего тесты
-        Path tf = Paths.get(testsFile != null ? testsFile : "data.txt");
-
-        // Чтение всех строк файла тестов
-        List<String> lines = Files.readAllLines(tf);
-
-        // Перевод номера теста к индексу строки
         int i = index - 1;
-
-        // Проверка выхода за границы списка строк
-        if (i < 0 || i >= lines.size()) return "";
-
-        // Извлечение строки теста по индексу
-        String line = lines.get(i);
-
-        // Удаление префикса вида "1) "
-        int p = line.indexOf(") ");
-        return p >= 0 ? line.substring(p + 2).trim() : line.trim();
+        if (i < 0 || i >= CASES.length) return "";
+        return CASES[i];
     }
 
 
