@@ -4,8 +4,6 @@ Traffic lights on the street
 
 # Task
 
-Traffic lights on the street
-
 A new street with shops is being constructed in the city, and traffic lights are planned to be installed along it. Each traffic light provides a safe pedestrian zone represented by a segment along the street (the X-axis). A pedestrian can walk safely only within a zone covered by at least one traffic light.
 
 The street is represented as a single straight line (the X-axis). Each traffic light defines the beginning and end of a safe zone [l, r]. The task is to calculate the total length of the safe zone (without counting overlapping segments more than once).

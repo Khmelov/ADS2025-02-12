@@ -29,7 +29,6 @@ public class FiboB {
 
         while (n > 1) {
             n--;
-
             lastValue = answer.add(lastValue);
             lastValue = lastValue.xor(answer);
             answer = lastValue.xor(answer);

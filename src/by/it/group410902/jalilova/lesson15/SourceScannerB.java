@@ -1,120 +1,153 @@
 package by.it.group410902.jalilova.lesson15;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.MalformedInputException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class SourceScannerB {
 
     public static void main(String[] args) {
+        String src = System.getProperty("user.dir")
+                + File.separator + "src" + File.separator;
 
-        String src = System.getProperty("user.dir") + File.separator + "src" + File.separator;
         Path root = Paths.get(src);
 
-        List<Result> results = new ArrayList<>();
+        if (!Files.exists(root)) {
+            System.out.println("src folder not found: " + root);
+            return;
+        }
 
-        try {
-            Files.walk(root)
+        List<FileInfo> result = new ArrayList<>();
+
+        try (Stream<Path> stream = Files.walk(root)) {
+            stream.filter(Files::isRegularFile)
                     .filter(p -> p.toString().endsWith(".java"))
-                    .forEach(p -> {
-                        String text;
-                        try {
-                            try {
-                                text = Files.readString(p);
-                            } catch (MalformedInputException e) {
-                                return; // игнорируем битые файлы
-                            }
-
-                            // пропускаем тестовые файлы
-                            if (text.contains("@Test") || text.contains("org.junit.Test")) return;
-
-                            // удаляем package/import и комментарии
-                            String cleaned = removePackageImportAndComments(text);
-
-                            // обрезаем символы <33
-                            cleaned = trimNonPrintable(cleaned);
-
-                            if (cleaned.isEmpty()) return;
-
-                            // размер в байтах
-                            int size = cleaned.getBytes().length;
-
-                            // относительный путь
-                            String relPath = root.relativize(p).toString();
-
-                            results.add(new Result(size, relPath));
-
-                        } catch (IOException ignored) {
-                        }
-                    });
+                    .filter(p -> !isTestFile(p))            // исключаем junit тесты
+                    .forEach(p -> processFile(p, root, result));
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        // сортировка: сначала по размеру, потом по пути
-        results.sort(Comparator
-                .comparingInt((Result r) -> r.size)
-                .thenComparing(r -> r.path));
+        result.sort((a, b) -> {
+            if (a.size != b.size)
+                return Long.compare(a.size, b.size);
+            return a.path.compareTo(b.path);
+        });
 
-        // вывод
-        for (Result r : results) {
-            System.out.println(r.size + " " + r.path);
+        for (FileInfo fi : result) {
+            System.out.println(fi.size + " " + fi.path);
         }
     }
 
-    private static String removePackageImportAndComments(String text) {
-        StringBuilder sb = new StringBuilder();
+    private static boolean isTestFile(Path p) {
+        try {
+            String text = Files.readString(p);
+            return text.contains("@Test") || text.contains("org.junit.Test");
+        } catch (IOException e) {
+            return true;
+        }
+    }
+
+    private static void processFile(Path file, Path root, List<FileInfo> result) {
+        String text;
+
+        try {
+            byte[] raw = Files.readAllBytes(file);
+            text = new String(raw, StandardCharsets.UTF_8);
+        } catch (MalformedInputException e) {
+
+            try {
+                byte[] raw = Files.readAllBytes(file);
+                text = new String(raw, StandardCharsets.ISO_8859_1);
+            } catch (IOException ex) {
+                return;
+            }
+        } catch (IOException e) {
+            return;
+        }
+
+        String processed = cleanCode(text);
+
+        Path relative = root.relativize(file);
+        String outPath = relative.toString().replace("/", "\\");
+
+        result.add(new FileInfo(outPath, processed.getBytes(StandardCharsets.UTF_8).length));
+    }
+
+    private static String cleanCode(String text) {
+        StringBuilder sb = new StringBuilder(text.length());
+        String[] lines = text.split("\n");
+
         boolean inBlockComment = false;
 
-        String[] lines = text.split("\n");
         for (String line : lines) {
-            String s = line;
 
-            // блок комментария /* ... */
-            if (inBlockComment) {
-                if (s.contains("*/")) {
-                    s = s.substring(s.indexOf("*/") + 2);
-                    inBlockComment = false;
-                } else continue;
-            }
+            String trimmed = line.trim();
+            if (trimmed.startsWith("package ") || trimmed.startsWith("import "))
+                continue;
 
-            // удаляем все блоки /* ... */
-            while (s.contains("/*")) {
-                int start = s.indexOf("/*");
-                int end = s.indexOf("*/", start + 2);
-                if (end >= 0) {
-                    s = s.substring(0, start) + s.substring(end + 2);
-                } else {
-                    s = s.substring(0, start);
+            StringBuilder cleared = new StringBuilder();
+
+            int i = 0;
+            while (i < line.length()) {
+
+                if (inBlockComment) {
+                    int end = line.indexOf("*/", i);
+                    if (end == -1) {
+                        i = line.length();
+                        continue;
+                    } else {
+                        inBlockComment = false;
+                        i = end + 2;
+                        continue;
+                    }
+                }
+
+                if (i + 1 < line.length() && line.charAt(i) == '/' && line.charAt(i + 1) == '*') {
                     inBlockComment = true;
+                    i += 2;
+                    continue;
+                }
+
+                if (i + 1 < line.length() && line.charAt(i) == '/' && line.charAt(i + 1) == '/') {
                     break;
                 }
+
+                cleared.append(line.charAt(i));
+                i++;
             }
 
-            // удаляем однострочные комментарии //
-            int idx = s.indexOf("//");
-            if (idx >= 0) s = s.substring(0, idx);
+            String cleaned = trimLowChars(cleared.toString());
 
-            // убираем package/import и пустые строки
-            String t = s.strip();
-            if (t.isEmpty()) continue;
-            if (t.startsWith("package ") || t.startsWith("import ")) continue;
-
-            sb.append(t).append("\n");
+            if (!cleaned.isEmpty())
+                sb.append(cleaned).append("\n");
         }
 
         return sb.toString();
     }
 
-    private static String trimNonPrintable(String s) {
+    private static String trimLowChars(String s) {
         int start = 0;
         int end = s.length() - 1;
+
         while (start <= end && s.charAt(start) < 33) start++;
         while (end >= start && s.charAt(end) < 33) end--;
-        return (start > end) ? "" : s.substring(start, end + 1);
+
+        if (start > end) return "";
+        return s.substring(start, end + 1);
     }
 
-    private record Result(int size, String path) {}
+    static class FileInfo {
+        String path;
+        long size;
+
+        FileInfo(String path, long size) {
+            this.path = path;
+            this.size = size;
+        }
+    }
 }

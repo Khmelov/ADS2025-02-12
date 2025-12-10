@@ -4,10 +4,7 @@ Finding the Shortest Path. Dijkstra's Algorithm
 
 # Task
 
-Finding the Shortest Path. Dijkstra's Algorithm.
-
 ## Given:
-
 - The starting and ending vertices of the path
 - A list of edges of the graph (in the format source vertex - destination vertex weight)
 

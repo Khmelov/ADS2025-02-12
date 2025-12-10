@@ -14,15 +14,15 @@ Implement a hash table that supports:
 * output of internal state `PRINT`
 
 The hash table uses open addressing with double hashing:
-[
+$$
 h_1(x) = (a \cdot x + b) \bmod m
-]
-[
+$$
+$$
 h_2(x) = 1 + (c \cdot x + d) \bmod (m - 1)
-]
-[
+$$
+$$
 h(x, k) = (h_1(x) + k \cdot h_2(x)) \bmod m
-]
+$$
 ### Required features
 
 1. **Deletion**
@@ -61,21 +61,21 @@ Brief Theory
 
 ## 1. Load Factor
 
-The load factor (\(\alpha\)) is defined as:
+The load factor $(\alpha\\)$ is defined as:
 
-\[
+$$
 \alpha = \frac{n}{m}
-\]
+$$
 
-When \(\alpha > 0.7\), the amortized cost of operations increases sharply, prompting a rehash — the creation of a new table.
+When $(\alpha > 0.7\\)$, the amortized cost of operations increases sharply, prompting a rehash — the creation of a new table.
 
 ## 2. Marking Deletion
 
 With open addressing, a cell cannot simply be made empty:
 
-\[
+$$
 \text{NULL} \neq \text{DELETED}
-\]
+$$
 
 Otherwise, the search may incorrectly terminate prematurely.
 
@@ -83,13 +83,13 @@ Otherwise, the search may incorrectly terminate prematurely.
 
 A complete table traversal is guaranteed if:
 
-\[
+$$
 \gcd(h_2(x), m) = 1
-\]
+$$
 
 Thus, the following hash function is used:
 
-\[
-h_2(x) = 1 + ((cx + d) \bmod (m - 1))
-\]
+$$
+h_2(x) = 1 + \big((cx + d) \bmod (m - 1)\big)
+$$
 

@@ -1,361 +1,227 @@
 package by.it.group410901.borisdubinin.lesson10;
 
-import java.util.*;
+import java.util.Deque;
+import java.util.NoSuchElementException;
+import java.util.Collection;
+import java.util.Iterator;
 
-public class MyLinkedList<E>{
+public class MyLinkedList<E> implements Deque<E> {
 
-    private int size;
-    private Node head;
-    private Node tail;
+    // Внутренний статический класс для узлов списка
+    private static class Node<E> {
+        E value;                // Значение элемента
+        Node<E> prev;       // Ссылка на предыдущий узел
+        Node<E> next;       // Ссылка на следующий узел
 
-    private class Node{
-        private E elem;
-
-        public Node prev;
-        public Node next;
-
-        public Node(E elem){
-            this.elem = elem;
-        }
-        public Node(E elem, Node prev, Node next){
-            this.elem = elem;
-            this.next = next;
-            this.prev = prev;
-        }
+        // Конструктор узла
+        Node(E val){ this.value = val; }
     }
 
-    private Node getNode(int index){
-        Node ptr;
-        if (index <= size /2) {
-            ptr = head;
-            for (; index > 0; index--)
-                ptr = ptr.next;
-        } else {
-            ptr = tail;
-            for (int tail_index = size - 1; tail_index > index; tail_index--)
-                ptr = ptr.prev;
-        }
-        return ptr;
-    }
+    // Поля класса
+    private Node<E> head;   // Первый элемент списка
+    private Node<E> tail;   // Последний элемент списка
+    private int size;       // Количество элементов в списке
 
-    public MyLinkedList(){
-        size = 0;
-        head = null;
-        tail = null;
-    }
-    
-    /// /////////////////////////////////////////////////////////////////////////////////////
-    /// /////////////////////////////////////////////////////////////////////////////////////
-    /// /////////////////////////////////////////////////////////////////////////////////////
-    
-    //@Override
+    // Конструктор по умолчанию
+    public MyLinkedList(){}
+
+    // Преобразование списка в строку для вывода
+    @Override
     public String toString(){
-        StringBuilder sb = new StringBuilder(size * 16);
-        sb.append("[");
-
-        for(Node ptr = head; ptr != null; ptr = ptr.next){
-            sb.append(ptr.elem);
-            if(ptr.next != null)
-                sb.append(", ");
+        if(size==0) return "[]";  // Пустой список
+        StringBuilder sb = new StringBuilder();
+        sb.append('[');
+        Node<E> n = head;
+        // Проходим по всем элементам списка
+        while(n!=null){
+            sb.append(String.valueOf(n.value));
+            n = n.next;
+            if(n!=null) sb.append(", ");  // Добавляем запятую, если не последний элемент
         }
-        sb.append("]");
-
+        sb.append(']');
         return sb.toString();
     }
-    //@Override
-    public int size(){
-        return size;
-    }
 
-    //@Override
+    // Добавление элемента в конец списка
+    @Override
     public boolean add(E element){
         addLast(element);
         return true;
     }
-    //@Override
-    public void addFirst(E element){
-        if(size == 0){
-            head = new Node(element, null, null);
-            tail = head;
-        }
-        else {
-            head = new Node(element, null, head);
-            head.next.prev = head;
-        }
-        size++;
-    }
-    //@Override
-    public void addLast(E element){
-        if (size == 0){
-            head = new Node(element, null, null);
-            tail = head;
-        }
-        else {
-            tail = new Node(element, tail, null);
-            tail.prev.next = tail;
-        }
-        size++;
-    }
 
+    // Удаление элемента по индексу
     public E remove(int index){
-        if(index < 0 || index >= size)
-            return null;
+        // Проверка корректности индекса
+        if(index<0 || index>=size) throw new IndexOutOfBoundsException();
+        Node<E> cur;
 
-        Node ptr;
-        if(size == 1){
-            ptr = head;
-            head = tail = null;
+        // Оптимизация: ищем с начала или с конца в зависимости от позиции
+        if(index < (size>>1)){  // size>>1 = size/2 (битовый сдвиг)
+            // Ищем с начала списка
+            cur = head;
+            for(int i=0;i<index;i++) cur = cur.next;
+        } else {
+            // Ищем с конца списка
+            cur = tail;
+            for(int i=size-1;i>index;i--) cur = cur.prev;
         }
-        else if(index == 0){
-            ptr = head;
-            head = head.next;
-            head.prev = null;
-        }
-        else if(index == size -1){
-            ptr = tail;
-            tail = tail.prev;
-            tail.next = null;
-        }
-        else {
-            ptr = getNode(index);
-            ptr.prev.next = ptr.next;
-            ptr.next.prev = ptr.prev;
-        }
-
-        size--;
-        return ptr.elem;
+        E val = cur.value;
+        unlink(cur);  // Удаляем узел
+        return val;
     }
-    //@Override
+
+    // Удаление первого найденного элемента по значению
+    @Override
     public boolean remove(Object o){
-        Node ptr = head;
-
-        while (ptr != null) {
-            if (Objects.equals(o, ptr.elem)) {
-                if (ptr == head) {
-                    head = head.next;
-                    if (head != null) head.prev = null;
-                    else tail = null;
-                }
-                else if (ptr == tail) {
-                    tail = tail.prev;
-                    tail.next = null;
-                }
-                else {
-                    ptr.prev.next = ptr.next;
-                    ptr.next.prev = ptr.prev;
-                }
-                size--;
+        Node<E> n = head;
+        // Проходим по всем элементам списка
+        while(n!=null){
+            // Сравниваем значения (учитываем случай null)
+            if(o==null ? n.value ==null : o.equals(n.value)){
+                unlink(n);  // Удаляем узел
                 return true;
             }
-            ptr = ptr.next;
+            n = n.next;
         }
-        return false;
+        return false;  // Элемент не найден
     }
 
-    //@Override
-    public E element() {
-        if(size == 0)
-            return null;
-        return getFirst();
-    }
-   // @Override
-    public E getFirst() {
-        return head.elem;
-    }
-    //@Override
-    public E getLast() {
-        return tail.elem;
-    }
+    // Возвращает количество элементов в списке
+    @Override
+    public int size(){ return size; }
 
-    //@Override
-    public E poll() {
-        return pollFirst();
-    }
-    //@Override
-    public E pollFirst() {
-        if(size == 0)
-            throw new NoSuchElementException("Коллекция пуста");
-
-        E first = head.elem;
-        remove(0);
-        return first;
-    }
-    //@Override
-    public E pollLast() {
-        if(size == 0)
-            throw new NoSuchElementException("Коллекция пуста");
-
-        E last = tail.elem;
-        remove(size-1);
-        return last;
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// /////////////////////////////////////////////////////////////////////////////////////////////////
-    /// /////////////////////////////////////////////////////////////////////////////////////////////////
-    /// /////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public boolean offerFirst(E e){
-        return false;
-    }
-    public boolean offerLast(E e){
-        return false;
-    }
-    public E removeFirst(){
-        return null;
-    }
-    public E removeLast(){
-        return null;
-    }
-    public E peekFirst(){
-        return null;
-    }
-    public E peekLast(){
-        return null;
-    }
-    public boolean removeFirstOccurrence(Object o){
-        return false;
-    }
-    public boolean removeLastOccurrence(Object o){
-        return false;
-    }
-    public boolean offer(E e){
-        return false;
-    }
-    public E remove(){
-        return null;
-    }
-    public E peek(){
-        return null;
-    }
-    public boolean addAll(Collection<? extends E> c){
-        return false;
-    }
-
-    //@Override
-    public boolean removeAll(Collection<?> c) {
-        return false;
-    }
-
-    //@Override
-    public boolean retainAll(Collection<?> c) {
-        return false;
-    }
-
-    //@Override
-    public void clear() {
-        if(isEmpty())
-            return;
-
-        Node ptr1 = head;
-        Node ptr2 = head.next;
-        while(ptr2 != null){
-            ptr1.prev = null;
-            ptr1.next = null;
-            ptr1 = ptr2;
-            ptr2 = ptr2.next;
+    // Добавление элемента в начало списка
+    @Override
+    public void addFirst(E element){
+        if(element==null) throw new NullPointerException();
+        Node<E> n = new Node<>(element);
+        if(size==0){
+            // Если список пустой, новый элемент становится и головой и хвостом
+            head = tail = n;
+        } else {
+            // Вставляем новый элемент перед текущей головой
+            n.next = head;
+            head.prev = n;
+            head = n;
         }
-        ptr1.next = null;
-        ptr1.prev = null;
-        head = null;
-        tail = null;
-        size = 0;
+        size++;
     }
 
-    public E get(int index){
-        return getNode(index).elem;
-    }
-
-    public void push(E e){
-
-    }
-    public E pop(){
-        return null;
-    }
-    public boolean contains(Object o){
-        Node ptr = head;
-        while(ptr != null){
-            if(Objects.equals(o, ptr.elem))
-                return true;
-            ptr = ptr.next;
+    // Добавление элемента в конец списка
+    @Override
+    public void addLast(E element){
+        if(element==null) throw new NullPointerException();
+        Node<E> n = new Node<>(element);
+        if(size==0){
+            // Если список пустой, новый элемент становится и головой и хвостом
+            head = tail = n;
+        } else {
+            // Вставляем новый элемент после текущего хвоста
+            tail.next = n;
+            n.prev = tail;
+            tail = n;
         }
-        return false;
+        size++;
     }
 
-    public Iterator<E> iterator(){
-        return new MyIterator();
-    }
-    private class MyIterator implements Iterator<E>{
-        private Node next;
-        private Node lastReturned;
-        public MyIterator(){
-            next = head;
-            lastReturned = null;
-        }
+    // Получение первого элемента без удаления (бросает исключение если пусто)
+    @Override
+    public E element(){ return getFirst(); }
 
-        @Override
-        public boolean hasNext() {
-            return next != null;
-        }
-
-        @Override
-        public E next() {
-            lastReturned = next;
-            next = next.next;
-            return lastReturned.elem;
-        }
-
-        @Override
-        public void remove(){
-            if (lastReturned == null) {
-                throw new IllegalStateException("next() has not been called, or remove() has already been called after the last next()");
-            }
-
-            if (lastReturned == head) {
-                head = head.next;
-                if (head != null) {
-                    head.prev = null;
-                } else {
-                    // Если список стал пустым
-                    tail = null;
-                }
-            }
-            // Если удаляем хвост
-            else if (lastReturned == tail) {
-                tail = tail.prev;
-                tail.next = null;
-            }
-            // Если удаляем элемент в середине
-            else {
-                lastReturned.prev.next = lastReturned.next;
-                lastReturned.next.prev = lastReturned.prev;
-            }
-
-            size--;
-            lastReturned = null; // Запрещаем повторный вызов remove()
-        }
+    // Получение первого элемента
+    @Override
+    public E getFirst(){
+        if(size==0) throw new NoSuchElementException();
+        return head.value;
     }
 
-    public Iterator<E> descendingIterator(){
-        return null;
+    // Получение последнего элемента
+    @Override
+    public E getLast(){
+        if(size==0) throw new NoSuchElementException();
+        return tail.value;
     }
 
-    public boolean isEmpty(){
-        return size < 1;
+    // Извлечение первого элемента с удалением (возвращает null если пусто)
+    @Override
+    public E poll(){ return pollFirst(); }
+
+    // Извлечение первого элемента
+    @Override
+    public E pollFirst(){
+        if(size==0) return null;
+        E v = head.value;
+        unlink(head);  // Удаляем головной элемент
+        return v;
     }
 
-    public E[] toArray(){
-        return null;
+    // Извлечение последнего элемента
+    @Override
+    public E pollLast(){
+        if(size==0) return null;
+        E v = tail.value;
+        unlink(tail);  // Удаляем хвостовой элемент
+        return v;
     }
 
-    //@Override
-    public <T> T[] toArray(T[] a) {
-        return null;
+    // Внутренний метод для удаления узла из списка
+    private void unlink(Node<E> n){
+        Node<E> p = n.prev;  // Предыдущий узел
+        Node<E> q = n.next;  // Следующий узел
+
+        // Обновляем ссылки соседних узлов
+        if(p==null)
+            head = q;        // Если удаляем голову, обновляем голову
+        else
+            p.next = q;      // Иначе предыдущий узел ссылается на следующий
+
+        if(q==null)
+            tail = p;        // Если удаляем хвост, обновляем хвост
+        else
+            q.prev = p;      // Иначе следующий узел ссылается на предыдущий
+
+        // Очищаем ссылки удаляемого узла (помощь сборщику мусора)
+        n.prev = n.next = null;
+        n.value = null;
+        size--;
+
+        // Если список стал пустым, сбрасываем ссылки
+        if(size==0){ head = tail = null; }
     }
 
-    //@Override
-    public boolean containsAll(Collection<?> c) {
-        return false;
+    @Override public boolean offerFirst(E e){ throw new UnsupportedOperationException(); }
+    @Override public boolean offerLast(E e){ throw new UnsupportedOperationException(); }
+    @Override public boolean offer(E e){ throw new UnsupportedOperationException(); }
+    @Override public E peek(){ throw new UnsupportedOperationException(); }
+    @Override public E peekFirst(){ throw new UnsupportedOperationException(); }
+    @Override public E peekLast(){ throw new UnsupportedOperationException(); }
+    // Удаление с исключением если пусто
+    @Override public E remove(){
+        E r = pollFirst();
+        if(r==null) throw new NoSuchElementException();
+        return r;
     }
-
+    @Override public E removeFirst(){ return remove(); }
+    @Override public E removeLast(){
+        E r = pollLast();
+        if(r==null) throw new NoSuchElementException();
+        return r;
+    }
+    @Override public void push(E e){ throw new UnsupportedOperationException(); }
+    @Override public E pop(){ throw new UnsupportedOperationException(); }
+    @Override public boolean removeFirstOccurrence(Object o){ throw new UnsupportedOperationException(); }
+    @Override public boolean removeLastOccurrence(Object o){ throw new UnsupportedOperationException(); }
+    @Override public boolean contains(Object o){ throw new UnsupportedOperationException(); }
+    @Override public Iterator<E> iterator(){ throw new UnsupportedOperationException(); }
+    @Override public Iterator<E> descendingIterator(){ throw new UnsupportedOperationException(); }
+    // Проверка на пустоту
+    @Override public boolean isEmpty(){ return size==0; }
+    // Очистка списка
+    @Override public void clear(){ head = tail = null; size = 0; }
+    @Override public boolean containsAll(Collection<?> c){ throw new UnsupportedOperationException(); }
+    @Override public boolean addAll(Collection<? extends E> c){ throw new UnsupportedOperationException(); }
+    @Override public boolean removeAll(Collection<?> c){ throw new UnsupportedOperationException(); }
+    @Override public boolean retainAll(Collection<?> c){ throw new UnsupportedOperationException(); }
+    @Override public Object[] toArray(){ throw new UnsupportedOperationException(); }
+    @Override public <T> T[] toArray(T[] a){ throw new UnsupportedOperationException(); }
 }
