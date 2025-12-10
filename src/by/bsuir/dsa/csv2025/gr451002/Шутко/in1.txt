@@ -1,0 +1,7 @@
+3
+5 5 5
+4
+MIN 0 2
+UPDATE 1 3
+MIN 0 2
+MIN 1 1

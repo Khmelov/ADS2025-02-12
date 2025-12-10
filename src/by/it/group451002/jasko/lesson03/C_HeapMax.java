@@ -42,11 +42,11 @@ public class C_HeapMax {
         System.out.println("MAX=" + instance.findMaxValue(stream));
     }
 
-    //эта процедура читает данные из файла, ее можно не менять.
+    // Эта процедура читает данные из файла, ее можно не менять.
     Long findMaxValue(InputStream stream) {
         long maxValue = 0L;
         MaxHeap heap = new MaxHeap();
-        //прочитаем строку для кодирования из тестового файла
+        // Прочитаем строку для кодирования из тестового файла
         Scanner scanner = new Scanner(stream);
         int count = scanner.nextInt();
         for (int i = 0; i < count; ) {
@@ -74,7 +74,7 @@ public class C_HeapMax {
         //Будет мало? Ну тогда можете его собрать как Generic и/или использовать в варианте B
         private final List<Long> heap = new ArrayList<>();
 
-        // Восстановление свойства кучи при просеивании вниз
+        // Используется при удалении, чтобы опустить слишком маленький элемент вниз
         int siftDown(int i) { //просеивание вниз
             int left = 2 * i + 1;
             int right = 2 * i + 2;
@@ -98,7 +98,7 @@ public class C_HeapMax {
             return i;
         }
 
-        // Восстановление свойства кучи при просеивании вверх
+        // Используется при добавлении, чтобы поднять слишком большой элемент наверх
         void siftUp(int i) { //просеивание вверх
             while (i > 0 && heap.get(i) > heap.get((i - 1) / 2)) {
                 swap(i, (i - 1) / 2);
@@ -113,11 +113,19 @@ public class C_HeapMax {
             heap.set(j, temp);
         }
 
+        // Добавление элемента
+        // Бросаем новый элемент в конец кучи
+        // Если он больше родителя - поднимаем выше
+        // Повторяем, пока он не найдёт своё место
         void insert(Long value) { //вставка
             heap.add(value); // Добавляем элемент в конец
             siftUp(heap.size() - 1); // Просеиваем вверх
         }
 
+        // Взятие самого большого элемента:
+        // Забираем элемент с вершины (это наш максимум)
+        // Берём последний камень и ставим его наверх
+        // Если этот камень слишком маленький - опускаем его вниз
         Long extractMax() { //извлечение и удаление максимума
             if (heap.isEmpty()) {
                 return null;
