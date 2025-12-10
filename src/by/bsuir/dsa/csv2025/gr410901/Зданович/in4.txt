@@ -1,0 +1,5 @@
+X-Y(7), Y-Z(1), Z-W(2), X-W(100)
+3
+MST
+CONNECTED X W
+CONNECTED X Q

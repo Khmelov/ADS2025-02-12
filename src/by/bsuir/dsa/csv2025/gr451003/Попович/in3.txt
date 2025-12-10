@@ -1,0 +1,1 @@
+nums = [-5,-10,0,5,10,-15] maxValue = 10 maxCount = 5 maxMemory = 1000000

@@ -51,7 +51,6 @@ public class B_LongDivComSubSeq {
             for (int j = 0; j < i; j++) {
                 if (m[j] < m[i] && m[i] % m[j] == 0) {
                     dp[i] = Math.max(dp[i], dp[j] + 1);
-
                 }
             }
             result = Math.max(result, dp[i]);

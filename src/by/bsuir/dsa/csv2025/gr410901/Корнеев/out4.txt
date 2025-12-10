@@ -1,0 +1,3 @@
+Original array 2 1
+After iteration 1 1 2
+Sorted array 1 2
