@@ -1,0 +1,1 @@
+nums = [100000,-100000] maxValue = 100000 maxCount = 1 maxMemory = 1000000

@@ -1,0 +1,7 @@
+10
+10 20 20 20 20 20 20 20 20 10
+Update 1 10
+Update 8 10
+Query 0 9
+Query 1 8
+END

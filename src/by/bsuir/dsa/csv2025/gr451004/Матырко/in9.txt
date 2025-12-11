@@ -1,0 +1,1 @@
+add 10 add 20 add 5 add 15 add 25 del 20 del 10 sum

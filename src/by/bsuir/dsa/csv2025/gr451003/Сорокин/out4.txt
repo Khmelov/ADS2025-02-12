@@ -1,0 +1,2 @@
+1 2 3
+Comparisons: 2, Swaps: 1

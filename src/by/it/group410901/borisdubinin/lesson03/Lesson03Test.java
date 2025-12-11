@@ -39,7 +39,7 @@ public class Lesson03Test {
     public void checkC() throws Exception {
         InputStream inputStream = C_HeapMax.class.getResourceAsStream("dataC.txt");
         C_HeapMax instance = new C_HeapMax();
-        Long res = instance.findMaxValue(inputStream);
+        Long res = instance.findMax(inputStream);
         boolean ok = (res == 500);
         assertTrue("C failed", ok);
     }
