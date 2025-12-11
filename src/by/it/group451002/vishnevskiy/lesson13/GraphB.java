@@ -4,83 +4,101 @@ import java.util.*;
 
 public class GraphB {
 
+    // Главный метод программы
     public static void main(String[] args) {
+        // Создаем сканер для чтения ввода с консоли
         Scanner scanner = new Scanner(System.in);
+        // Читаем всю строку, содержащую описание графа
         String input = scanner.nextLine();
 
+        // Проверяем наличие циклов в графе
         boolean hasCycle = hasCycle(input);
 
+        // Выводим результат: "yes" если есть циклы, "no" если нет
         System.out.println(hasCycle ? "yes" : "no");
     }
 
-    //метод для проверки наличия циклов
-    public static boolean hasCycle(String input)
-    {
-        // hashmap для представления графа, hashset для хранения вершин
+    // Метод для проверки наличия циклов в ориентированном графе
+    public static boolean hasCycle(String input) {
+        // Граф: вершина -> список её соседей (достижимых вершин)
         Map<String, List<String>> graph = new HashMap<>();
+        // Множество всех вершин графа
         Set<String> allVertices = new HashSet<>();
 
-        if (!input.isEmpty())
-        {
+        // Проверяем, не пустая ли входная строка
+        if (!input.isEmpty()) {
+            // Разбиваем строку по запятым, получая отдельные рёбра
             String[] edges = input.split(",\\s*");
-            for (String edge : edges)// Обрабатываем каждое ребро в списке рёбер
-            {// Разбиваем ребро по "->" для получения начальной и конечной вершины
-                String[] parts = edge.split("\\s*->\\s*");
-                String from = parts[0].trim();
-                String to = parts[1].trim();
 
+            // Обрабатываем каждое ребро
+            for (String edge : edges) {
+                // Разделяем ребро по символу "->"
+                String[] parts = edge.split("\\s*->\\s*");
+                String from = parts[0].trim();  // Начальная вершина ребра
+                String to = parts[1].trim();    // Конечная вершина ребра
+
+                // Добавляем ребро в граф:
+                // Если вершина 'from' еще не в графе, создаем для неё пустой список
+                // Затем добавляем 'to' в список соседей 'from'
                 graph.computeIfAbsent(from, k -> new ArrayList<>()).add(to);
+
+                // Добавляем обе вершины в множество всех вершин
                 allVertices.add(from);
                 allVertices.add(to);
             }
         }
 
-        // запоминаем пройденные вершины
+        // Множество для отслеживания посещённых вершин
         Set<String> visited = new HashSet<>();
+        // Множество для отслеживания вершин в текущем пути (стеке рекурсии)
         Set<String> recursionStack = new HashSet<>();
 
-        for (String vertex : allVertices)  // Проверяем все вершины графа на наличие циклов
-        {
-            if (!visited.contains(vertex))// Если вершина еще не посещена, запускаем DFS из нее
-            {// Если DFS обнаружил цикл, возвращаем true
-                if (dfsHasCycle(vertex, graph, visited, recursionStack))
-                {
+        // Проверяем все вершины графа на наличие циклов
+        for (String vertex : allVertices) {
+            // Если вершина еще не посещена, запускаем из неё DFS
+            if (!visited.contains(vertex)) {
+                // Если DFS находит цикл, возвращаем true
+                if (dfsHasCycle(vertex, graph, visited, recursionStack)) {
                     return true;
                 }
             }
         }
 
+        // Если ни из одной вершины не найден цикл, возвращаем false
         return false;
     }
 
+    // Рекурсивный метод обхода в глубину (DFS) для поиска циклов
     private static boolean dfsHasCycle(String vertex, Map<String, List<String>> graph,
-                                       Set<String> visited, Set<String> recursionStack)
-    {
-        // Помечаем вершину как посещенную и добавляем в стек рекурсии
+                                       Set<String> visited, Set<String> recursionStack) {
+        // Помечаем текущую вершину как посещённую
         visited.add(vertex);
+        // Добавляем вершину в стек текущего пути
         recursionStack.add(vertex);
 
-        // Проверяем есть ли у текушщей вершины соседи
-        if (graph.containsKey(vertex))
-        {//проверяем всех соседей
-            for (String neighbor : graph.get(vertex))
-            {
-                if (!visited.contains(neighbor)) //если последняя вершина не посещена
-                {
-                    if (dfsHasCycle(neighbor, graph, visited, recursionStack))
-                    {
-                        return true;
+        // Если у текущей вершины есть соседи (исходящие рёбра)
+        if (graph.containsKey(vertex)) {
+            // Проверяем всех соседей текущей вершины
+            for (String neighbor : graph.get(vertex)) {
+                // Если сосед еще не посещён
+                if (!visited.contains(neighbor)) {
+                    // Рекурсивно вызываем DFS для этого соседа
+                    if (dfsHasCycle(neighbor, graph, visited, recursionStack)) {
+                        return true;  // Найден цикл в подграфе
                     }
-                } else if (recursionStack.contains(neighbor))
-                {
-                    // Если сосед уже в стеке рекурсии - найден цикл
-                    return true;
+                }
+                // Если сосед уже в стеке текущего пути - это цикл!
+                else if (recursionStack.contains(neighbor)) {
+                    return true;  // Обнаружен цикл
                 }
             }
         }
 
-        // Убираем вершину из стека рекурсии  т.к. эту вершину уже обошли
+        // Убираем вершину из стека текущего пути перед возвратом из рекурсии
+        // Это означает, что мы закончили обработку этой вершины и её потомков
         recursionStack.remove(vertex);
+
+        // Цикл не найден для этой вершины и её потомков
         return false;
     }
 }
