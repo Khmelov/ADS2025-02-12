@@ -1,0 +1,4 @@
+repeat 14
+code 13
+sleep 12
+eat 11

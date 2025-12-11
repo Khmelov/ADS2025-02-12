@@ -1,0 +1,7 @@
+5
+1 2 3 4 5
+4
+GET 0
+GET 4
+INSERT 2 10
+GET 2

@@ -100,11 +100,13 @@ public class C_QSortOptimized {
 
         Arrays.sort(segments, (a, b) -> a.start - b.start);
 
-        for (int i = 0; i < m; i++) {
-            int count = 0;
-            for (Segment segment : segments) {
+        for (int i = 0; i < m; i++) { //m — это количество точек.
+            int count = 0; //точки инициализируется счетчик count, который будет отслеживать,
+            // сколько отрезков покрывают текущую точку points[i].
+            for (Segment segment : segments) { //цикл проходит по всем отрезкам segments,
+                // чтобы проверить, находится ли текущая точка в пределах каждого отрезка.
                 if (points[i] >= segment.start && points[i] <= segment.stop) {
-                    count++;
+                    count++; //проверяется, находится ли точка points[i] между началом и концом отрезка segment.
                 } else if (points[i] < segment.start) {
                     break; // Оптимизация: точки отсортированы, нет смысла дальше искать
                 }
