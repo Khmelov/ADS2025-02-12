@@ -9,14 +9,14 @@ Maximum Flow.
 **Problem Statement (Class FlowC):**
 Create a class `FlowC` with a `main` method that computes the **Maximum Flow (Max Flow)** between a given Source and Sink in a directed graph with capacities on the edges.
 
-## 📥 Input Data
+## Input Data
 
 The input data is read from the standard input (`System.in`):
 
 1.  **Line 1 (Graph):** Edges in the format `Node_from-Node_to:Capacity`. Edges are separated by a comma (with optional space).
 2.  **Line 2 (Source and Sink):** Names of the Source and Sink, separated by a space.
 
-## 1. Algorithm Requirements
+## Algorithm Requirements
 
 * **Algorithm:** Use the **Edmonds-Karp Algorithm**.
 * **Residual Graph:** Upon initialization, every forward edge $(u \to v)$ must have a corresponding **backward edge** $(v \to u)$ with zero capacity.
@@ -25,11 +25,11 @@ The input data is read from the standard input (`System.in`):
     * Determine the **bottleneck capacity** (minimum capacity) along the path.
     * Update the residual graph: decrease the capacity of forward edges and increase the capacity of backward edges by this amount.
 
-## 2. Output
+## Output
 
 The program must output a single integer—the value of the **Maximum Flow** (`System.out.print()`).
 
-## 3. Robustness
+## Robustness
 
 The implementation must be robust against parsing errors (spaces, delimiters).
 

@@ -5,11 +5,15 @@ import java.util.*;
 import static java.lang.Math.*;
 
 import org.junit.Test;
+import org.junit.experimental.runners.Enclosed;
+import org.junit.runner.RunWith;
+
 import static org.junit.Assert.*;
 
 // ============================================================
 //  SINGLE-CLASS SOLUTION WITH JUNIT4 TESTS INSIDE
 // ============================================================
+@RunWith(Enclosed.class)
 public class Solution {
 
     // -----------------------------------------------

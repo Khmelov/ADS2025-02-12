@@ -25,10 +25,10 @@ public class SolutionTest {
         }
 
         if (result.wasSuccessful()) {
-            System.out.println("\nALL TESTS PASSED ✔");
+            System.out.println("\nALL TESTS PASSED");
             System.exit(0);
         } else {
-            System.out.println("\nTESTS FAILED ✘ (count = " + result.getFailureCount() + ")");
+            System.out.println("\nTESTS FAILED (count = " + result.getFailureCount() + ")");
             System.exit(1);
         }
     }

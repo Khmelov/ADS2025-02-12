@@ -3,7 +3,6 @@ package by.it.group451003.bernat.lesson07;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Scanner;
 
 /*

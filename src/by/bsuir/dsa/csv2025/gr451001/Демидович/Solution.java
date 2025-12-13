@@ -96,9 +96,6 @@ public class Solution {
             return Integer.parseInt(next());
         }
     }
-}
-
-class SolutionTest {
 
     private void runTest(String input, String expectedOutput) throws Exception {
         InputStream originalIn = System.in;
@@ -122,62 +119,63 @@ class SolutionTest {
     }
 
     @Test
-    void testGroup1_BaseCases() throws Exception {
+    public void testGroup1_BaseCases() throws Exception {
         runTest("3\nL L\nR RR\nL LL\n",
                 "YES\nYES\nYES\n");
     }
 
     @Test
-    void testGroup2_TooShort() throws Exception {
+    public void testGroup2_TooShort() throws Exception {
         runTest("2\nRRR R\nLL L\n",
                 "NO\nNO\n");
     }
 
     @Test
-    void testGroup3_TooLong() throws Exception {
+    public void testGroup3_TooLong() throws Exception {
         runTest("3\nR RRR\nLL LLLLLLL\nRRRR RRRRRRRRR\n",
                 "NO\nNO\nNO\n");
     }
 
     @Test
-    void testGroup4_WrongCharOrOrder() throws Exception {
+    public void testGroup4_WrongCharOrOrder() throws Exception {
         runTest("3\nR L\nLR RL\nL RR\n",
                 "NO\nNO\nNO\n");
     }
 
     @Test
-    void testGroup5_ValidIntermediate() throws Exception {
+    public void testGroup5_ValidIntermediate() throws Exception {
         runTest("2\nLRR LLRRR\nRLL RRLLL\n",
                 "YES\nYES\n");
     }
 
     @Test
-    void testGroup6_MaxExpansion() throws Exception {
+    public void testGroup6_MaxExpansion() throws Exception {
         runTest("2\nLRLR LLRRLLRR\nLLRR LLLLRRRR\n",
                 "YES\nYES\n");
     }
 
     @Test
-    void testGroup7_StructureFewerBlocks() throws Exception {
+    public void testGroup7_StructureFewerBlocks() throws Exception {
         runTest("2\nLRL LR\nLRLR LLRR\n",
                 "NO\nNO\n");
     }
 
     @Test
-    void testGroup8_StructureMoreBlocks() throws Exception {
+    public void testGroup8_StructureMoreBlocks() throws Exception {
         runTest("2\nLR LRRL\nRL RLLR\n",
                 "NO\nNO\n");
     }
 
     @Test
-    void testGroup9_LongBlocksBoundary() throws Exception {
+    public void testGroup9_LongBlocksBoundary() throws Exception {
         runTest("2\nRRR RRRRRR\nLLLL LLLLLLLL\n",
                 "YES\nYES\n");
     }
 
     @Test
-    void testGroup10_MixedExpansionTypes() throws Exception {
+    public void testGroup10_MixedExpansionTypes() throws Exception {
         runTest("2\nLLLLR LLLLLLLLRR\nRRLLLR RRLLLRR\n",
                 "YES\nYES\n");
     }
 }
+

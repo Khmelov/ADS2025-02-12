@@ -124,62 +124,61 @@ public class Solution {
         }
     }
 
-
     @Test
-    void test1() throws Exception {
+    public void test1() throws Exception {
         runTest("6 6\n" + "1 2\n" + "1 3\n" + "2 4\n" + "3 5\n" + "5 4\n" + "4 6\n" + "1 6",
                 "order 1 2 4 6 3 5\n" + "path 1 2 4 6");
     }
 
     @Test
-    void test2() throws Exception {
+    public void test2() throws Exception {
         runTest("4 3\n" + "1 2\n" + "2 3\n" + "3 4\n" + "1 4",
                 "order 1 2 3 4\n" + "path 1 2 3 4");
     }
 
     @Test
-    void test3() throws Exception {
+    public void test3() throws Exception {
         runTest("6 5\n" + "1 2\n" + "1 3\n" + "2 4\n" + "2 5\n" + "3 6\n" + "1 5",
                 "order 1 2 4 5 3 6\n" + "path 1 2 5");
     }
 
     @Test
-    void test4() throws Exception {
+    public void test4() throws Exception {
         runTest("3 3\n" + "1 2\n" + "2 3\n" + "3 1\n" + "1 3",
                 "order 1 2 3\n" + "path 1 2 3");
     }
 
     @Test
-    void test5() throws Exception {
+    public void test5() throws Exception {
         runTest("5 3\n" + "1 2\n" + "2 3\n" + "4 5\n" + "1 5",
                 "order 1 2 3\n" + "path NO PATH");
     }
     @Test
-    void test6() throws Exception {
+    public void test6() throws Exception {
         runTest("4 5\n" + "1 2\n" + "1 2\n" + "2 2\n" + "2 3\n" + "3 4\n" + "1 4",
                 "order 1 2 3 4\n" + "path 1 2 3 4");
     }
 
     @Test
-    void test7() throws Exception {
+    public void test7() throws Exception {
         runTest("3 2\n" + "2 3\n" + "3 1\n" + "1 1",
                 "order 1\n" + "path 1");
     }
 
     @Test
-    void test8() throws Exception {
+    public void test8() throws Exception {
         runTest("7 7\n" + "1 3\n" + "1 2\n" + "2 5\n" + "2 4\n" + "3 6\n" + "6 7\n" + "5 7\n" + "1 6",
                 "order 1 2 4 5 7 3 6\n" + "path 1 3 6");
     }
 
     @Test
-    void test9() throws Exception {
+    public void test9() throws Exception {
         runTest("6 6\n" + "1 2\n" + "1 4\n" + "2 3\n" + "3 1\n" + "4 5\n" + "5 6\n" + "1 6",
                 "order 1 2 3 4 5 6\n" + "path 1 4 5 6");
     }
 
     @Test
-    void test10() throws Exception {
+    public void test10() throws Exception {
         runTest("9 9\n" + "1 2\n" + "2 3\n" + "3 4\n" + "2 5\n" + "5 6\n" + "6 7\n" + "7 3\n" + "4 8\n" + "8 9\n" + "1 9",
                 "order 1 2 3 4 8 9 5 6 7\n" + "path 1 2 3 4 8 9");
     }

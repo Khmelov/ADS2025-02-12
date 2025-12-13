@@ -4,8 +4,6 @@ Robin
 
 # Task
 
-Robin
-
 Robin has guests — his brother and his mom. You need to choose the start day of each visit.
 
 Days available for visits are numbered from **1** to **n**.
