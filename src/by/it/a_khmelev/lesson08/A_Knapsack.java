@@ -5,7 +5,6 @@ import by.it.a_khmelev.lesson07.A_EditDist;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Scanner;
 
 /*
@@ -51,8 +50,6 @@ public class A_Knapsack {
 
 
         int result = 0;
-
-
         //!!!!!!!!!!!!!!!!!!!!!!!!!     КОНЕЦ ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
         return result;
     }
