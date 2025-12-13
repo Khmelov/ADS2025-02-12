@@ -39,8 +39,8 @@ import java.util.Scanner;
 public class A_EditDist {
 
 
-    int getDistanceEdinting(String one, String two) {
-        //!!!!!!!!!!!!!!!!!!!!!!!!!     НАЧАЛО ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
+    int getDistanceEditing(String one, String two) {
+        //!!!!!!!!!!!!!!!!!!!!!!!!! НАЧАЛО ЗАДАЧИ !!!!!!!!!!!!!!!!!!!!!!!!!
 
         int[][] memo = new int[one.length() + 1][two.length() + 1];
 
@@ -49,9 +49,9 @@ public class A_EditDist {
                 memo[i][j] = -1;
             }
         }
-
-        int result = editDistRecursive(one, two, one.length(), two.length(), memo);
-        //!!!!!!!!!!!!!!!!!!!!!!!!!     КОНЕЦ ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
+        int result;
+        result = editDistRecursive(one, two, one.length(), two.length(), memo);
+        //!!!!!!!!!!!!!!!!!!!!!!!!! КОНЕЦ ЗАДАЧИ !!!!!!!!!!!!!!!!!!!!!!!!!
         return result;
     }
     private int editDistRecursive(String one, String two, int i, int j, int[][] memo) {
@@ -81,8 +81,8 @@ public class A_EditDist {
         InputStream stream = A_EditDist.class.getResourceAsStream("dataABC.txt");
         A_EditDist instance = new A_EditDist();
         Scanner scanner = new Scanner(stream);
-        System.out.println(instance.getDistanceEdinting(scanner.nextLine(), scanner.nextLine()));
-        System.out.println(instance.getDistanceEdinting(scanner.nextLine(), scanner.nextLine()));
-        System.out.println(instance.getDistanceEdinting(scanner.nextLine(), scanner.nextLine()));
+        System.out.println(instance.getDistanceEditing(scanner.nextLine(), scanner.nextLine()));
+        System.out.println(instance.getDistanceEditing(scanner.nextLine(), scanner.nextLine()));
+        System.out.println(instance.getDistanceEditing(scanner.nextLine(), scanner.nextLine()));
     }
 }

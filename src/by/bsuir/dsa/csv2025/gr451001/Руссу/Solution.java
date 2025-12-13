@@ -67,8 +67,6 @@ public class Solution {
     }
 
 
-    public class SolutionTest {
-
         private int run(String inputK, String tree) {
             int K = Integer.parseInt(inputK.trim());
             Node root = Solution.parseTree(tree.trim());
@@ -87,7 +85,7 @@ public class Solution {
         @Test public void test9() { assertEquals(2, run("5", "0[3[2],2[3]]")); }
         @Test public void test10(){ assertEquals(2, run("22", "11[6[4[1],5],7[8,3[4]]]")); }
 
-    }
+
 
 
     public static void main(String[] args) {
