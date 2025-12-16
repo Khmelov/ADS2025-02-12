@@ -6,7 +6,6 @@ Hash function collision detection
 
 Comparison of Hash Functions. Detecting Hash Collisions
 
-## Task
 Write a program in **Java** that takes two strings from the user and compares their hashes calculated by two different functions. The program should determine whether a collision occurs (the same hash for different strings).
 
 ## Requirements
@@ -23,8 +22,6 @@ Write a program in **Java** that takes two strings from the user and compares th
 
 # Theory
 
-Hashing
-
 Hashing is the process of converting input data of arbitrary length (string, file, object) into a fixed-length output value (hash code or digest).  
 **Purpose:** to create a unique "fingerprint" of the data for quick identification, comparison, or integrity verification.  
 
@@ -40,13 +37,12 @@ Hash codes are used:
 - **Efficiency**: hash calculation should be fast.  
 - **Diffusion (Avalanche effect)**: changing one bit in the input should change about half of the bits in the output hash.  
 - **Confusion**: the relationship between input and output should be complex and nonlinear.  
-- **Collision resistance**: it should be computationally infeasible to find two different strings $S_1 \neq S_2$ such that $H(S_1) = H(S_2)$.
+- **Collision resistance**: it should be infeasible to find two different strings $S_1 \neq S_2$ such that $H(S_1) = H(S_2)$.
 
 ---
 
 ## Collisions and the Birthday Paradox
 
-### Collision
 A collision occurs when two different strings are transformed into the same hash value:
 
 $S_1 \neq S_2 \implies H(S_1) = H(S_2)$

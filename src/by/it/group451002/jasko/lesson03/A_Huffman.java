@@ -39,7 +39,7 @@ import java.util.*;
 
 public class A_Huffman {
 
-    //индекс данных из листьев
+    // Индекс данных из листьев
     static private final Map<Character, String> codes = new TreeMap<>();
 
     public static void main(String[] args) {
@@ -92,10 +92,23 @@ public class A_Huffman {
         //это будет последний и единственный элемент оставшийся в очереди priorityQueue.
         Node root = priorityQueue.poll();
         if (root != null) {
+            // Генерация кодов
+            // Рекурсивно обходим дерево, накапливая коды (0 для левого поддерева, 1 для правого)
             root.fillCodes("");
         }
+        //        [8]
+        //       /   \
+        //    0 /     \1
+        //   a(4)     [4]
+        //           /   \
+        //        0 /     \1
+        //       b(2)     [2]
+        //               /   \
+        //            0 /     \1
+        //           c(1)    d(1)
 
         //5. Кодирование строки
+        // Заменяем каждый символ исходной строки соответствующим кодом из карты codes
         StringBuilder encodedString = new StringBuilder();
         for (char c : s.toCharArray()) {
             encodedString.append(codes.get(c));

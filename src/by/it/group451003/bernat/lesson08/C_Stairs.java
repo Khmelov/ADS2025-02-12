@@ -1,6 +1,5 @@
 package by.it.group451003.bernat.lesson08;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Scanner;

@@ -41,31 +41,31 @@ public class Solution {
     }
 
     @Test
-    void test1() {
+    public void test1() {
         int[] coins = {1, 2, 5};
         assertEquals(3, Solution.minCoins(coins, 12));
     }
 
     @Test
-    void test2() {
+    public void test2() {
         int[] coins = {3, 4, 5};
         assertEquals(2, Solution.minCoins(coins, 8));
     }
 
     @Test
-    void test3() {
+    public void test3() {
         int[] coins = {7, 15};
         assertEquals(0, Solution.minCoins(coins, 0));
     }
 
     @Test
-    void test4() {
+    public void test4() {
         int[] coins = {50, 20, 1};
         assertEquals(4, Solution.minCoins(coins, 80));
     }
 
     @Test
-    void test5() {
+    public void test5() {
         int[] coins = {1, 7, 9, 11};
         assertEquals(91, Solution.minCoins(coins, 999));
     }

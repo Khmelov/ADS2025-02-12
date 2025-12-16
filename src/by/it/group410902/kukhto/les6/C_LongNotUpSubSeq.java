@@ -1,7 +1,5 @@
 package by.it.group410902.kukhto.les6;
 
-import by.it.a_khmelev.lesson06.B_LongDivComSubSeq;
-
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Scanner;

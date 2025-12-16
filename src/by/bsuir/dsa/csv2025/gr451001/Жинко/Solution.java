@@ -2,6 +2,8 @@ package by.bsuir.dsa.csv2025.gr451001.Жинко;
 
 import java.io.*;
 import java.util.*;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class Solution {
 
@@ -249,6 +251,9 @@ public class Solution {
     }
 
     public static void main(String[] args) throws Exception {
+        idToRating = new HashMap<>();
+        tree = new AVLTree();
+
         FastScanner fs = new FastScanner(System.in);
         StringBuilder out = new StringBuilder();
 
@@ -269,9 +274,14 @@ public class Solution {
             } else if (t == 4) {
                 int k = fs.nextInt();
                 List<Integer> res = kthPlayer(k);
-                for (int x : res) out.append(x).append(" ");
-                out.append("\n");
 
+                if (!res.isEmpty()) {   // ← выводим только если есть что выводить
+                    for (int i = 0; i < res.size(); i++) {
+                        out.append(res.get(i));
+                        if (i < res.size() - 1) out.append(" ");
+                    }
+                    out.append("\n");
+                }
             } else if (t == 5) {
                 out.append(countPlayersInRange(fs.nextInt(), fs.nextInt())).append("\n");
             }
@@ -306,5 +316,96 @@ public class Solution {
             while ((c = read()) > ' ') x = x * 10 + (c - '0');
             return x * sign;
         }
+    }
+
+    private void runTest(String input, String expectedOutput) throws Exception {
+        InputStream originalIn = System.in;
+        PrintStream originalOut = System.out;
+
+        try {
+            System.setIn(new ByteArrayInputStream(input.getBytes()));
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            System.setOut(new PrintStream(baos));
+
+            Solution.main(new String[0]);
+
+            String actual = baos.toString().replace("\r\n", "\n").trim();
+            String expected = expectedOutput.replace("\r\n", "\n").trim();
+
+            assertEquals(expected, actual);
+        } finally {
+            System.setIn(originalIn);
+            System.setOut(originalOut);
+        }
+    }
+
+    @Test
+    public void test0() throws Exception {
+        String input = "9\n1 1 1500\n1 2 1700\n1 3 1200\n4 2\n3 3 1500\n4 2\n5 1400 1600\n2 2\n4 1\n";
+        String expectedOutput = "1\n1 3\n2\n1 3";
+        runTest(input, expectedOutput);
+    }
+
+    @Test
+    public void test1() throws Exception {
+        String input = "7\n1 1 1000\n1 2 2000\n1 3 3000\n2 2\n4 2\n4 1\n5 1500 4500\n";
+        String expectedOutput = "1\n3\n1";
+        runTest(input, expectedOutput);
+    }
+
+    @Test
+    public void test2() throws Exception {
+        String input = "3\n1 1 800\n1 1 900\n5 700 1000\n";
+        String expectedOutput = "1";
+        runTest(input, expectedOutput);
+    }
+
+    @Test
+    public void test3() throws Exception {
+        String input = "4\n1 1 5000\n1 2 1000\n1 3 3000\n5 1000 5000\n";
+        String expectedOutput = "3";
+        runTest(input, expectedOutput);
+    }
+
+    @Test
+    public void test4() throws Exception {
+        String input = "4\n1 1 600\n1 2 700\n3 2 600\n5 500 600\n";
+        String expectedOutput = "2";
+        runTest(input, expectedOutput);
+    }
+
+    @Test
+    public void test5() throws Exception {
+        String input = "6\n1 1 300\n1 2 400\n1 3 200\n1 2 300\n3 3 300\n4 1\n";
+        String expectedOutput = "1 2 3";
+        runTest(input, expectedOutput);
+    }
+
+    @Test
+    public void test6() throws Exception {
+        String input = "3\n4 1\n1 1 200\n4 1\n";
+        String expectedOutput = "1";
+        runTest(input, expectedOutput);
+    }
+
+    @Test
+    public void test7() throws Exception {
+        String input = "7\n1 1 1200\n1 2 1300\n1 3 1400\n1 4 1500\n4 1\n4 4\n5 1201 1501\n";
+        String expectedOutput = "4\n1\n3";
+        runTest(input, expectedOutput);
+    }
+
+    @Test
+    public void test8() throws Exception {
+        String input = "8\n1 1 1000\n1 2 2000\n1 3 3000\n4 4\n1 4 4000\n4 4\n2 1\n4 4\n";
+        String expectedOutput = "1";
+        runTest(input, expectedOutput);
+    }
+
+    @Test
+    public void test9() throws Exception {
+        String input = "8\n1 1 100\n1 2 200\n1 3 300\n4 1\n1 1 400\n4 1\n2 1\n4 1\n";
+        String expectedOutput = "3\n1\n3";
+        runTest(input, expectedOutput);
     }
 }
