@@ -1,0 +1,10 @@
+9
+add 100000000
+add 0
+find 0
+del 0
+find 0
+del 0
+add 0
+find 0
+find 42

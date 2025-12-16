@@ -24,7 +24,7 @@ public class ListC<E> implements List<E> {
             List_Node<E> temp = this.start.get_next();
             while (temp != null) {
                 try {
-                    to_str += ", " + temp.get_value().toString();
+                  to_str += ", " + temp.get_value().toString();
                     temp = temp.get_next();
                 } catch (Exception e) {
                     throw new RuntimeException(e);

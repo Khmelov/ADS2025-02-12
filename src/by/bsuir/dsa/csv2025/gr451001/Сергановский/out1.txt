@@ -1,0 +1,2 @@
+Topological sort is impossible: graph contains a cycle.
+Topological sort is impossible: graph contains a cycle.

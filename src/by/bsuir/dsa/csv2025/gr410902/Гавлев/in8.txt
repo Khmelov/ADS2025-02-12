@@ -1,0 +1,36 @@
+10 25 1 10
+Station 1
+Victory_Square 2
+Nemiga 3
+Academy_of_Sciences 4
+Stone_Hill 5
+Chizhovka 6
+Uruchye 7
+Malinovka 8
+Serebryanka 9
+Loshitsa 10
+1 4 1
+4 2 1
+2 5 1
+5 3 1
+3 7 1
+7 9 1
+9 10 1
+1 2 4
+1 3 5
+1 5 6
+1 7 7
+2 3 3
+2 6 4
+2 7 5
+3 4 3
+3 6 4
+3 8 5
+4 5 3
+4 8 4
+5 7 3
+6 8 2
+7 8 2
+8 9 3
+8 10 4
+9 2 10

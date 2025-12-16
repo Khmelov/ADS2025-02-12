@@ -52,9 +52,9 @@ public class B_Huffman {
 
     String decode(InputStream inputStream) {
         StringBuilder result = new StringBuilder();
-        //прочитаем строку для кодирования из тестового файла
+        // Прочитаем строку для кодирования из тестового файла
         Scanner scanner = new Scanner(inputStream);
-        int count = scanner.nextInt();
+        int count = scanner.nextInt(); // Количество различных символов (k)
         scanner.nextInt();
         //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! НАЧАЛО ЗАДАЧИ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
         //тут запишите ваше решение
@@ -62,8 +62,8 @@ public class B_Huffman {
         // Создаем карту для хранения соответствия кодов и символов
         HashMap<String, Character> codeToChar = new HashMap<>();
 
-        // Читаем коды символов
-        scanner.nextLine(); // Переходим на следующую строку после чисел
+        // Построение таблицы кодов вида "символ: код"
+        scanner.nextLine(); // Переходим на следующую строку
         for (int i = 0; i < count; i++) {
             String line = scanner.nextLine();
             String[] parts = line.split(": ");

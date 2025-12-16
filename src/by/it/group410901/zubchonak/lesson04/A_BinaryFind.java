@@ -63,11 +63,12 @@ public class A_BinaryFind {
                 int mid = low + (high - low) / 2;
                 if (a[mid] == value) {
                     index = mid + 1;
+                    // поиск завершен элемент равен искомому значению, поиск завершен
                     break;
                 } else if (a[mid] < value) {
-                    low = mid + 1;
+                    low = mid + 1; //искомое значение находится в правой части массива
                 } else {
-                    high = mid - 1;
+                    high = mid - 1; // искомое значение находится в левой части массива
                 }
             }
 
