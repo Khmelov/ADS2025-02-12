@@ -1,36 +1,43 @@
 package by.it.group451004.akbulatov.lesson14;
 
 import java.util.Scanner;
+import java.util.Arrays;
 
-public class StatesHanoiTowerC {
-    static class DSU {
+public class StatesHanoiTowerC
+{
+    static class DSU
+    {
         int[] parent;
         int[] size;
 
-        DSU(int n) {
+        DSU(int n)
+        {
             parent = new int[n];
             size = new int[n];
-            for (int i = 0; i < n; i++) {
+            for (int i = 0; i < n; i++)
+            {
                 parent[i] = i;
                 size[i] = 1;
             }
         }
 
-        int find(int x) {
-            if (parent[x] != x) {
-                parent[x] = find(parent[x]); // эвристика сокращения пути
-            }
+        int find(int x)
+        {
+            if (parent[x] != x)
+                parent[x] = find(parent[x]);
+
             return parent[x];
         }
 
-        void union(int x, int y) {
+        void union(int x, int y)
+        {
             int rootX = find(x);
             int rootY = find(y);
 
             if (rootX == rootY) return;
 
-            // эвристика по размеру поддерева
-            if (size[rootX] < size[rootY]) {
+            if (size[rootX] < size[rootY])
+            {
                 int temp = rootX;
                 rootX = rootY;
                 rootY = temp;
@@ -40,135 +47,85 @@ public class StatesHanoiTowerC {
             size[rootX] += size[rootY];
         }
 
-        int getSize(int x) {
+        int getSize(int x)
+        {
             return size[find(x)];
         }
     }
 
-    // Вспомогательный класс для хранения состояния
-    static class State {
-        int maxHeight;
-        int step;
-
-        State(int maxHeight, int step) {
-            this.maxHeight = maxHeight;
-            this.step = step;
-        }
-    }
-
-    public static void main(String[] args) {
+    public static void main(String[] args)
+    {
         Scanner scanner = new Scanner(System.in);
         int N = scanner.nextInt();
-        int totalSteps = (1 << N) - 1; // 2^N - 1
+        int totalSteps = (1 << N) - 1;
 
-        // Массив для хранения максимальных высот на каждом шаге
-        State[] states = new State[totalSteps];
+        int[] maxHeights = new int[totalSteps];
 
-        // Стек для эмуляции рекурсии
-        int[] stackN = new int[1000];
-        int[] stackFrom = new int[1000];
-        int[] stackTo = new int[1000];
-        int[] stackAux = new int[1000];
-        int stackPtr = 0;
+        int[] stepIndex = {0};
+        int[] heights = {N, 0, 0};
+        solveHanoi(N, 0, 1, 2, heights, maxHeights, stepIndex);
 
-        // Инициализация стека с начальной задачей
-        stackN[stackPtr] = N;
-        stackFrom[stackPtr] = 0; // A
-        stackTo[stackPtr] = 1;   // B
-        stackAux[stackPtr] = 2;  // C
-        stackPtr++;
-
-        // Массивы для хранения высот пирамид
-        int[] heights = new int[3];
-        heights[0] = N; // начальная высота A
-
-        int step = 0;
-
-        // Итеративное решение Ханойских башен
-        while (stackPtr > 0) {
-            stackPtr--;
-            int n = stackN[stackPtr];
-            int from = stackFrom[stackPtr];
-            int to = stackTo[stackPtr];
-            int aux = stackAux[stackPtr];
-
-            if (n == 1) {
-                // Перемещаем диск
-                heights[from]--;
-                heights[to]++;
-                step++;
-
-                // Находим максимальную высоту
-                int maxHeight = Math.max(heights[0], Math.max(heights[1], heights[2]));
-                states[step - 1] = new State(maxHeight, step - 1);
-            } else {
-                // Помещаем подзадачи в стек в обратном порядке
-                // move(n-1, from, aux, to)
-                stackN[stackPtr] = n - 1;
-                stackFrom[stackPtr] = from;
-                stackTo[stackPtr] = aux;
-                stackAux[stackPtr] = to;
-                stackPtr++;
-
-                // move(1, from, to, aux) - будет обработано на следующей итерации
-                stackN[stackPtr] = 1;
-                stackFrom[stackPtr] = from;
-                stackTo[stackPtr] = to;
-                stackAux[stackPtr] = aux;
-                stackPtr++;
-
-                // move(n-1, aux, to, from)
-                stackN[stackPtr] = n - 1;
-                stackFrom[stackPtr] = aux;
-                stackTo[stackPtr] = to;
-                stackAux[stackPtr] = from;
-                stackPtr++;
-            }
-        }
-
-        // Создаем DSU для группировки шагов
         DSU dsu = new DSU(totalSteps);
 
-        // Группируем шаги по максимальной высоте
-        int[] firstStepWithHeight = new int[N + 2]; // +2 для индексации от 0 до N+1
-        for (int i = 0; i <= N + 1; i++) {
-            firstStepWithHeight[i] = -1;
-        }
+        int[] lastSeenIndices = new int[N + 1];
+        Arrays.fill(lastSeenIndices, -1);
 
         for (int i = 0; i < totalSteps; i++) {
-            int height = states[i].maxHeight;
-            if (firstStepWithHeight[height] == -1) {
-                firstStepWithHeight[height] = i;
-            } else {
-                dsu.union(firstStepWithHeight[height], i);
-            }
+            int currentHeight = maxHeights[i];
+
+            if (lastSeenIndices[currentHeight] != -1)
+                dsu.union(i, lastSeenIndices[currentHeight]);
+            else
+                lastSeenIndices[currentHeight] = i;
         }
 
-        // Собираем размеры групп
-        int[] groupSizes = new int[N + 2];
-        boolean[] visited = new boolean[totalSteps];
+        int[] sizeCounts = new int[totalSteps + 1];
 
-        for (int i = 0; i < totalSteps; i++) {
-            int root = dsu.find(i);
-            if (!visited[root]) {
-                visited[root] = true;
-                groupSizes[dsu.getSize(root)]++;
-            }
+        for (int i = 0; i < totalSteps; i++)
+        {
+            if (dsu.parent[i] == i)
+                sizeCounts[dsu.size[i]]++;
         }
 
-        // Выводим размеры групп в порядке возрастания
+        StringBuilder output = new StringBuilder();
         boolean first = true;
-        for (int i = 1; i <= totalSteps; i++) {
-            if (groupSizes[i] > 0) {
-                // Для каждого размера группы выводим его столько раз, сколько групп такого размера
-                for (int j = 0; j < groupSizes[i]; j++) {
-                    if (!first) {
-                        System.out.print(" ");
-                    }
-                    System.out.print(i);
-                    first = false;
-                }
+
+        for (int size = 1; size <= totalSteps; size++)
+        {
+            int count = sizeCounts[size];
+            for (int k = 0; k < count; k++)
+            {
+                if (!first) output.append(" ");
+                output.append(size);
+                first = false;
             }
         }
+
+        StringBuilder sb = new StringBuilder();
+        for (int s = 1; s <= totalSteps; s++)
+            for (int k = 0; k < sizeCounts[s]; k++)
+                sb.append(s).append(" ");
+
+        System.out.println(sb.toString().trim());
+    }
+
+    private static void solveHanoi(int n, int from, int to, int aux, int[] heights, int[] maxHeights, int[] stepIndex)
+    {
+        if (n == 0)
+            return;
+
+        solveHanoi(n - 1, from, aux, to, heights, maxHeights, stepIndex);
+
+        heights[from]--;
+        heights[to]++;
+
+        int maxHeight = heights[0];
+        if (heights[1] > maxHeight) maxHeight = heights[1];
+        if (heights[2] > maxHeight) maxHeight = heights[2];
+
+        maxHeights[stepIndex[0]] = maxHeight;
+        stepIndex[0]++;
+
+        solveHanoi(n - 1, aux, to, from, heights, maxHeights, stepIndex);
     }
 }

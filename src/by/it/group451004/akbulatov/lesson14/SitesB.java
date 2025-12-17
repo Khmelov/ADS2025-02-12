@@ -2,99 +2,95 @@ package by.it.group451004.akbulatov.lesson14;
 
 import java.util.*;
 
-public class SitesB {
-    // Внутренний класс DSU с двумя эвристиками
-    static class DSU {
+public class SitesB
+{
+    static class DSU
+    {
         private final Map<String, String> parent = new HashMap<>();
         private final Map<String, Integer> rank = new HashMap<>();
 
-        // Найти корень с эвристикой сжатия пути
-        public String find(String x) {
-            if (!parent.containsKey(x)) {
+        public String find(String x)
+        {
+            if (!parent.containsKey(x))
+            {
                 parent.put(x, x);
                 rank.put(x, 0);
                 return x;
             }
 
-            if (!parent.get(x).equals(x)) {
-                parent.put(x, find(parent.get(x))); // эвристика сжатия пути
-            }
+            if (!parent.get(x).equals(x))
+                parent.put(x, find(parent.get(x)));
+
             return parent.get(x);
         }
 
-        // Объединить два множества с эвристикой объединения по рангу
-        public void union(String x, String y) {
+        public void union(String x, String y)
+        {
             String rootX = find(x);
             String rootY = find(y);
 
-            if (rootX.equals(rootY)) {
-                return;
-            }
+            if (rootX.equals(rootY)) return;
 
-            // Эвристика объединения по рангу
-            if (rank.get(rootX) < rank.get(rootY)) {
+            if (rank.get(rootX) < rank.get(rootY))
+            {
                 parent.put(rootX, rootY);
-            } else if (rank.get(rootX) > rank.get(rootY)) {
+            }
+            else if (rank.get(rootX) > rank.get(rootY))
+            {
                 parent.put(rootY, rootX);
-            } else {
+            }
+            else
+            {
                 parent.put(rootY, rootX);
                 rank.put(rootX, rank.get(rootX) + 1);
             }
         }
 
-        // Получить все кластеры с их размерами
-        public List<Integer> getClusterSizes() {
+        public List<Integer> getClusterSizes()
+        {
             Map<String, Integer> clusterSizes = new HashMap<>();
 
-            // Сначала убедимся, что все элементы имеют актуальных родителей
-            for (String site : parent.keySet()) {
+            for (String site : parent.keySet())
                 find(site);
-            }
 
-            // Подсчет размеров кластеров
-            for (String site : parent.keySet()) {
+            for (String site : parent.keySet())
+            {
                 String root = find(site);
                 clusterSizes.put(root, clusterSizes.getOrDefault(root, 0) + 1);
             }
 
-            // Создаем список размеров
             List<Integer> sizes = new ArrayList<>(clusterSizes.values());
             Collections.sort(sizes);
             return sizes;
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args)
+    {
         Scanner scanner = new Scanner(System.in);
         DSU dsu = new DSU();
 
-        // Чтение входных данных
-        while (true) {
+        while (true)
+        {
             String line = scanner.nextLine().trim();
-            if (line.equals("end")) {
+            if (line.equals("end"))
                 break;
-            }
 
-            // Разделение строки на два сайта
             String[] sites = line.split("\\+");
             if (sites.length == 2) {
                 String site1 = sites[0].trim();
                 String site2 = sites[1].trim();
 
-                // Объединение сайтов в DSU
                 dsu.union(site1, site2);
             }
         }
 
-        // Получение размеров кластеров и вывод результата
         List<Integer> clusterSizes = dsu.getClusterSizes();
 
-        // Вывод в формате, как в примере
-        for (int i = clusterSizes.size() - 1; i >= 0; i--) {
+        for (int i = clusterSizes.size() - 1; i >= 0; i--)
+        {
             System.out.print(clusterSizes.get(i));
-            if (i > 0) {
-                System.out.print(" ");
-            }
+            if (i > 0) System.out.print(" ");
         }
         scanner.close();
     }
