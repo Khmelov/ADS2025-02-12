@@ -1,103 +1,93 @@
-package by.it.group451003.galuzo.lesson15;
+    package by.it.group451003.galuzo.lesson15;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Scanner;
-import java.util.stream.Stream;
+    import java.io.File;
+    import java.io.IOException;
+    import java.nio.charset.StandardCharsets;
+    import java.nio.file.Files;
+    import java.nio.file.Path;
+    import java.util.ArrayList;
+    import java.util.Comparator;
+    import java.util.List;
 
-public class SourceScannerA {
-    protected static class myStringComparator implements Comparator<String>{
-        @Override
-        public int compare(String s1, String s2) {
-            int int_s1, int_s2;
+    public class SourceScannerA {
+        public static void main(String[] args) {
+            String src = System.getProperty("user.dir") + File.separator + "src" + File.separator;
+            Path root = Path.of(src);
+            List<FileInfo> fileInfos = new ArrayList<>();
 
-            int_s1 = new Scanner(s1).nextInt(10);
-            int_s2 = new Scanner(s2).nextInt(10);
-
-            if (int_s1 == int_s2) {
-                return s1.compareTo(s2);
-            }
-            return int_s1 > int_s2 ? 1 : -1;
-        }
-
-    }
-
-    protected static char[] move(char[] array) {
-        char[] temp;
-        int i = 0, size;
-
-        while(array[i] == 0)
-            i++;
-
-        size = array.length - i;
-        temp = new char[size];
-        System.arraycopy(array, i, temp, 0, size);
-        array = temp;
-
-        i = array.length - 1;
-        while (array[i] == 0)
-            i--;
-
-        size = i + 1;
-        temp = new char[size];
-        System.arraycopy(array, 0, temp, 0, size);
-        return temp;
-    }
-
-    private static void getInformation() throws IOException {
-        ArrayList<String> size_directory = new ArrayList<>();
-
-        Path src = Path.of(System.getProperty("user.dir")
-                + File.separator + "src" + File.separator);
-
-        try (Stream<Path> fileTrees = Files.walk(src)) {
-            fileTrees.forEach(
-                    directory -> {
-                        if (directory.toString().endsWith(".java")) {
+            try (var walk = Files.walk(root)) {
+                walk.filter(p -> p.toString().endsWith(".java"))
+                        .forEach(p -> {
                             try {
-                                char[] charArr;
-                                String str = Files.readString(directory);
-                                if (!str.contains("@Test") && !str.contains("org.junit.Test")) {
-                                    str = str.replaceAll("package.+;", "")
-                                            .replaceAll("import.+;", "");
-
-                                    if (!str.isEmpty() && (str.charAt(0) < 33 || str.charAt(str.length() - 1) < 33)) {
-                                        charArr = str.toCharArray();
-                                        int indexF = 0, indexL = charArr.length - 1;
-
-                                        while (indexF < charArr.length && charArr[indexF] < 33 && charArr[indexF] != 0)
-                                            charArr[indexF++] = 0;
-                                        while (indexL >= 0 && charArr[indexL] < 33 && charArr[indexL] != 0)
-                                            charArr[indexL--] = 0;
-
-                                        str = new String(move(charArr));
-                                    }
-
-                                    size_directory.add(str.getBytes().length + " " + src.relativize(directory));
+                                String content = Files.readString(p, StandardCharsets.UTF_8);
+                                if (content.contains("@Test") || content.contains("org.junit.Test")) {
+                                    return;
                                 }
+
+                                String processed = processContentA(content);
+                                String relativePath = root.relativize(p).toString();
+
+                                fileInfos.add(new FileInfo(relativePath, processed.getBytes(StandardCharsets.UTF_8).length));
+
                             } catch (IOException e) {
-                                if (System.currentTimeMillis() < 0) {
-                                    System.err.println(directory);
-                                }
+                                // Игнорируем ошибки чтения
                             }
-                        }
-                    }
-            );
+                        });
+            } catch (IOException e) {
+                System.err.println("Ошибка обхода каталога: " + e.getMessage());
+                return;
+            }
 
-            Collections.sort(size_directory, new myStringComparator());
+            fileInfos.sort(Comparator
+                    .comparingInt(FileInfo::getSize)
+                    .thenComparing(FileInfo::getPath));
 
-            for (var info : size_directory)
-                System.out.println(info);
+            for (FileInfo info : fileInfos) {
+                // ИЗМЕНЕНИЕ: выводим в том же формате, что и samples()
+                System.out.println(info.getPath());
+            }
         }
 
-    }
+        private static String processContentA(String content) {
+            String[] lines = content.split("\n");
+            StringBuilder result = new StringBuilder();
 
-    public static void main(String[] args) throws IOException {
-        getInformation();
+            for (String line : lines) {
+                String trimmedLine = line.trim();
+                if (trimmedLine.startsWith("package") || trimmedLine.startsWith("import")) {
+                    continue;
+                }
+                result.append(line).append("\n");
+            }
+
+            return removeLowCharsFromStartAndEnd(result.toString());
+        }
+
+        private static String removeLowCharsFromStartAndEnd(String str) {
+            int start = 0;
+            int end = str.length();
+
+            while (start < end && str.charAt(start) < 33) {
+                start++;
+            }
+
+            while (end > start && str.charAt(end - 1) < 33) {
+                end--;
+            }
+
+            return str.substring(start, end);
+        }
+
+        private static class FileInfo {
+            private final String path;
+            private final int size;
+
+            public FileInfo(String path, int size) {
+                this.path = path;
+                this.size = size;
+            }
+
+            public String getPath() { return path; }
+            public int getSize() { return size; }
+        }
     }
-}
