@@ -54,34 +54,34 @@ public class Solution {
 
     @Test
     public void allTests() {
-        // Case 1
+        //Case 1
         assertEquals(0, runOnce("0 0 0 3\n1 2 3\n"));
 
-        // Case 2
+        //Case 2
         assertEquals(5, runOnce("5 0 5 1\n5\n"));
 
-        // Case 3
+        //Case 3
         assertEquals(7, runOnce("10 3 10 2\n4 7\n"));
 
-        // Case 4
+        //Case 4
         assertEquals(14, runOnce("10 10 0 4\n3 3 4 4\n"));
 
-        // Case 5
+        //Case 5
         assertEquals(16, runOnce("10 10 2 4\n6 6 2 2\n"));
 
-        // Case 6
+        //Case 6
         assertEquals(25, runOnce("7 20 20 5\n7 6 5 4 3\n"));
 
-        // Case 7
+        //Case 7
         assertEquals(18, runOnce("10 9 3 5\n5 5 4 4 3\n"));
 
-        // Case 8
+        //Case 8
         assertEquals(1212, runOnce("1000 1000 5 4\n600 600 6 6\n"));
 
-        // Case 9
+        //Case 9
         assertEquals(60, runOnce("100 10 100 6\n10 10 10 10 10 10\n"));
 
-        // Case 10
+        //Case 10
         assertEquals(80, runOnce("100 100 1 3\n40 40 40\n"));
     }
 }
