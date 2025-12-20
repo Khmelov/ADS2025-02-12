@@ -12,7 +12,7 @@ public class FiboB {
     private final long startTime = System.currentTimeMillis();
 
     public static void main(String[] args) {
-        //вычисление чисел простым быстрым методом
+        // Вычисление чисел простым быстрым методом
         FiboB fibo = new FiboB();
         int n = 55555;
         System.out.printf("fastB(%d)=%d \n\t time=%d \n\n", n, fibo.fastB(n), fibo.time());
@@ -22,7 +22,7 @@ public class FiboB {
         return System.currentTimeMillis() - startTime;
     }
 
-    BigInteger fastB(Integer n) {
+    BigInteger fastB(Integer n) { // Вычисляет n-е число Фибоначчи с помощью массива, который хранит промежуточные результаты.
         // Реализация вычисления чисел Фибоначчи за O(n) с использованием массива
         if (n == 0) {
             return BigInteger.ZERO;

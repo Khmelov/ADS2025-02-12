@@ -9,12 +9,12 @@ public class Solution {
         int n = sc.nextInt();
         int[] arr = new int[n];
 
-        
+
         for (int i = 0; i < n; i++) {
             arr[i] = sc.nextInt();
         }
 
-        
+
         int minLeft = arr[0];
         int maxDiff = 0;
 
@@ -23,7 +23,7 @@ public class Solution {
             minLeft = Math.min(minLeft, arr[j]);
         }
 
-        
+
         System.out.println(maxDiff);
     }
 }

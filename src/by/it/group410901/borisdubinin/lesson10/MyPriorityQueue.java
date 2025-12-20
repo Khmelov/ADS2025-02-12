@@ -1,280 +1,256 @@
 package by.it.group410901.borisdubinin.lesson10;
 
-import java.util.*;
+import java.util.Queue;
+import java.util.Collection;
+import java.util.NoSuchElementException;
 
-public class MyPriorityQueue<E> implements Queue<E>{
+// Приоритетная очередь на основе минимальной двоичной кучи
+// Элементы должны быть сравнимыми (Comparable)
+public class MyPriorityQueue<E extends Comparable<? super E>> implements Queue<E> {
+    private E[] array;        // Массив для хранения кучи
+    private int size;        // Текущее количество элементов
+    private static final int DEFAULT_CAPACITY = 16;  // Начальная емкость по умолчанию
 
-    private static final int DEFAULT_CAPACITY = 32;
-
-    private final Comparator<E> comparator;
-
-    private Object[] array;
-    private int size;
-
-    public MyPriorityQueue(){
-        this(null);
-    }
-    public MyPriorityQueue(Comparator<E> comparator){
-        array = new Object[DEFAULT_CAPACITY];
+    // Конструктор с заданной емкостью
+    @SuppressWarnings("unchecked")
+    public MyPriorityQueue(int capacity) {
+        if (capacity < 1) capacity = DEFAULT_CAPACITY;  // Минимальная емкость
+        array = (E[]) new Comparable[capacity];
         size = 0;
-        this.comparator = comparator;
     }
 
-    private int compare(E left, E right){
-        if(comparator != null)
-            return comparator.compare(left, right);
-        else {
-            Comparable<? super E> comparableLeft = (Comparable<? super E>) left;
-            return comparableLeft.compareTo(right);
+    // Конструктор по умолчанию
+    public MyPriorityQueue() {
+        this(DEFAULT_CAPACITY);
+    }
+
+    // Возвращает текущую емкость массива
+    private int cap() { return array.length; }
+
+    // Увеличивает размер массива в 2 раза
+    @SuppressWarnings("unchecked")
+    private void grow() {
+        int n = cap() << 1;  // Новая емкость = старая * 2 (битовый сдвиг влево)
+        E[] nh = (E[]) new Comparable[n];
+        // Копируем элементы в новый массив
+        for (int i = 0; i < size; i++) nh[i] = array[i];
+        array = nh;
+    }
+
+    // Обмен элементов по индексам
+    private void swap(int i, int j) {
+        E t = array[i]; array[i] = array[j]; array[j] = t;
+    }
+
+    // Просеивание вверх (восстановление свойства кучи при добавлении)
+    private void siftUp(int idx) {
+        E val = array[idx];  // Сохраняем значение текущего элемента
+        while (idx > 0) {
+            int p = (idx - 1) >>> 1;  // Индекс родителя (беззнаковый сдвиг вправо = деление на 2)
+            // Если родитель меньше или равен текущему, куча упорядочена
+            if (array[p].compareTo(val) <= 0) break;
+            // Перемещаем родителя вниз
+            array[idx] = array[p];
+            idx = p;  // Переходим к родителю
         }
+        array[idx] = val;  // Устанавливаем значение на правильную позицию
     }
 
-    private void siftUp(int index){
-        int parent = (index-1)/2;
-        while(compare((E)array[parent], (E)array[index]) > 0){
-            Object temp = array[parent];
-            array[parent] = array[index];
-            array[index] = temp;
+    // Просеивание вниз (восстановление свойства кучи при удалении)
+    private void siftDown(int idx) {
+        E val = array[idx];  // Сохраняем значение текущего элемента
+        int half = size >>> 1;  // Индекс последнего родителя
+        while (idx < half) {
+            int l = (idx << 1) + 1;  // Индекс левого потомка
+            int r = l + 1;           // Индекс правого потомка
+            int smallest = l;         // Предполагаем, что левый потомок наименьший
 
-            index = parent;
-            parent = (index-1)/2;
+            // Если есть правый потомок и он меньше левого
+            if (r < size && array[r].compareTo(array[l]) < 0) smallest = r;
+
+            // Если текущий элемент меньше или равен наименьшему потомку
+            if (array[smallest].compareTo(val) >= 0) break;
+
+            // Перемещаем наименьшего потомка вверх
+            array[idx] = array[smallest];
+            idx = smallest;  // Переходим к потомку
         }
+        array[idx] = val;  // Устанавливаем значение на правильную позицию
     }
-    private void siftDown(int index){
-        while (true) {
-            int leftChild = 2 * index + 1;
-            int rightChild = 2 * index + 2;
-            int smallest = index;
 
-            if (leftChild < size && compare((E) array[leftChild], (E) array[smallest]) < 0) {
-                smallest = leftChild;
-            }
+    // Удаление элемента по индексу
+    private E removeAt(int idx) {
+        E removed = array[idx];  // Сохраняем удаляемый элемент
+        int last = --size;      // Уменьшаем размер и сохраняем индекс последнего
 
-            if (rightChild < size && compare((E) array[rightChild], (E) array[smallest]) < 0) {
-                smallest = rightChild;
-            }
-
-            if (smallest == index) {
-                break;
-            }
-
-            Object temp = array[index];
-            array[index] = array[smallest];
-            array[smallest] = temp;
-
-            index = smallest;
+        // Если удаляем последний элемент
+        if (idx == last) {
+            array[idx] = null;
+            return removed;
         }
+
+        // Перемещаем последний элемент на место удаленного
+        E moved = array[last];
+        array[last] = null;
+        array[idx] = moved;
+
+        // Восстанавливаем свойства кучи
+        int parent = (idx - 1) >>> 1;  // Индекс родителя
+        if (idx > 0 && array[idx].compareTo(array[parent]) < 0) {
+            siftUp(idx);    // Просеиваем вверх если элемент меньше родителя
+        } else {
+            siftDown(idx);  // Иначе просеиваем вниз
+        }
+        return removed;
     }
 
-    private void increaseCapacity(){
-        Object[] newArray = new Object[array.length * 2];
-        System.arraycopy(array, 0, newArray, 0, array.length);
-        array = newArray;
-    }
-
-    /// ////////////////////////////////////////////////////////////////////////////////////////////////////
-
+    // Преобразование очереди в строку для вывода
     @Override
-    public String toString(){
-        if(size < 1)
-            return "[]";
-
-        StringBuilder sb = new StringBuilder("[");
+    public String toString() {
+        if (size == 0) return "[]";  // Пустая очередь
+        StringBuilder sb = new StringBuilder();
+        sb.append('[');
         for (int i = 0; i < size; i++) {
-            sb.append(array[i]);
-            sb.append(", ");
+            sb.append(String.valueOf(array[i]));
+            if (i != size - 1) sb.append(", ");  // Запятая между элементами
         }
-
-        sb.setLength(sb.length()-1);
-        sb.setCharAt(sb.length()-1, ']');
-
+        sb.append(']');
         return sb.toString();
     }
 
+    // Возвращает количество элементов в очереди
     @Override
-    public int size() {
-        return size;
-    }
-    @Override
-    public boolean isEmpty() {
-        return size < 1;
-    }
+    public int size() { return size; }
 
-    @Override
-    public boolean add(E e) {
-        if(e == null)
-            throw new NullPointerException();
-
-        if(size == array.length)
-            increaseCapacity();
-
-        array[size] = e;
-        siftUp(size);
-        size++;
-
-        return true;
-    }
-    @Override
-    public boolean offer(E e) {
-        return add(e);
-    }
-    @Override
-    public boolean addAll(Collection<? extends E> c) {
-        if(c == null)
-            throw new NullPointerException();
-        if(c.isEmpty())
-            return false;
-
-        for(E e : c){
-            add(e);
-        }
-
-        return true;
-    }
-
-    @Override
-    public E remove() {
-        if(size < 1)
-            throw new NoSuchElementException();
-
-        E root = (E)array[0];
-        array[0] = array[size-1];
-        size--;
-        siftDown(0);
-
-        return root;
-    }
-    @Override
-    public E poll() {
-        if(size < 1)
-            return null;
-
-        return remove();
-    }
-    @Override
-    public boolean removeAll(Collection<?> c) {
-        if (c == null) throw new NullPointerException();
-
-        if (size == 0) return false;
-
-        // Создаем новый массив только для сохраняемых элементов
-        Object[] newArray = new Object[array.length];
-        int newIndex = 0;
-
-        for (int i = 0; i < size; i++) {
-            if (!c.contains((E) array[i])) {
-                newArray[newIndex++] = array[i];
-            }
-        }
-
-        // Заменяем старый массив новым
-        array = newArray;
-        boolean changed = size != newIndex;
-        size = newIndex;
-
-        // Перестраиваем кучу
-        heapify();
-
-        return changed;
-    }
+    // Очистка очереди
     @Override
     public void clear() {
-        array = new Object[DEFAULT_CAPACITY];
+        for (int i = 0; i < size; i++) array[i] = null;  // Помощь сборщику мусора
         size = 0;
     }
 
+    // Добавление элемента в очередь
     @Override
-    public E element() {
-        if(size < 1)
-            throw new NoSuchElementException();
-
-        return (E)array[0];
-    }
-    @Override
-    public E peek() {
-        if(size < 1)
-            return null;
-
-        return (E)array[0];
-    }
-
-    @Override
-    public boolean contains(Object o) {
-        if(o == null)
-            return false;
-
-        for(int i = 0; i < size; i++){
-            if(o.equals(array[i]))
-                return true;
-        }
-
-        return false;
-    }
-    @Override
-    public boolean containsAll(Collection<?> c) {
-        if(c == null)
-            throw new NullPointerException();
-        if(c.isEmpty())
-            return true;
-
-        for(Object o : c){
-            if(!contains(o))
-                return false;
-        }
-
+    public boolean add(E element) {
+        if (element == null) throw new NullPointerException();  // Null не допускается
+        if (size == cap()) grow();  // Увеличиваем массив при необходимости
+        array[size] = element;       // Добавляем в конец
+        siftUp(size);               // Восстанавливаем свойства кучи
+        size++;
         return true;
     }
 
+    // Альтернативный метод добавления
+    @Override
+    public boolean offer(E e) { return add(e); }
+
+    // Извлечение минимального элемента с удалением
+    @Override
+    public E poll() {
+        if (size == 0) return null;  // Пустая очередь
+        E res = array[0];             // Минимальный элемент всегда в корне
+        removeAt(0);                 // Удаляем корень
+        return res;
+    }
+
+    // Просмотр минимального элемента без удаления
+    @Override
+    public E peek() { return size == 0 ? null : array[0]; }
+
+    // Просмотр минимального элемента с исключением если пусто
+    @Override
+    public E element() {
+        if (size == 0) throw new NoSuchElementException();
+        return array[0];
+    }
+
+    // Проверка на пустоту
+    @Override
+    public boolean isEmpty() { return size == 0; }
+
+    // Удаление минимального элемента с исключением если пусто
+    @Override
+    public E remove() {
+        E r = poll();
+        if (r == null) throw new NoSuchElementException();
+        return r;
+    }
+
+    // Проверка наличия элемента
+    @Override
+    public boolean contains(Object o) {
+        if (o == null) return false;  // Null не допускается
+        // Линейный поиск по массиву
+        for (int i = 0; i < size; i++) if (o.equals(array[i])) return true;
+        return false;
+    }
+
+    // Проверка наличия всех элементов коллекции
+    @Override
+    public boolean containsAll(Collection<?> c) {
+        if (c == null) throw new NullPointerException();
+        for (Object e : c) if (!contains(e)) return false;
+        return true;
+    }
+
+    // Добавление всех элементов коллекции
+    @Override
+    public boolean addAll(Collection<? extends E> c) {
+        if (c == null) throw new NullPointerException();
+        boolean modified = false;
+        for (E e : c) {
+            add(e);
+            modified = true;
+        }
+        return modified;
+    }
+
+    // Удаление всех элементов, содержащихся в коллекции
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        if (c == null) throw new NullPointerException();
+        int j = 0;
+        // Фильтруем элементы: оставляем только те, которых нет в коллекции c
+        for (int i = 0; i < size; i++) {
+            if (!c.contains(array[i])) {
+                array[j++] = array[i];
+            }
+        }
+        if (j == size) return false;  // Ничего не изменилось
+
+        // Очищаем оставшиеся ячейки
+        for (int k = j; k < size; k++) array[k] = null;
+        size = j;
+        // Восстанавливаем свойства кучи
+        for (int k = (size >>> 1) - 1; k >= 0; k--) siftDown(k);
+        return true;
+    }
+
+    // Удаление всех элементов, НЕ содержащихся в коллекции
     @Override
     public boolean retainAll(Collection<?> c) {
         if (c == null) throw new NullPointerException();
-
-        if (size == 0) return false;
-
-        // Создаем новый массив только для сохраняемых элементов
-        Object[] newArray = new Object[array.length];
-        int newIndex = 0;
-
+        int j = 0;
+        // Фильтруем элементы: оставляем только те, которые есть в коллекции c
         for (int i = 0; i < size; i++) {
-            if (c.contains((E) array[i])) {
-                newArray[newIndex++] = array[i];
+            if (c.contains(array[i])) {
+                array[j++] = array[i];
             }
         }
+        if (j == size) return false;  // Ничего не изменилось
 
-        // Заменяем старый массив новым
-        array = newArray;
-        boolean changed = size != newIndex;
-        size = newIndex;
-
-        // Перестраиваем кучу
-        heapify();
-
-        return changed;
+        // Очищаем оставшиеся ячейки
+        for (int k = j; k < size; k++) array[k] = null;
+        size = j;
+        // Восстанавливаем свойства кучи
+        for (int k = (size >>> 1) - 1; k >= 0; k--) siftDown(k);
+        return true;
     }
 
-    private void heapify() {
-        // Начинаем с последнего не-листового узла
-        for (int i = (size / 2) - 1; i >= 0; i--) {
-            siftDown(i);
-        }
-    }
-
-    /// //////////////////////////////////////////////////////////////////////////////
-
-    @Override
-    public Iterator<E> iterator() {
-        return null;
-    }
-    @Override
-    public Object[] toArray() {
-        return new Object[0];
-    }
-    @Override
-    public <T> T[] toArray(T[] a) {
-        return null;
-    }
-    @Override
-    public boolean remove(Object o) {
-        return false;
-    }
+    @Override public boolean remove(Object o) { throw new UnsupportedOperationException(); }
+    @Override public java.util.Iterator<E> iterator() { throw new UnsupportedOperationException(); }
+    @Override public Object[] toArray() { throw new UnsupportedOperationException(); }
+    @Override public <T> T[] toArray(T[] a) { throw new UnsupportedOperationException(); }
+    @Override public boolean equals(Object o) { return super.equals(o); }
+    @Override public int hashCode() { return super.hashCode(); }
 }

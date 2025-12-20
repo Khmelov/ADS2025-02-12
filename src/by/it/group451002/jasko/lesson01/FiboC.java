@@ -21,7 +21,7 @@ public class FiboC {
         return System.currentTimeMillis() - startTime;
     }
 
-    long fasterC(long n, int m) {
+    long fasterC(long n, int m) { // Вычисляет остаток от деления n-го числа Фибоначчи на m.
         // Нахождение периода Пизано для модуля m
         int pisanoPeriod = findPisanoPeriod(m);
 
@@ -44,7 +44,7 @@ public class FiboC {
         return curr;
     }
 
-    private int findPisanoPeriod(int m) {
+    private int findPisanoPeriod(int m) { // Находит длину периода Пизано для заданного модуля m
         // Находим период Пизано для заданного модуля m
         long prev = 0; // F(0)
         long curr = 1; // F(1)
