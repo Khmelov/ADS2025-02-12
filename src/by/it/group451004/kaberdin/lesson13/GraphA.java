@@ -16,7 +16,7 @@ public class GraphA {
         public void addEdge(String from, String to) {
             allVertices.add(from);
             allVertices.add(to);
-            adjacencyList.computeIfAbsent(from, k -> new ArrayList<>()).add(to);
+            adjacencyList.computeIfAbsent(from, _ -> new ArrayList<>()).add(to);
         }
         
         public List<String> topologicalSort() {
