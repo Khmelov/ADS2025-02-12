@@ -1,0 +1,44 @@
+import java.util.*;
+
+public class Main {
+
+    // расширенный алгоритм Евклида
+    static long[] exgcd(long a, long b) {
+        if (b == 0) return new long[]{a, 1, 0};
+        long[] r = exgcd(b, a % b);
+        long g = r[0];
+        long x = r[2];
+        long y = r[1] - (a / b) * r[2];
+        return new long[]{g, x, y};
+    }
+
+    public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+
+        long a = in.nextLong();
+        long b = in.nextLong();
+        long m = in.nextLong();
+
+        long[] r = exgcd(a, m);
+        long g = r[0];
+
+        // Проверка существования решения
+        if (b % g != 0) {
+            System.out.println("NO");
+            return;
+        }
+
+        // Приведение
+        long a2 = a / g;
+        long b2 = b / g;
+        long m2 = m / g;
+
+        // Модульный обратный элемент
+        long inv = r[1];        // r[1] — коэффициент для a
+        inv = (inv % m2 + m2) % m2;
+
+        long x = (b2 % m2) * inv % m2;
+
+        System.out.println(x);
+    }
+}

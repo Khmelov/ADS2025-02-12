@@ -1,200 +1,195 @@
 package by.it.group451001.zhynko.lesson15;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.MalformedInputException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.*;
 import java.util.*;
 
 public class SourceScannerC {
+
     public static void main(String[] args) {
-        String src = System.getProperty("user.dir") + File.separator + "src" + File.separator;
-        Path root = Path.of(src);
-        List<ProcessedFile> files = new ArrayList<>();
+        String src = System.getProperty("user.dir") + File.separator + "src";
+        List<by.it.group451001.zhynko.lesson15.SourceScannerC.FileData> fileDataList = new ArrayList<>();
+        Path srcPath = Paths.get(src);
+        try {
+            Files.walk(srcPath)
+                    .filter(p -> p.toString().endsWith(".java"))
+                    .forEach(file -> processJavaFile(file, srcPath, fileDataList));
+        } catch (IOException e) {}
+        Map<String, List<String>> copies = findCopiesByHashing(fileDataList);
+        List<String> sortedFiles = new ArrayList<>(copies.keySet());
+        Collections.sort(sortedFiles);
 
-        try (var walk = Files.walk(root)) {
-            walk.filter(p -> p.toString().endsWith(".java"))
-                    .forEach(p -> {
-                        try {
-                            String content = Files.readString(p, StandardCharsets.UTF_8);
-
-                            if (content.contains("@Test") || content.contains("org.junit.Test")) {
-                                return;
-                            }
-
-                            String processed = processContentC(content);
-                            String relativePath = root.relativize(p).toString();
-
-                            files.add(new ProcessedFile(relativePath, processed));
-
-                        } catch (IOException e) {
-
-                        }
-                    });
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
-
-        Map<Integer, List<String>> hashGroups = new HashMap<>();
-
-        for (ProcessedFile file : files) {
-            int hash = file.content.hashCode();
-            hashGroups.computeIfAbsent(hash, k -> new ArrayList<>()).add(file.path);
-        }
-
-        boolean hasCopies = false;
-        List<String> allFileNames = new ArrayList<>();
-
-        for (List<String> group : hashGroups.values()) {
-            if (group.size() > 1) {
-                hasCopies = true;
-                for (String path : group) {
-                    allFileNames.add(getFileName(path));
-                }
-            } else if (!hasCopies) {
-
-                allFileNames.add(getFileName(group.get(0)));
+        for (String filePath : sortedFiles) {
+            System.out.println(filePath);  // оригинальный файл
+            List<String> copyPaths = copies.get(filePath);
+            Collections.sort(copyPaths);
+            for (String copyPath : copyPaths) {
+                System.out.println(copyPath);  // его дубликаты
             }
         }
-
-
-        Collections.sort(allFileNames);
-        for (String fileName : allFileNames) {
-            System.out.println(fileName);
-        }
     }
 
+    private static void processJavaFile(Path file, Path srcPath, List<by.it.group451001.zhynko.lesson15.SourceScannerC.FileData> fileDataList) {
+        try {
+            String content = Files.readString(file, StandardCharsets.UTF_8);
+            if (content.contains("@Test") || content.contains("org.junit.Test")) return;
 
-    private static String getFileName(String path) {
-        int lastSeparator = path.lastIndexOf(File.separator);
-        return (lastSeparator != -1) ? path.substring(lastSeparator + 1) : path;
+            String processed = processFileContent(content);
+            String relativePath = srcPath.relativize(file).toString();
+
+            fileDataList.add(new by.it.group451001.zhynko.lesson15.SourceScannerC.FileData(relativePath, processed));
+
+        } catch (MalformedInputException e) {
+        } catch (IOException e) {}
     }
 
-    private static String processContentC(String content) {
-
-        content = removePackageAndImports(content);
-
-        content = removeComments(content);
-
-        content = replaceLowCharsWithSpaces(content);
-
-        content = content.trim();
-
-        return content;
-    }
-
-    private static String removePackageAndImports(String content) {
-        String[] lines = content.split("\n");
+    private static String processFileContent(String content) {
+        String withoutComments = removeComments(content);
+        String[] lines = withoutComments.split("\\R");
         StringBuilder result = new StringBuilder();
 
         for (String line : lines) {
-            String trimmedLine = line.trim();
-            if (!trimmedLine.startsWith("package") && !trimmedLine.startsWith("import")) {
-                result.append(line).append("\n");
+            String processedLine = processLine(line);
+            if (!processedLine.isEmpty()) {
+                result.append(processedLine).append(" ");
             }
         }
 
-        return result.toString();
+        String processed = result.toString();
+        processed = processed.replaceAll("\\s+", " ").trim();
+        return processed;
     }
 
     private static String removeComments(String content) {
         StringBuilder result = new StringBuilder();
-        boolean inBlockComment = false;
-        boolean inLineComment = false;
-        boolean inString = false;
-        boolean inChar = false;
+        int length = content.length();
+        int i = 0;
 
-        for (int i = 0; i < content.length(); i++) {
-            char current = content.charAt(i);
-            char next = (i < content.length() - 1) ? content.charAt(i + 1) : 0;
-
-            if (inBlockComment) {
-                if (current == '*' && next == '/') {
-                    inBlockComment = false;
-                    i++;
-                }
-                continue;
+        while (i < length) {
+            if (i + 1 < length && content.charAt(i) == '/' && content.charAt(i + 1) == '/') {
+                while (i < length && content.charAt(i) != '\n' && content.charAt(i) != '\r') i++;
             }
-
-            if (inLineComment) {
-                if (current == '\n') {
-                    inLineComment = false;
-                    result.append(current);
-                }
-                continue;
+            else if (i + 1 < length && content.charAt(i) == '/' && content.charAt(i + 1) == '*') {
+                i += 2;
+                while (i + 1 < length && !(content.charAt(i) == '*' && content.charAt(i + 1) == '/')) i++;
+                i += 2;
             }
-
-            if (inString) {
-                result.append(current);
-                if (current == '\\' && next == '"') {
-                    result.append(next);
-                    i++;
-                } else if (current == '"') {
-                    inString = false;
-                }
-                continue;
-            }
-
-            if (inChar) {
-                result.append(current);
-                if (current == '\\' && next == '\'') {
-                    result.append(next);
-                    i++;
-                } else if (current == '\'') {
-                    inChar = false;
-                }
-                continue;
-            }
-
-            if (current == '"') {
-                inString = true;
-                result.append(current);
-            } else if (current == '\'') {
-                inChar = true;
-                result.append(current);
-            } else if (current == '/' && next == '*') {
-                inBlockComment = true;
+            else {
+                result.append(content.charAt(i));
                 i++;
-            } else if (current == '/' && next == '/') {
-                inLineComment = true;
-                i++;
-            } else {
-                result.append(current);
             }
         }
-
         return result.toString();
     }
 
-    private static String replaceLowCharsWithSpaces(String str) {
-        StringBuilder result = new StringBuilder();
-        boolean inWhitespaceSequence = false;
+    private static String processLine(String line) {
+        String trimmed = line.trim();
+        if (trimmed.startsWith("package") || trimmed.startsWith("import")) return "";
+        return trimmed;
+    }
 
-        for (int i = 0; i < str.length(); i++) {
-            char c = str.charAt(i);
-            if (c < 33) {
-                if (!inWhitespaceSequence) {
-                    result.append(' ');
-                    inWhitespaceSequence = true;
+    private static Map<String, List<String>> findCopiesByHashing(List<by.it.group451001.zhynko.lesson15.SourceScannerC.FileData> fileDataList) {
+        Map<String, List<String>> copies = new HashMap<>();
+        Map<by.it.group451001.zhynko.lesson15.SourceScannerC.FileSignature, List<by.it.group451001.zhynko.lesson15.SourceScannerC.FileData>> groups = new HashMap<>();
+
+        for (by.it.group451001.zhynko.lesson15.SourceScannerC.FileData file : fileDataList) {
+            by.it.group451001.zhynko.lesson15.SourceScannerC.FileSignature signature = new by.it.group451001.zhynko.lesson15.SourceScannerC.FileSignature(file.content);
+            groups.computeIfAbsent(signature, k -> new ArrayList<>()).add(file);
+        }
+
+        for (List<by.it.group451001.zhynko.lesson15.SourceScannerC.FileData> group : groups.values()) {
+            if (group.size() > 1) {
+                for (int i = 0; i < group.size(); i++) {
+                    by.it.group451001.zhynko.lesson15.SourceScannerC.FileData file1 = group.get(i);
+                    List<String> fileCopies = new ArrayList<>();
+
+                    for (int j = i + 1; j < group.size(); j++) {
+                        by.it.group451001.zhynko.lesson15.SourceScannerC.FileData file2 = group.get(j);
+                        if (isCopy(file1.content, file2.content)) {
+                            fileCopies.add(file2.path);
+                        }
+                    }
+
+                    if (!fileCopies.isEmpty()) {
+                        copies.put(file1.path, fileCopies);
+                    }
                 }
-            } else {
-                result.append(c);
-                inWhitespaceSequence = false;
             }
         }
 
-        return result.toString();
+        return copies;
     }
 
-    private static class ProcessedFile {
-        private final String path;
-        private final String content;
+    private static boolean isCopy(String s1, String s2) {
+        if (s1.equals(s2)) return true;
+        if (Math.abs(s1.length() - s2.length()) > 20) return false;
+        return calculateSimilarity(s1, s2) > 0.95;  // 95% схожести
+    }
 
-        public ProcessedFile(String path, String content) {
+    private static double calculateSimilarity(String s1, String s2) {
+        Set<String> ngrams1 = getNgrams(s1, 3);
+        Set<String> ngrams2 = getNgrams(s2, 3);
+
+        int intersection = 0;
+        for (String ngram : ngrams1) {
+            if (ngrams2.contains(ngram)) {
+                intersection++;
+            }
+        }
+
+        int union = ngrams1.size() + ngrams2.size() - intersection;
+        return union == 0 ? 0 : (double) intersection / union;
+    }
+
+    private static Set<String> getNgrams(String str, int n) {
+        Set<String> ngrams = new HashSet<>();
+        for (int i = 0; i <= str.length() - n; i++) {
+            ngrams.add(str.substring(i, i + n));
+        }
+        return ngrams;
+    }
+
+    private static class FileData {
+        final String path;
+        final String content;
+        FileData(String path, String content) {
             this.path = path;
             this.content = content;
+        }
+    }
+
+    private static class FileSignature {
+        final int length;
+        final long hash;
+
+        FileSignature(String content) {
+            this.length = content.length();
+            this.hash = calculateContentHash(content);
+        }
+
+        private long calculateContentHash(String content) {
+            if (content.length() == 0) return 0;
+            long hash = 0;
+            int step = Math.max(1, content.length() / 10);
+            for (int i = 0; i < content.length(); i += step) {
+                hash = hash * 31 + content.charAt(i);
+            }
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            by.it.group451001.zhynko.lesson15.SourceScannerC.FileSignature that = (by.it.group451001.zhynko.lesson15.SourceScannerC.FileSignature) o;
+            return length == that.length && Math.abs(hash - that.hash) < 1000;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(length, hash / 1000);
         }
     }
 }

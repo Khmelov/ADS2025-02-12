@@ -2,7 +2,7 @@
 
 Maximum Difference
 
-# Task
+# Description
 
 Maximum Difference
 
