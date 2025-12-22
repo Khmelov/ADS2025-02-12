@@ -47,6 +47,21 @@ public class A_Knapsack {
 
 
         int result = 0;
+        int[] dp = new int[w + 1]; // dp[i] - макс вес при вместимости i
+        // dp[0] = 0
+        for (int i = 1; i <= w; i++) {
+            int best = 0;
+            for (int j = 0; j < n; j++) {
+                int weight = gold[j];
+                if (weight == 0) continue;
+                if (weight <= i) {
+                    int candidate = dp[i - weight] + weight;
+                    if (candidate > best) best = candidate;
+                }
+            }
+            dp[i] = best;
+        }
+        result = dp[w];
         //!!!!!!!!!!!!!!!!!!!!!!!!!     КОНЕЦ ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
         return result;
     }

@@ -1,0 +1,6 @@
+200000 5
+contact 1 200000
+size 1
+size 200000
+undo
+size 1

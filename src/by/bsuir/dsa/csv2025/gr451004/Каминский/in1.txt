@@ -1,0 +1,7 @@
+6
+add 10
+add 20
+find 5
+del 10
+find 10
+find 20
