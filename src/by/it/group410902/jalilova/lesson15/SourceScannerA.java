@@ -1,91 +1,97 @@
 package by.it.group410902.jalilova.lesson15;
-import java.io.*;
+
+import java.io.IOException;
 import java.nio.charset.MalformedInputException;
 import java.nio.file.*;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class SourceScannerA {
 
     public static void main(String[] args) {
-
-        long startTime = System.currentTimeMillis(); // Засекаем время начала выполнения программы
-
-        // Путь к папке src текущего проекта
-        Path root = Paths.get(System.getProperty("user.dir") + File.separator + "src" + File.separator);
-
-        List<Result> results = new ArrayList<>(); // Список для хранения результатов (размер файла + относительный путь)
-
-        try {
-            // Рекурсивный обход всех файлов и папок внутри src
-            Files.walk(root)
-                    .filter(p -> p.toString().endsWith(".java")) // Оставляем только файлы с расширением .java
-                    .forEach(p -> { // Для каждого найденного java-файла
-                        try {
-                            String text;
-                            try {
-                                text = Files.readString(p); // Чтение содержимого файла как строки
-                            } catch (MalformedInputException e) {
-                                return; // Игнорируем файлы с некорректной кодировкой
-                            }
-
-                            // Пропускаем тестовые файлы
-                            if (text.contains("@Test") || text.contains("org.junit.Test")) return;
-
-                            // Удаляем строки package и import
-                            StringBuilder sb = new StringBuilder();
-                            for (String line : text.split("\n")) { // Разделяем текст на строки
-                                String trimmed = line.trim(); // Убираем пробелы в начале и конце строки
-                                if (trimmed.startsWith("package ")) continue; // Пропускаем строку package
-                                if (trimmed.startsWith("import ")) continue; // Пропускаем строку import
-                                sb.append(line).append("\n"); // Добавляем оставшиеся строки обратно
-                            }
-
-                            // Убираем все символы с кодом <33 в начале и конце текста
-                            String cleaned = trimNonPrintable(sb.toString());
-
-                            // Размер текста в байтах
-                            int size = cleaned.getBytes().length;
-
-                            // Относительный путь файла относительно src
-                            String relPath = root.relativize(p).toString();
-
-                            // Добавляем результат в список
-                            results.add(new Result(size, relPath));
-
-                        } catch (IOException ignored) {
-                            // Игнорируем ошибки чтения файлов (например, нет прав)
-                        }
-                    });
-        } catch (IOException e) {
-            e.printStackTrace(); // Если ошибка при обходе файлов, выводим стек
-        }
-
-        // Сортировка результатов: сначала по размеру, если размер одинаковый — по пути
-        results.sort(Comparator
-                .comparingInt((Result r) -> r.size)
-                .thenComparing(r -> r.path));
-
-        // Вывод результатов в консоль
-        for (Result r : results) {
-            System.out.println(r.size + " " + r.path);
-        }
-
-        // Время выполнения программы
-        long endTime = System.currentTimeMillis();
-        System.out.println("TIME = " + (endTime - startTime) + " ms");
+        new SourceScannerA().process();
     }
 
-    // Метод убирает все непринтируемые символы с кодом <33 в начале и конце текста
-    private static String trimNonPrintable(String s) {
+    private void process() {
+        Path root = Paths.get(System.getProperty("user.dir"), "src");
+
+        if (!Files.exists(root)) {
+            System.out.println("src directory not found");
+            return;
+        }
+
+        List<FileInfo> results = new ArrayList<>();
+
+        try (Stream<Path> stream = Files.walk(root)) {
+            stream.filter(Files::isRegularFile)
+                    .filter(p -> p.toString().endsWith(".java"))
+                    .forEach(p -> processFile(p, root, results));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        results.sort(Comparator
+                .comparingLong((FileInfo f) -> f.size)
+                .thenComparing(f -> f.relativePath));
+
+        for (FileInfo info : results) {
+            System.out.println(info.size + " " + info.relativePath);
+        }
+    }
+
+    private void processFile(Path file, Path root, List<FileInfo> outList) {
+        String text;
+
+        try {
+            text = Files.readString(file);
+        } catch (MalformedInputException e) {
+            return;
+        } catch (IOException e) {
+            return;
+        }
+
+        if (text.contains("@Test") || text.contains("org.junit.Test")) {
+            return;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (String line : text.split("\n")) {
+            String trimmed = line.trim();
+            if (trimmed.startsWith("package ") || trimmed.startsWith("import "))
+                continue;
+            sb.append(line).append("\n");
+        }
+
+        String processed = sb.toString();
+
+        processed = trimLowChars(processed);
+
+        long size = processed.getBytes(java.nio.charset.StandardCharsets.UTF_8).length;
+
+        String relative = root.relativize(file).toString().replace("/", "\\");
+
+        outList.add(new FileInfo(size, relative));
+    }
+
+    private String trimLowChars(String s) {
         int start = 0;
         int end = s.length() - 1;
 
         while (start <= end && s.charAt(start) < 33) start++;
         while (end >= start && s.charAt(end) < 33) end--;
 
-        return (start > end) ? "" : s.substring(start, end + 1); // Возвращаем обрезанную строку
+        if (start > end) return "";
+        return s.substring(start, end + 1);
     }
 
-    // Класс для хранения результатов: размер файла и относительный путь
-    private record Result(int size, String path) {}
+    private static class FileInfo {
+        long size;
+        String relativePath;
+
+        FileInfo(long size, String relativePath) {
+            this.size = size;
+            this.relativePath = relativePath;
+        }
+    }
 }

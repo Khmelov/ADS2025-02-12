@@ -39,14 +39,12 @@ public class C_HeapMax {
     public static void main(String[] args) throws FileNotFoundException {
         InputStream stream = C_HeapMax.class.getResourceAsStream("dataC.txt");
         C_HeapMax instance = new C_HeapMax();
-        System.out.println("MAX=" + instance.findMaxValue(stream));
+        System.out.println("MAX=" + instance.findMax(stream));
     }
 
-    //эта процедура читает данные из файла, ее можно не менять.
-    Long findMaxValue(InputStream stream) {
+    Long findMax(InputStream stream) {
         Long maxValue = 0L;
         MaxHeap heap = new MaxHeap();
-        //прочитаем строку для кодирования из тестового файла
         Scanner scanner = new Scanner(stream);
         Integer count = scanner.nextInt();
         for (int i = 0; i < count; ) {
@@ -62,41 +60,60 @@ public class C_HeapMax {
                 if (p[0].equalsIgnoreCase("insert"))
                     heap.insert(Long.parseLong(p[1]));
                 i++;
-                //System.out.println(heap); //debug
             }
         }
         return maxValue;
     }
 
     private class MaxHeap {
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! НАЧАЛО ЗАДАЧИ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-        //тут запишите ваше решение.
-        //Будет мало? Ну тогда можете его собрать как Generic и/или использовать в варианте B
         private List<Long> heap = new ArrayList<>();
 
-        int siftDown(int i) { //просеивание вверх
-
-            return i;
+        void siftDown(int i) {
+            int kid1 = i * 2 + 1;
+            int kid2 = i * 2 + 2;
+            if (kid1 < heap.size()){
+                if (heap.get(kid1) > heap.get(i))
+                {
+                    int maxKid = kid1;
+                    if (kid2 < heap.size() && heap.get(kid2) > heap.get(kid1)){
+                        maxKid = kid2;
+                    }
+                    Long temp = heap.get(maxKid);
+                    heap.set(maxKid, heap.get(i));
+                    heap.set(i, temp);
+                    siftDown(maxKid);
+                } else if (kid2 < heap.size() && heap.get(kid2) > heap.get(i)) {
+                    Long temp = heap.get(kid2);
+                    heap.set(kid2, heap.get(i));
+                    heap.set(i, temp);
+                    siftDown(kid2);
+                }
+            }
         }
 
-        int siftUp(int i) { //просеивание вниз
-
-            return i;
+        void siftUp(int i) {
+            int parent = (i - 1)/ 2;
+            while (i > 0 && heap.get(parent) < heap.get(i)) {
+                Long t = heap.get(parent);
+                heap.set(parent, heap.get(i));
+                heap.set(i, t);
+                i = parent;
+                parent = (i - 1) / 2;
+            }
         }
 
-        void insert(Long value) { //вставка
+        void insert(Long value) {
+            heap.add(value);
+            siftUp(heap.size() - 1);
         }
 
-        Long extractMax() { //извлечение и удаление максимума
+        Long extractMax() {
             Long result = null;
-
+            result = heap.get(0);
+            heap.set(0, heap.get(heap.size() - 1));
+            heap.remove(heap.size() - 1);
+            siftDown(0);
             return result;
         }
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! КОНЕЦ ЗАДАЧИ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
     }
-
-    // РЕМАРКА. Это задание исключительно учебное.
-    // Свои собственные кучи нужны довольно редко.
-    // В реальном приложении все иначе. Изучите и используйте коллекции
-    // TreeSet, TreeMap, PriorityQueue и т.д. с нужным CompareTo() для объекта внутри.
 }

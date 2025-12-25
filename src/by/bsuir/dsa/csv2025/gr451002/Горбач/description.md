@@ -4,11 +4,8 @@ Adaptive Package Sorting
 
 # Task
 
-Adaptive Package Sorting
-
-## Problem Statement
-
 You are working for a logistics company that specializes in urgent deliveries. Your task is to develop an algorithm for determining the delivery order of packages.
+Implement the `DeliveryHandler` class that will process incoming packages. The class should contain the `addPackage` method, which takes data for a new package, inserts it at the correct position in the sorted list using the insertion sort principle, and returns the index where the package was inserted.
 
 ### Package Characteristics
 
@@ -29,14 +26,10 @@ The incoming stream of packages is not sorted. However, after adding each new pa
 
 The Insertion Sort algorithm is ideal for maintaining order in a constantly growing list. Your task is to implement a modified version of this algorithm.
 
-## Task Description
-
-Implement the `DeliveryHandler` class that will process incoming packages. The class should contain the `addPackage` method, which takes data for a new package, inserts it at the correct position in the sorted list using the insertion sort principle, and returns the index where the package was inserted.
-
 ### Method
 
 ```java
-int addPackage(int id, int priority, double distance, int estimatedTime)
+int addPackage(int id, int priority, double distance, int estimatedTime);
 ```
 
 ### Input Parameters
@@ -85,7 +78,7 @@ After executing the example, the list should be ordered as follows:
 
 # Theory
 
-Insertion Sort
+## Insertion Sort
 
 Insertion Sort is one of the simplest sorting algorithms, and it works perfectly for situations where data arrives gradually and needs to be maintained in a sorted state.
 

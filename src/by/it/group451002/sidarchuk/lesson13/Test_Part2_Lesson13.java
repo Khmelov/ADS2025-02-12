@@ -46,6 +46,17 @@ public class Test_Part2_Lesson13 extends HomeWork {
         //Дополните эти тесты СВОИМИ более сложными примерами и проверьте их работоспособность.
         //Параметр метода run - это ввод. Параметр метода include - это вывод.
         //Общее число примеров должно быть не менее 12 (сейчас их 3).
+        // Дополнительные тесты С циклами
+        run("1 -> 2, 2 -> 3, 3 -> 1", true).include("yes").exclude("no");
+        run("1 -> 2, 2 -> 1", true).include("yes").exclude("no");
+        run("1 -> 2, 2 -> 3, 3 -> 2", true).include("yes").exclude("no");
+        run("1 -> 2, 2 -> 3, 3 -> 4, 4 -> 2", true).include("yes").exclude("no");
+        run("1 -> 2, 2 -> 3, 3 -> 4, 4 -> 1", true).include("yes").exclude("no");
+        // Дополнительные тесты БЕЗ циклов
+        run("1 -> 2, 1 -> 3, 2 -> 4, 3 -> 4", true).include("no").exclude("yes");
+        run("1 -> 2, 2 -> 3, 3 -> 4, 4 -> 5", true).include("no").exclude("yes");
+        run("1 -> 2, 1 -> 3, 2 -> 4, 3 -> 5", true).include("no").exclude("yes");
+        run("1 -> 2, 2 -> 3, 1 -> 3, 3 -> 4", true).include("no").exclude("yes");
     }
 
     @Test
@@ -57,6 +68,25 @@ public class Test_Part2_Lesson13 extends HomeWork {
         //Дополните эти тесты СВОИМИ более сложными примерами и проверьте их работоспособность.
         //Параметр метода run - это ввод. Параметр метода include - это вывод.
         //Общее число примеров должно быть не менее 8 (сейчас их 2).
+        //Полный граф из 4 вершин
+        run("A->B, A->C, A->D, B->A, B->C, B->D, C->A, C->B, C->D, D->A, D->B, D->C", true)
+                .include("ABCD");
+        //Граф-цепочка (каждая вершина связана только со следующей)
+        run("A->B, B->C, C->D, D->E, E->F", true)
+                .include("A\nB\nC\nD\nE\nF");
+        //Пустой граф (только вершины без рёбер)
+        run("", true)
+                .include("");
+        //Одна вершина с петлёй
+        run("A->A", true)
+                .include("A");
+        //Один большой цикл (все вершины в одной компоненте)
+        run("A->B, B->C, C->D, D->A", true)
+                .include("ABCD");
+        //Граф-треугольник (3 вершины все связаны друг с другом)
+        run("A->B, B->C, C->A", true)
+                .include("ABC");
+
     }
 
 
