@@ -32,7 +32,7 @@ public class Test_Part2_Lesson15Test extends HomeWork {
     }
 
 
-    @Test(timeout = 25000) //можно изменить под свою производительность
+    @Test(timeout = 60000) //можно изменить под свою производительность
     public void testSourceScannerC() {
         run("").include("FiboA.java");
     }
