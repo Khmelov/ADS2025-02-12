@@ -1,6 +1,6 @@
 # Name
 
-Problem: Coordinate Compression
+Coordinate Compression
 
 # Task
 
