@@ -48,7 +48,9 @@ import java.util.Scanner;
 
 public class C_EditDist {
 
-    String getDistanceEdinting(String one, String two) {
+
+
+    public String getDistanceEdinting(String one, String two) {
         //!!!!!!!!!!!!!!!!!!!!!!!!!     НАЧАЛО ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
         String result = "";
 
@@ -106,6 +108,44 @@ public class C_EditDist {
         return temp;
         //!!!!!!!!!!!!!!!!!!!!!!!!!     КОНЕЦ ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
     }
+
+
+//-----------------------------------------КУСОК КОДА ДЛЯ 15 ЛАБЫ НЕ ПУГАТЬСЯ-------------------------------
+    public int getDistanceEdintingCount(String one, String two) {
+        int l1 = one.length() + 1;
+        int l2 = two.length() + 1;
+        int[][] arr = new int[l1][l2];
+
+        for (int i = 0; i < l1; i++) arr[i][0] = i;
+        for (int j = 0; j < l2; j++) arr[0][j] = j;
+
+        for (int i = 1; i < l1; i++) {
+            for (int j = 1; j < l2; j++) {
+                int cost = (one.charAt(i - 1) == two.charAt(j - 1)) ? 0 : 1;
+                arr[i][j] = Math.min(Math.min(arr[i - 1][j] + 1, arr[i][j - 1] + 1), arr[i - 1][j - 1] + cost);
+            }
+        }
+
+        int edits = 0;
+        int i = l1 - 1, j = l2 - 1;
+        while (i > 0 || j > 0) {
+            if (i > 0 && j > 0 && one.charAt(i - 1) == two.charAt(j - 1)) {
+                i--; j--; // совпадение
+            } else if (i > 0 && (j == 0 || arr[i][j] == arr[i - 1][j] + 1)) {
+                edits++; // удаление
+                i--;
+            } else if (j > 0 && (i == 0 || arr[i][j] == arr[i][j - 1] + 1)) {
+                edits++; // вставка
+                j--;
+            } else if (i > 0 && j > 0) {
+                edits++; // замена
+                i--; j--;
+            }
+        }
+
+        return edits;
+    }
+
 
 
     public static void main(String[] args) throws FileNotFoundException {

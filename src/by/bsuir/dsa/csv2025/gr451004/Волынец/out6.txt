@@ -1,0 +1,6 @@
+ASCII hash1: 669
+ASCII hash2: 635
+Collision ASCII: NO
+FNV1a hash1: 39270
+FNV1a hash2: 39270
+Collision FNV1a: YES

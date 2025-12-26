@@ -1,0 +1,5 @@
+X End
+X - Y 5
+Y - Z 2
+A - B 10
+Z - End 1
