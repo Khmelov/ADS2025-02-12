@@ -28,7 +28,6 @@ public class GraphC {
     }
 
     private static List<List<String>> kosaraju(Map<String, List<String>> graph) {
-        // Шаг 1: Первый DFS для получения порядка завершения
         Set<String> visited = new HashSet<>();
         Deque<String> stack = new ArrayDeque<>();
         for (String vertex : graph.keySet()) {
@@ -37,10 +36,8 @@ public class GraphC {
             }
         }
 
-        // Шаг 2: Создание транспонированного графа
         Map<String, List<String>> transposed = transposeGraph(graph);
 
-        // Шаг 3: Второй DFS для нахождения SCC
         visited.clear();
         List<List<String>> sccs = new ArrayList<>();
         while (!stack.isEmpty()) {
@@ -48,7 +45,7 @@ public class GraphC {
             if (!visited.contains(vertex)) {
                 List<String> scc = new ArrayList<>();
                 dfsSecond(vertex, transposed, visited, scc);
-                Collections.sort(scc); // Лексикографический порядок
+                Collections.sort(scc);
                 sccs.add(scc);
             }
         }

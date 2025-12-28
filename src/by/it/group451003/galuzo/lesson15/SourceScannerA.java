@@ -11,7 +11,7 @@ import java.util.Scanner;
 import java.util.stream.Stream;
 
 public class SourceScannerA {
-    protected static class myStringComparator implements Comparator<String>{
+    public static class myStringComparator implements Comparator<String>{
         @Override
         public int compare(String s1, String s2) {
             int int_s1, int_s2;

@@ -10,7 +10,7 @@ public class GraphA {
         List<String> result = topologicalSort(graph);
         System.out.println(String.join(" ", result));
         scanner.close();
-    }//
+    }
 
     private static Map<String, List<String>> parseGraph(String input) {
         Map<String, List<String>> graph = new HashMap<>();
@@ -28,9 +28,9 @@ public class GraphA {
     private static List<String> topologicalSort(Map<String, List<String>> graph) {
         Set<String> visited = new HashSet<>();
         List<String> result = new ArrayList<>();
-        PriorityQueue<String> queue = new PriorityQueue<>(); // Для лексикографического порядка
+        PriorityQueue<String> queue = new PriorityQueue<>();
 
-        // Находим вершины без входящих рёбер
+
         Set<String> noIncoming = new HashSet<>(graph.keySet());
         for (List<String> neighbors : graph.values()) {
             noIncoming.removeAll(neighbors);

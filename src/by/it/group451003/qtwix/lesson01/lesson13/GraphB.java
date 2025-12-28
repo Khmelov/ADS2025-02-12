@@ -10,7 +10,7 @@ public class GraphB {
         boolean hasCycle = hasCycle(graph);
         System.out.println(hasCycle ? "yes" : "no");
         scanner.close();
-    }//
+    }
 
     private static Map<String, List<String>> parseGraph(String input) {
         Map<String, List<String>> graph = new HashMap<>();
