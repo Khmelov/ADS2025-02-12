@@ -37,7 +37,7 @@ public class A_BinaryFind {
         }
     }
 
-    int[] findIndex(InputStream stream) throws FileNotFoundException {
+    public int[] findIndex(InputStream stream) throws FileNotFoundException {
         //подготовка к чтению данных
         Scanner scanner = new Scanner(stream);
         //!!!!!!!!!!!!!!!!!!!!!!!!!     НАЧАЛО ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
