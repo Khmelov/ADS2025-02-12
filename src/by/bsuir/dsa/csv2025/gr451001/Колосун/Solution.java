@@ -136,11 +136,10 @@ public class Solution {
         int nextInt() { return Integer.parseInt(next()); }
         long nextLong() { return Long.parseLong(next()); }
     }
-}
 
-class SolutionTest {
 
-    private void runTest(String input, String expectedOutput) throws Exception {
+
+    public void runTest(String input, String expectedOutput) throws Exception {
         InputStream originalIn = System.in;
         PrintStream originalOut = System.out;
 
@@ -162,13 +161,13 @@ class SolutionTest {
     }
 
     @Test
-    void testGroup1_BasicUpgrade() throws Exception {
+    public void testGroup1_BasicUpgrade() throws Exception {
         runTest("4\n3 2\n5 10 20\n6 12\n15 25\n3 2\n10 20 30\n15 25\n15 25\n3 1\n1 5 10\n4\n100\n4 2\n1 1 10 10\n2 8\n3 9\n",
                 "2\n2\n1\n2\n");
     }
 
     @Test
-    void testGroup2_CriticalDiscard() throws Exception {
+    public void testGroup2_CriticalDiscard() throws Exception {
         runTest("2\n"+
                 "2 3\n" +
                 "10 5\n" +
@@ -182,7 +181,7 @@ class SolutionTest {
     }
 
     @Test
-    void testGroup3_ExactMatch() throws Exception {
+    public void testGroup3_ExactMatch() throws Exception {
         runTest("3\n 4 3\n" +
                         "1 5 10 20\n" +
                         "15 2 7\n" +
@@ -201,13 +200,13 @@ class SolutionTest {
     }
 
     @Test
-    void testGroup4_InstantPowerhouse() throws Exception {
+    public void testGroup4_InstantPowerhouse() throws Exception {
         runTest("4\n4 3\n1 10 50 100\n1 5 90\n1000 0 0\n4 3\n10 1 50 100\n5 1 90\n0 1000 0\n5 3\n1 10 20 30 40\n5 35 1\n100 100 0\n4 3\n1 2 3 4\n1 2 5\n10 10 0\n",
                 "3\n3\n3\n3\n");
     }
 
     @Test
-    void testGroup5_Stage1Failure() throws Exception {
+    public void testGroup5_Stage1Failure() throws Exception {
         runTest("2\n2 3\n" +
                         "10 20\n" +
                         "10 18 1\n" +
@@ -220,7 +219,7 @@ class SolutionTest {
     }
 
     @Test
-    void testGroup6_Stage2SimpleConsumption() throws Exception {
+    public void testGroup6_Stage2SimpleConsumption() throws Exception {
         runTest("2\n3 3\n" +
                         "10 20 30\n" +
                         "15 5 25\n" +
@@ -233,13 +232,13 @@ class SolutionTest {
     }
 
     @Test
-    void testGroup7_OptimalS2Match() throws Exception {
+    public void testGroup7_OptimalS2Match() throws Exception {
         runTest("4\n5 4\n1 3 5 7 9\n2 4 6 8\n0 0 0 0\n6 6\n1 2 3 4 5 6\n1 2 3 4 5 6\n0 0 0 0 0 0\n5 5\n10 20 30 40 50\n15 25 35 45 55\n0 0 0 0 0\n5 3\n1 5 10 20 30\n15 2 5\n0 0 0\n",
                 "4\n6\n4\n3\n");
     }
 
     @Test
-    void testGroup8_S2Inefficiency() throws Exception {
+    public void testGroup8_S2Inefficiency() throws Exception {
         runTest("3\n4 4\n" +
                         "5 10 15 20\n" +
                         "6 11 16 21\n" +
@@ -257,7 +256,7 @@ class SolutionTest {
     }
 
     @Test
-    void testGroup9_FullCycle() throws Exception {
+    public void testGroup9_FullCycle() throws Exception {
         runTest("2\n4 4\n" +
                         "1 10 50 100\n" +
                         "1 5 20 90\n" +
@@ -271,7 +270,7 @@ class SolutionTest {
     }
 
     @Test
-    void testGroup10_LargeNumbers() throws Exception {
+    public void testGroup10_LargeNumbers() throws Exception {
         runTest("3\n3 2\n" +
                         "5 10 15\n" +
                         "12 18\n" +

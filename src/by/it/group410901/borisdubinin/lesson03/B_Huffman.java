@@ -2,7 +2,9 @@ package by.it.group410901.borisdubinin.lesson03;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.TreeMap;
 
 // Lesson 3. B_Huffman.
 // Восстановите строку по её коду и беспрефиксному коду символов.
@@ -50,18 +52,32 @@ public class B_Huffman {
     }
 
     String decode(InputStream inputStream) throws FileNotFoundException {
+        Map<String, Character> codes = new TreeMap<>();
         StringBuilder result = new StringBuilder();
-        //прочитаем строку для кодирования из тестового файла
         Scanner scanner = new Scanner(inputStream);
-        Integer count = scanner.nextInt();
+        Integer numberOf = scanner.nextInt();
         Integer length = scanner.nextInt();
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! НАЧАЛО ЗАДАЧИ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-        //тут запишите ваше решение
 
+        scanner.nextLine();
+        for (int i = 0; i < numberOf; i++) {
+            String line = scanner.nextLine();
+            String[] parts = line.split(": ");
+            char ch = parts[0].charAt(0);
+            String code = parts[1];
 
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! КОНЕЦ ЗАДАЧИ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+            codes.put(code, ch);
+        }
+        StringBuilder codedString = new StringBuilder(scanner.nextLine());
+
+        while (!codedString.isEmpty()) {
+            StringBuilder subString = new StringBuilder();
+            while (!codes.containsKey(subString.toString())) {
+                subString.append(codedString.charAt(0));
+                codedString.deleteCharAt(0);
+            }
+            result.append(codes.get(subString.toString()));
+        }
+
         return result.toString(); //01001100100111
     }
-
-
 }
