@@ -21,7 +21,7 @@ public class A_VideoRegistrator {
     }
 
     //модификаторы доступа опущены для возможности тестирования
-    List<Double> calcStartTimes(double[] events, double workDuration) {
+    public List<Double> calcStartTimes(double[] events, double workDuration) {
         //events - события которые нужно зарегистрировать
         //timeWorkDuration время работы видеокамеры после старта
         List<Double> result;
