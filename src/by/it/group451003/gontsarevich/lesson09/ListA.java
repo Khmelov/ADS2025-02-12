@@ -1,11 +1,12 @@
-package by.it.group451001.tsurko.lesson09;
+package by.it.group451003.gontsarevich.lesson09;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 public class ListA<E> implements List<E> {
-    private Object[] array;
-    private int size;
-    private final int DEFAULT_CAPACITY = 16;
+
     //Создайте аналог списка БЕЗ использования других классов СТАНДАРТНОЙ БИБЛИОТЕКИ
 
     /////////////////////////////////////////////////////////////////////////
@@ -13,63 +14,76 @@ public class ListA<E> implements List<E> {
     //////               Обязательные к реализации методы             ///////
     /////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////
-    @Override
-    public String toString() {
-        if (array == null){
-            return null;
-        }
-        String result = "[";
-        for (Object object : array) {
-            if (object == null){
-                continue;
-            }
-            result = result + object.toString() + ", ";
-        }
-        result = result.substring(0, result.length() - 2);
-        result += "]";
-        return result;
+
+    private static int capacity = 16;
+    private int length = 0;
+    E[] array;
+
+    public ListA(int capacity) {
+        array = (E[]) new Object[capacity];
+        this.capacity = capacity;
     }
 
     public ListA() {
-        this.array = new Object[DEFAULT_CAPACITY];
+        this(capacity);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder strbldr = new StringBuilder();
+        strbldr.append("[");
+
+        int i = 0;
+        while (i < length) {
+            strbldr.append(array[i] + ", ");
+            i++;
+        }
+
+        int sbLength = strbldr.length();
+        if (sbLength > 1)
+            strbldr.delete(sbLength - 2, sbLength);
+        strbldr.append("]");
+
+        return strbldr.toString();
     }
 
     @Override
     public boolean add(E e) {
-        if (size == array.length){
-            Object[] array = new Object[this.array.length * 2];
-            for (int i = 0; i < size; i++) {
-                array[i] = this.array[i];
-            }
-            this.array = array;
+        length++;
+
+        if (length >= capacity) {
+            E[] tempArr = (E[]) new Object[capacity += 16];
+
+            for (int i = 0; i < length - 1; i++)
+                tempArr[i] = array[i];
+
+            array = tempArr;
         }
-        array[size] = e;
-        size++;
+        array[length - 1] = e;
+
         return true;
     }
 
     @Override
     public E remove(int index) {
-        if (size == 0){
-            size = 0;
+        if (index > length || index < 0)
             return null;
+
+        else {
+            E element = array[index];
+
+            length--;
+
+            for (int i = index; i < length; i++)
+                array[i] = array[i + 1];
+
+            return element;
         }
-        size--;
-        Object[] array = new Object[size + 1];
-        for (int i = 0; i < index; i++){
-            array[i] = this.array[i];
-        }
-        for (int i = index + 1; i <= size; i++){
-            array[i - 1] = this.array[i];
-        }
-        E oldValue = (E) this.array[index];
-        this.array = array;
-        return oldValue;
     }
 
     @Override
     public int size() {
-        return size;
+        return length;
     }
 
     /////////////////////////////////////////////////////////////////////////
