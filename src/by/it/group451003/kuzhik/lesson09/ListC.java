@@ -181,25 +181,31 @@ public class ListC<E> implements List<E> {
 
     @Override
     public boolean removeAll(Collection<?> c) {
+        boolean modified = false;
         for (Object o : c) {
-            while  (indexOf(o) != -1)
+            while (indexOf(o) != -1) {
                 remove(o);
+                modified = true;
+            }
         }
-        return true;
+        return modified;
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
+        boolean modified = false;
         E[] newArr = (E[]) new Object[aList.length];
         int newArrIndex = 0;
         for (int i = 0; i < size; i++) {
-            if  (c.contains(aList[i])) {
+            if (c.contains(aList[i])) {
                 newArr[newArrIndex++] = aList[i];
+            } else {
+                modified = true;
             }
         }
         aList = newArr;
         size = newArrIndex;
-        return true;
+        return modified;
     }
 
     /////////////////////////////////////////////////////////////////////////
