@@ -17,12 +17,19 @@ public class SourceScannerC {
 
         try {
             Files.walk(srcPath)
-                    .filter(path -> path.toString().endsWith(".java"))
+                    .filter(path -> {
+                        // ФИЛЬТР: берем только СВОИ файлы
+                        String pathStr = path.toString();
+                        return pathStr.endsWith(".java")
+                                && pathStr.contains("group451002") // ТОЛЬКО моя группа
+                                && !pathStr.contains("test")       // игнорируем тесты
+                                && !pathStr.contains("Test");
+                    })
                     .forEach(path -> {
                         try {
                             String content = Files.readString(path, StandardCharsets.UTF_8);
 
-                            // Пропускаем тестовые файлы
+                            // Дополнительная проверка на тестовые файлы
                             if (content.contains("@Test") || content.contains("org.junit.Test")) {
                                 return;
                             }
@@ -166,6 +173,11 @@ public class SourceScannerC {
     }
 
     private static void findAndPrintCopiesOptimized(List<ProcessedFile> files) {
+        if (files.isEmpty()) {
+            System.out.println("Нет файлов для анализа (фильтр group451002)");
+            return;
+        }
+
         Map<String, List<String>> copies = new TreeMap<>();
         int n = files.size();
 
@@ -216,10 +228,15 @@ public class SourceScannerC {
         }
 
         // Вывод результатов
-        for (Map.Entry<String, List<String>> entry : copies.entrySet()) {
-            System.out.println(entry.getKey());
-            for (String copy : entry.getValue()) {
-                System.out.println(copy);
+        if (copies.isEmpty()) {
+            System.out.println("Дубликаты не найдены");
+        } else {
+            for (Map.Entry<String, List<String>> entry : copies.entrySet()) {
+                System.out.println(entry.getKey());
+                for (String copy : entry.getValue()) {
+                    System.out.println(copy);
+                }
+                System.out.println(); // Пустая строка между группами
             }
         }
     }

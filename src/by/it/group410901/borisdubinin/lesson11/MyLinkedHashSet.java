@@ -1,98 +1,108 @@
 package by.it.group410901.borisdubinin.lesson11;
 
+import java.util.Set;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Set;
-import by.it.group410901.borisdubinin.lesson10.MyLinkedList;
 
 public class MyLinkedHashSet<E> implements Set<E> {
-    private static final int[] PRIMES = {31, 67, 131, 257, 521, 1031, 2053, 4099, 8209};
-    private MyLinkedList<E>[] array;
+
+    // Внутренний статический класс для узла двусвязного списка
+    // Отличается от обычного HashSet наличием ссылок before/after для поддержания порядка
+    private static class Node<E> {
+        final E value;        // Хранимое значение (final для неизменности)
+        Node<E> next;         // Ссылка на следующий узел в хеш-цепочке (для разрешения коллизий)
+        Node<E> before, after; // Ссылки для поддержания порядка добавления в двусвязном списке
+        Node(E value, Node<E> next) {
+            this.value = value;
+            this.next = next;
+        }
+    }
+
+    // Основная хеш-таблица - массив связных списков (цепочки для разрешения коллизий)
+    private Node<E>[] array;
+
+    // Указатели на начало и конец двусвязного списка для поддержания порядка итерации
+    private Node<E> head, tail;
+
+    // Общий размер множества (включая null элемент если есть)
     private int size;
-    private final MyLinkedList<E> orderList;
 
-    public MyLinkedHashSet(){
+    // Флаг наличия null элемента (null хранится отдельно)
+    private boolean hasNull;
+
+    // Начальная емкость таблицы по умолчанию
+    private static final int DEFAULT_CAPACITY = 16;
+
+    // Коэффициент загрузки для определения момента ресайза
+    private static final float LOAD_FACTOR = 0.75f;
+
+    // Конструктор с заданной начальной емкостью
+    @SuppressWarnings("unchecked")
+    public MyLinkedHashSet(int capacity) {
+        // Проверка валидности емкости
+        if (capacity < 1) capacity = DEFAULT_CAPACITY;
+
+        // Создание массива узлов
+        array = (Node<E>[]) new Node[capacity];
+
+        // Инициализация указателей двусвязного списка
+        head = tail = null;
         size = 0;
-        array = (MyLinkedList<E>[]) new MyLinkedList[PRIMES[0]];
-        // Инициализируем все ячейки
-        for (int i = 0; i < array.length; i++) {
-            array[i] = new MyLinkedList<>();
-        }
-        orderList = new MyLinkedList<>();
+        hasNull = false;
     }
 
-    private int getNextPrime(int currentCapacity) {
-        // Ищем первое простой число больше текущего размера
-        for (int prime : PRIMES) {
-            if (prime > currentCapacity) {
-                return prime;
+    // Конструктор по умолчанию - использует стандартную емкость
+    public MyLinkedHashSet() {
+        this(DEFAULT_CAPACITY);
+    }
+
+    // Вспомогательный метод для получения текущей емкости таблицы
+    private int cap() {
+        return array.length;
+    }
+
+    // Метод для вычисления индекса в таблице для заданного объекта
+    private int indexFor(Object o, int len) {
+        // Для null всегда возвращаем 0, для других объектов используем hashCode()
+        int h = (o == null) ? 0 : o.hashCode();
+
+        // Убираем знаковый бит для неотрицательного индекса
+        return (h & 0x7fffffff) % len;
+    }
+
+    // Метод для увеличения размера таблицы при превышении коэффициента загрузки
+    @SuppressWarnings("unchecked")
+    private void resize() {
+        // Удваиваем емкость таблицы
+        int newCap = cap() << 1;
+
+        // Создание новой таблицы увеличенного размера
+        Node<E>[] newTable = (Node<E>[]) new Node[newCap];
+
+        // Перехеширование всех элементов из старой таблицы в новую
+        // Важно: порядок в двусвязном списке не меняется при ресайзе
+        for (int i = 0; i < cap(); i++) {
+            Node<E> n = array[i];  // Получаем голову цепочки из старой таблицы
+
+            // Проходим по всей цепочке
+            while (n != null) {
+                // Сохраняем ссылку на следующий узел до изменения
+                Node<E> next = n.next;
+
+                // Вычисляем новый индекс для текущего значения
+                int idx = indexFor(n.value, newCap);
+
+                // Вставляем узел в начало цепочки новой таблицы
+                n.next = newTable[idx];  // Старая голова становится следующим узлом
+                newTable[idx] = n;       // Текущий узел становится новой головой
+
+                // Переходим к следующему узлу в старой цепочке
+                n = next;
             }
         }
-        // Если все числа в массиве меньше, вычисляем следующее
-        return findNextPrime(currentCapacity * 2);
-    }
 
-    private int findNextPrime(int number) {
-        while (!isPrime(number)) {
-            number++;
-        }
-        return number;
-    }
-
-    private boolean isPrime(int number) {
-        if (number < 2) return false;
-        if (number == 2) return true;
-        if (number % 2 == 0) return false;
-
-        for (int i = 3; i * i <= number; i += 2) {
-            if (number % i == 0) return false;
-        }
-        return true;
-    }
-
-    private int getIndex(E element) {
-        if (element == null) {
-            return 0;
-        }
-
-        int hash = element.hashCode();
-
-        // Дополнительные битовые операции
-        hash = (hash ^ (hash >> 16)) * 0x45d9f3b;
-        hash = (hash ^ (hash >> 16)) * 0x45d9f3b;
-        hash = hash ^ (hash >> 16);
-
-        // Учет размера массива
-        return Math.abs(hash) % array.length;
-    }
-
-    private void ensureCapacity(){
-        if(size <= array.length*0.75)
-            return;
-
-        MyLinkedList<E>[] oldArray = array;
-        int oldCapacity = array.length;
-
-        array = (MyLinkedList<E>[]) new MyLinkedList[getNextPrime(oldCapacity)];
-        for (int i = 0; i < array.length; i++) {
-            array[i] = new MyLinkedList<>();
-        }
-
-        for(MyLinkedList<E> oldCell: oldArray){
-            while(!oldCell.isEmpty()){
-                E elem = oldCell.poll();
-                MyLinkedList<E> bucket = array[getIndex(elem)];
-                bucket.add(elem);
-            }
-        }
-    }
-
-    /// //////////////////////////////////////////////////////////////////////////////////
-    /// //////////////////////////////////////////////////////////////////////////////////
-
-    @Override
-    public String toString() {
-        return orderList.toString();
+        // Заменяем старую таблицу новой
+        array = newTable;
     }
 
     @Override
@@ -102,138 +112,275 @@ public class MyLinkedHashSet<E> implements Set<E> {
 
     @Override
     public void clear() {
-        size = 0;
-        array = (MyLinkedList<E>[]) new MyLinkedList[PRIMES[0]];
-        for (int i = 0; i < array.length; i++) {
-            array[i] = new MyLinkedList<>();
+        // Очищаем все ячейки таблицы
+        for (int i = 0; i < cap(); i++) {
+            array[i] = null;
         }
-        orderList.clear();
+
+        // Сбрасываем указатели двусвязного списка и все счетчики
+        head = tail = null;
+        size = 0;
+        hasNull = false;
     }
 
     @Override
     public boolean isEmpty() {
-        return size < 1;
+        return size == 0;
     }
 
     @Override
     public boolean add(E e) {
-        // Проверяем необходимость расширения массива
-        ensureCapacity();
+        // Обработка добавления null элемента
+        if (e == null) {
+            // Если null уже есть в множестве, возвращаем false
+            if (hasNull) return false;
 
-        int index = getIndex(e);
-        MyLinkedList<E> bucket = array[index];
-
-        // Проверяем, нет ли уже такого элемента в bucket
-        if (bucket.contains(e)) {
-            return false; // Элемент уже существует
+            // Иначе устанавливаем флаг, добавляем в двусвязный список и увеличиваем счетчик
+            hasNull = true;
+            linkNode(null);  // Специальная обработка для null
+            size++;
+            return true;
         }
 
-        // Добавляем элемент в bucket
-        bucket.add(e);
-        orderList.add(e);
+        // Вычисляем индекс для ненулевого элемента
+        int idx = indexFor(e, cap());
+
+        // Проверяем цепочку на наличие дубликата
+        for (Node<E> n = array[idx]; n != null; n = n.next) {
+            if (e.equals(n.value)) return false;  // Элемент уже существует
+        }
+
+        // Создаем новый узел и добавляем его в начало хеш-цепочки
+        Node<E> node = new Node<>(e, array[idx]);
+        array[idx] = node;
+
+        // Добавляем узел в двусвязный список (в конец для сохранения порядка добавления)
+        linkNode(node);
+
+        // Обновляем счетчик
         size++;
+
+        // Проверяем необходимость ресайза (учитываем все элементы, включая null)
+        if (size > cap() * LOAD_FACTOR) {
+            resize();
+        }
+
         return true;
+    }
+
+    // Метод для добавления узла в двусвязный список (поддержание порядка итерации)
+    private void linkNode(Node<E> node) {
+        if (node == null) {
+            // Специальная обработка для null элемента - создаем фиктивный узел
+            Node<E> fake = new Node<>(null, null);
+            fake.before = tail;
+
+            // Обновляем ссылки в двусвязном списке
+            if (tail != null) {
+                tail.after = fake;
+            }
+            tail = fake;
+
+            // Если список был пуст, устанавливаем голову
+            if (head == null) {
+                head = fake;
+            }
+            return;
+        }
+
+        // Стандартная процедура добавления узла в конец двусвязного списка
+        node.before = tail;  // Предыдущим для нового узла становится старый хвост
+
+        if (tail != null) {
+            tail.after = node;  // Следующим для старого хвоста становится новый узел
+        }
+        tail = node;  // Новый узел становится новым хвостом
+
+        // Если список был пуст, новый узел также становится головой
+        if (head == null) {
+            head = node;
+        }
+    }
+
+    // Метод для удаления узла из двусвязного списка
+    private void unlinkNode(Node<E> node) {
+        // Обновляем ссылку у предыдущего узла (если он есть)
+        if (node.before != null) {
+            node.before.after = node.after;  // Пропускаем удаляемый узел
+        } else {
+            head = node.after;  // Если удаляем голову, обновляем указатель head
+        }
+
+        // Обновляем ссылку у следующего узла (если он есть)
+        if (node.after != null) {
+            node.after.before = node.before;  // Пропускаем удаляемый узел
+        } else {
+            tail = node.before;  // Если удаляем хвост, обновляем указатель tail
+        }
     }
 
     @Override
     public boolean remove(Object o) {
+        // Обработка удаления null элемента
         if (o == null) {
-            return array[0].remove(null);
-        }
-        boolean wasRemoved = array[getIndex((E) o)].remove(o);
-        if(wasRemoved) {
+            if (!hasNull) return false;  // Если null нет, возвращаем false
+
+            hasNull = false;
+
+            // Поиск фиктивного узла для null в двусвязном списке и его удаление
+            Node<E> cur = head;
+            while (cur != null) {
+                if (cur.value == null) {
+                    unlinkNode(cur);
+                    break;
+                }
+                cur = cur.after;
+            }
+
             size--;
-            orderList.remove(o);
+            return true;
         }
-        return wasRemoved;
+
+        // Удаление ненулевого элемента
+        int idx = indexFor(o, cap());
+        Node<E> prev = null;
+        Node<E> cur = array[idx];
+
+        // Поиск элемента в хеш-цепочке
+        while (cur != null) {
+            if (o.equals(cur.value)) {
+                // Найден элемент для удаления - удаляем из хеш-цепочки
+                if (prev == null) {
+                    array[idx] = cur.next;  // Удаляем голову цепочки
+                } else {
+                    prev.next = cur.next;   // Удаляем из середины/конца цепочки
+                }
+
+                // Удаляем узел из двусвязного списка
+                unlinkNode(cur);
+
+                size--;
+                return true;
+            }
+
+            // Переходим к следующему узлу в цепочке
+            prev = cur;
+            cur = cur.next;
+        }
+
+        // Элемент не найден
+        return false;
     }
 
     @Override
     public boolean contains(Object o) {
-        if (o == null) {
-            return array[0].contains(null);
+        // Проверка наличия null элемента
+        if (o == null) return hasNull;
+
+        // Поиск ненулевого элемента в хеш-таблице
+        int idx = indexFor(o, cap());
+        for (Node<E> n = array[idx]; n != null; n = n.next) {
+            if (o.equals(n.value)) return true;
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append('[');
+        boolean first = true;
+
+        // Обход в порядке добавления (используя двусвязный список)
+        Node<E> cur = head;
+        while (cur != null) {
+            if (!first) {
+                sb.append(", ");
+            }
+            // Для фиктивного узла null выводим "null", для остальных - их значение
+            sb.append(String.valueOf(cur.value));
+            first = false;
+            cur = cur.after;  // Переход к следующему узлу в порядке добавления
         }
 
-        return array[getIndex((E)o)].contains(o);
+        sb.append(']');
+        return sb.toString();
     }
+
+    // Стандартные реализации методов интерфейса Set
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        for (Object element : c) {
-            if (!contains(element)) {
-                return false;
-            }
+        if (c == null) throw new NullPointerException();
+        for (Object o : c) {
+            if (!contains(o)) return false;
         }
         return true;
     }
+
     @Override
     public boolean addAll(Collection<? extends E> c) {
-        boolean modified = false;
-        for (E element : c) {
-            if (add(element)) {
-                modified = true;
-            }
+        if (c == null) throw new NullPointerException();
+        boolean mod = false;
+        for (E e : c) {
+            if (add(e)) mod = true;
         }
-        return modified;
+        return mod;
     }
-    @Override
-    public boolean retainAll(Collection<?> c) {
-        if(c == null)
-            throw new NullPointerException();
-        if(c.isEmpty()){
-            this.clear();
-            return true;
-        }
 
-        boolean modified = false;
-        Iterator<E> it = orderList.iterator();
-        while(it.hasNext()){
-            E e = it.next();
-            if(!c.contains(e)){
-                it.remove();
-                this.remove(e);
-                modified = true;
-            }
-        }
-
-        return modified;
-    }
     @Override
     public boolean removeAll(Collection<?> c) {
-        if(c == null)
-            throw new NullPointerException();
-        if(c.isEmpty()){
-            this.clear();
-            return false;
+        if (c == null) throw new NullPointerException();
+        boolean mod = false;
+        for (Object o : c) {
+            if (remove(o)) mod = true;
         }
-
-        boolean modified = false;
-        Iterator<E> it = orderList.iterator();
-        while(it.hasNext()){
-            E e = it.next();
-            if(c.contains(e)){
-                it.remove();
-                this.remove(e);
-                modified = true;
-            }
-        }
-
-        return modified;
+        return mod;
     }
 
-    /// /////////////////////////////////////////////////////////////////////////////////////////
-    /// /////////////////////////////////////////////////////////////////////////////////////////
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        if (c == null) throw new NullPointerException();
+        boolean changed = false;
+
+        // Обход в порядке добавления через двусвязный список
+        Node<E> cur = head;
+        while (cur != null) {
+            Node<E> next = cur.after;  // Сохраняем ссылку на следующий узел до возможного удаления
+            if (!c.contains(cur.value)) {
+                remove(cur.value);  // Удаляем элемент, если его нет в коллекции c
+                changed = true;
+            }
+            cur = next;  // Переходим к следующему узлу
+        }
+        return changed;
+    }
+
+    // Не реализованные методы (требуются для полной реализации интерфейса Set)
 
     @Override
     public Iterator<E> iterator() {
-        return null;
+        throw new UnsupportedOperationException();
     }
+
     @Override
     public Object[] toArray() {
-        return new Object[0];
+        throw new UnsupportedOperationException();
     }
+
     @Override
     public <T> T[] toArray(T[] a) {
-        return null;
+        throw new UnsupportedOperationException();
+    }
+
+    // Стандартные реализации от Object
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }

@@ -1,15 +1,11 @@
-package by.it.group451001.romeyko.lesson09;
+package by.it.group451001.tsurko.lesson09;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
 public class ListA<E> implements List<E> {
     private Object[] array;
     private int size;
-    private final int DEFAULT_CAPACITY = 10;
-
+    private final int DEFAULT_CAPACITY = 16;
     //Создайте аналог списка БЕЗ использования других классов СТАНДАРТНОЙ БИБЛИОТЕКИ
 
     /////////////////////////////////////////////////////////////////////////
