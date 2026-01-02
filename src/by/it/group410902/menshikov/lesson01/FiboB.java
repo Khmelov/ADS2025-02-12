@@ -31,5 +31,5 @@ public class FiboB {
             arr[i] = arr[i - 1].add(arr[i - 2]);
         }
         return arr[n];}
-    }
+}
 

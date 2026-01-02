@@ -106,7 +106,7 @@ public class Solution {
 
 
     @Test
-    void testMaxK() {
+    public void testMaxK() {
         int[] heights = {10, 20, 5, 15, 25};
         int k = 4;
         int expected = 15;
@@ -115,7 +115,7 @@ public class Solution {
     }
 
     @Test
-    void testMinNonZeroK() {
+    public void testMinNonZeroK() {
         int[] heights = {8, 3, 12, 6, 9, 15};
         int k = 1;
         int expected = 12;
@@ -124,7 +124,7 @@ public class Solution {
     }
 
     @Test
-    void testReverseOrderWithLargeK() {
+    public void testReverseOrderWithLargeK() {
         int[] heights = {100, 90, 80, 70, 60, 50, 40, 30, 20, 10};
         int k = 8;
         int expected = 90;
@@ -133,7 +133,7 @@ public class Solution {
     }
 
     @Test
-    void testSawtoothPattern() {
+    public void testSawtoothPattern() {
         int[] heights = {1, 100, 2, 99, 3, 98, 4, 97, 5, 96};
         int k = 2;
         int expected = 98;
@@ -142,7 +142,7 @@ public class Solution {
     }
 
     @Test
-    void testTwoLocalMaxima() {
+    public void testTwoLocalMaxima() {
         int[] heights = {10, 50, 20, 60, 30, 70, 40, 80, 35, 45};
         int k = 3;
         int expected = 70;
@@ -151,7 +151,7 @@ public class Solution {
     }
 
     @Test
-    void testPlateaus() {
+    public void testPlateaus() {
         int[] heights = {5, 5, 10, 10, 1, 1, 8, 8, 12, 12};
         int k = 4;
         int expected = 11;
@@ -160,7 +160,7 @@ public class Solution {
     }
 
     @Test
-    void testVeryLargeNumbers() {
+    public void testVeryLargeNumbers() {
         int[] heights = {Integer.MAX_VALUE - 1000, 1000, Integer.MAX_VALUE, 5000, 1};
         int k = 2;
         int expected = Integer.MAX_VALUE - 1;

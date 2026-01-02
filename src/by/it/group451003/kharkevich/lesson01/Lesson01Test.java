@@ -1,12 +1,14 @@
 package by.it.group451003.kharkevich.lesson01;
 
+import by.it.group451003.kharkevich.lesson01.FiboA;
+import by.it.group451003.kharkevich.lesson01.FiboB;
+import by.it.group451003.kharkevich.lesson01.FiboC;
 import org.junit.Test;
 
 import java.math.BigInteger;
 
 import static org.junit.Assert.assertTrue;
 
-@SuppressWarnings("all")
 public class Lesson01Test {
     /*
     для прохождения тестов создайте JUnit-конфигурацию на свой пакет:

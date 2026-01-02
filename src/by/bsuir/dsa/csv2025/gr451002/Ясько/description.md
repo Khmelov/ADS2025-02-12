@@ -4,8 +4,6 @@ Transport Routes Optimization
 
 # Task
 
-Transport Routes Optimization
-
 ## Problem Statement
 
 **Real part:** In a city's public transport system, different routes may use different transport types (bus, metro, tram). When transferring between transport types, passengers spend additional waiting time for the next transport. Find the route from start to end stop with minimum total travel time, considering transfer times.
@@ -43,8 +41,6 @@ Path: 0 → 1 → 2
 - **Total: 21 minutes**
 
 # Theory
-
-## Theory
 
 ### Dijkstra's Algorithm
 Dijkstra's algorithm finds shortest paths from a source vertex to all other vertices in a graph with non-negative weights.

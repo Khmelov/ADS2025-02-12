@@ -4,8 +4,6 @@ Shortest Path in Graph
 
 # Task
 
-Shortest Path in Graph
-
 Given a directed weighted graph, find the shortest path from vertex `s` to vertex `t`.  
 Input format:  
 - First line: `n m` — number of vertices and edges.  
@@ -16,8 +14,6 @@ Output format:
 - A single number — the length of the shortest path, or `-1` if no path exists.
 
 # Theory
-
-Theory
 
 To find the shortest path in a graph with non-negative weights, Dijkstra's algorithm is commonly used.  
 The idea: iteratively expand the set of vertices with known minimal distance, always picking the vertex with the smallest current label.

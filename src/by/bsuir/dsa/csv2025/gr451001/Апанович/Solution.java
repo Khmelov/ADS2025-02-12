@@ -65,7 +65,7 @@ public class Solution {
     }
 
     @Test
-    void test1() throws Exception {
+    public void test1() throws Exception {
         runTest("4\n" +
                         "1 1 1 1\n" +
                         "1 1 1 1\n" +
@@ -75,7 +75,7 @@ public class Solution {
     }
 
     @Test
-    void test2() throws Exception {
+    public void test2() throws Exception {
         runTest("5\n" +
                         "1 0 0 0 0\n" +
                         "0 1 0 0 0\n" +
@@ -86,7 +86,7 @@ public class Solution {
     }
 
     @Test
-    void test3() throws Exception {
+    public void test3() throws Exception {
         runTest("6\n" +
                         "1 1 0 0 0 0\n" +
                         "1 1 0 0 0 0\n" +
@@ -98,7 +98,7 @@ public class Solution {
     }
 
     @Test
-    void test4() throws Exception {
+    public void test4() throws Exception {
         runTest("4\n" +
                         "1 1 0 0\n" +
                         "1 1 1 0\n" +
@@ -108,7 +108,7 @@ public class Solution {
     }
 
     @Test
-    void test5() throws Exception {
+    public void test5() throws Exception {
         runTest("5\n" +
                         "1 1 1 1 1\n" +
                         "1 1 0 0 0\n" +
@@ -119,7 +119,7 @@ public class Solution {
     }
 
     @Test
-    void test6() throws Exception {
+    public void test6() throws Exception {
         runTest("6\n" +
                         "1 1 1 0 0 0\n" +
                         "1 1 1 0 0 0\n" +
@@ -131,14 +131,14 @@ public class Solution {
     }
 
     @Test
-    void test7() throws Exception {
+    public void test7() throws Exception {
         runTest("1\n" +
                         "1",
                 "1\n");
     }
 
     @Test
-    void test8() throws Exception {
+    public void test8() throws Exception {
         runTest("5\n" +
                         "1 1 0 0 1\n" +
                         "1 1 1 0 0\n" +
@@ -149,7 +149,7 @@ public class Solution {
     }
 
     @Test
-    void test9() throws Exception {
+    public void test9() throws Exception {
         runTest("7\n" +
                         "1 1 0 0 0 0 0\n" +
                         "1 1 1 0 0 0 0\n" +
@@ -162,7 +162,7 @@ public class Solution {
     }
 
     @Test
-    void test10() throws Exception {
+    public void test10() throws Exception {
         runTest("8\n" +
                         "1 0 1 0 0 0 0 0\n" +
                         "0 1 0 1 0 0 0 0\n" +
