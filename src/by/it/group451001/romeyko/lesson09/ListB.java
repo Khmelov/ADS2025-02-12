@@ -1,4 +1,4 @@
-package by.it.group451001.romeyko.lesson09;
+package by.it.group451001.tsurko.lesson09;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -8,8 +8,7 @@ import java.util.ListIterator;
 public class ListB<E> implements List<E> {
     private Object[] array;
     private int size;
-    private final int DEFAULT_CAPACITY = 10;
-
+    private final int DEFAULT_CAPACITY = 16;
     //Создайте аналог списка БЕЗ использования других классов СТАНДАРТНОЙ БИБЛИОТЕКИ
 
     /////////////////////////////////////////////////////////////////////////
@@ -177,6 +176,8 @@ public class ListB<E> implements List<E> {
         }
         return lastIndex;
     }
+
+
     /////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////
     //////               Опциональные к реализации методы             ///////
