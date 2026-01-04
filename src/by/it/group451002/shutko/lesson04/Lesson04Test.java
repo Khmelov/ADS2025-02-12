@@ -1,6 +1,7 @@
 package by.it.group451002.shutko.lesson04;
 
 
+import by.it.a_khmelev.lesson04.A_BinaryFind;
 import org.junit.Test;
 
 import java.io.InputStream;
