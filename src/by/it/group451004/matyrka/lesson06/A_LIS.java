@@ -4,33 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Scanner;
 
-/*
-Задача на программирование: наибольшая возрастающая подпоследовательность
-см.     https://ru.wikipedia.org/wiki/Задача_поиска_наибольшей_увеличивающейся_подпоследовательности
-        https://en.wikipedia.org/wiki/Longest_increasing_subsequence
-
-Дано:
-    целое число 1≤n≤1000
-    массив A[1…n] натуральных чисел, не превосходящих 2E9.
-
-Необходимо:
-    Выведите максимальное 1<=k<=n, для которого гарантированно найдётся
-    подпоследовательность индексов i[1]<i[2]<…<i[k] <= длины k,
-    где каждый элемент A[i[k]] больше любого предыдущего
-    т.е. для всех 1<=j<k, A[i[j]]<A[i[j+1]].
-
-Решить задачу МЕТОДАМИ ДИНАМИЧЕСКОГО ПРОГРАММИРОВАНИЯ
-
-    Sample Input:
-    5
-    1 3 3 2 6
-
-    Sample Output:
-    3
-*/
-
 public class A_LIS {
-
 
     public static void main(String[] args) throws FileNotFoundException {
         InputStream stream = A_LIS.class.getResourceAsStream("dataA.txt");
@@ -40,18 +14,38 @@ public class A_LIS {
     }
 
     int getSeqSize(InputStream stream) throws FileNotFoundException {
-        //подготовка к чтению данных
         Scanner scanner = new Scanner(stream);
-        //!!!!!!!!!!!!!!!!!!!!!!!!!     НАЧАЛО ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
-        //общая длина последовательности
+
         int n = scanner.nextInt();
-        int[] m = new int[n];
-        //читаем всю последовательность
+        int[] a = new int[n];
+
         for (int i = 0; i < n; i++) {
-            m[i] = scanner.nextInt();
+            a[i] = scanner.nextInt();
         }
+
+        // dp[i] — длина наибольшей возрастающей подпоследовательности,
+        // оканчивающейся в элементе i
+        int[] dp = new int[n];
+
+        // минимальная длина — 1
+        for (int i = 0; i < n; i++) {
+            dp[i] = 1;
+        }
+
+        // динамическое программирование
+        for (int i = 1; i < n; i++) {
+            for (int j = 0; j < i; j++) {
+                if (a[j] < a[i]) {
+                    dp[i] = Math.max(dp[i], dp[j] + 1);
+                }
+            }
+        }
+
         int result = 0;
-        //!!!!!!!!!!!!!!!!!!!!!!!!!     КОНЕЦ ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
+        for (int x : dp) {
+            result = Math.max(result, x);
+        }
+
         return result;
     }
 }

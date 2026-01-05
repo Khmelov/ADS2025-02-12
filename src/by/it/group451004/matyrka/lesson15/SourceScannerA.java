@@ -4,109 +4,98 @@ import java.io.*;
 import java.nio.charset.MalformedInputException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 
 public class SourceScannerA {
 
     public static void main(String[] args) {
-        String src = System.getProperty("user.dir") + File.separator + "src";
+        String src = System.getProperty("user.dir")
+                + File.separator + "src" + File.separator;
+
         List<FileData> fileDataList = new ArrayList<>();
-        Path srcPath = Paths.get(src);
 
         try {
-            Files.walk(srcPath)
-                    .filter(p -> p.toString().endsWith(".java"))
-                    .forEach(file -> processJavaFile(file, srcPath, fileDataList));
-        } catch (IOException e) {
-            // игнорируем ошибки обхода
+            Files.walkFileTree(Paths.get(src), new SimpleFileVisitor<>() {
+
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                    if (file.toString().endsWith(".java")) {
+                        processJavaFile(file, fileDataList);
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult visitFileFailed(Path file, IOException exc) {
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (IOException ignored) {
         }
 
-        fileDataList.sort((f1, f2) -> {
-            int sizeCompare = Integer.compare(f1.size, f2.size);
-            return sizeCompare != 0 ? sizeCompare : f1.relativePath.compareTo(f2.relativePath);
+        fileDataList.sort((a, b) -> {
+            int c = Integer.compare(a.size, b.size);
+            return c != 0 ? c : a.relativePath.compareTo(b.relativePath);
         });
 
-        for (FileData data : fileDataList) {
-            System.out.println(data.size + " " + data.relativePath);
+        for (FileData f : fileDataList) {
+            System.out.println(f.size + " " + f.relativePath);
         }
     }
 
-    private static void processJavaFile(Path file, Path srcPath, List<FileData> fileDataList) {
+    private static void processJavaFile(Path file, List<FileData> list) {
         try {
-            String content = Files.readString(file, StandardCharsets.UTF_8);
+            String content = new String(Files.readAllBytes(file), StandardCharsets.UTF_8);
 
-            // Пропускаем тестовые файлы
-            if (content.contains("@Test") || content.contains("org.junit.Test")) {
-                return;
-            }
+            if (content.contains("@Test") || content.contains("org.junit.Test")) return;
 
             String processed = processFileContent(content);
 
-            // Удаляем символы с кодом <33 в начале и конце всего текста
-            processed = removeLowCharsFromStart(processed);
-            processed = removeLowCharsFromEnd(processed);
+            String srcPath = System.getProperty("user.dir")
+                    + File.separator + "src" + File.separator;
 
-            String relativePath = srcPath.relativize(file).toString();
+            String relativePath = file.toString().substring(srcPath.length());
 
-            // Размер в байтах (UTF-8)
             int size = processed.getBytes(StandardCharsets.UTF_8).length;
 
-            fileDataList.add(new FileData(size, relativePath));
+            list.add(new FileData(size, relativePath));
 
-        } catch (MalformedInputException e) {
-            // игнорируем ошибки кодировки
-        } catch (IOException e) {
-            // игнорируем ошибки чтения файлов
+        } catch (MalformedInputException ignored) {
+        } catch (IOException ignored) {
         }
     }
 
     private static String processFileContent(String content) {
-        StringBuilder result = new StringBuilder();
-        String[] lines = content.split("\\R");
+        StringBuilder sb = new StringBuilder();
 
-        for (String line : lines) {
-            String processedLine = processLine(line);
-            if (!processedLine.isEmpty()) {
-                result.append(processedLine).append("\n");
-            }
+        for (String line : content.split("\n")) {
+            String t = line.trim();
+            if (t.startsWith("package") || t.startsWith("import")) continue;
+            sb.append(line).append('\n');
         }
 
-        return result.toString();
+        String res = sb.toString();
+        res = trimLowStart(res);
+        res = trimLowEnd(res);
+        return res;
     }
 
-    private static String processLine(String line) {
-        // Сначала удаляем символы с кодом <33 в начале и конце строки
-        String processed = removeLowCharsFromStart(line);
-        processed = removeLowCharsFromEnd(processed);
-
-        // Затем проверяем, не является ли строка package или import
-        String trimmed = processed.trim();
-        if (trimmed.startsWith("package") || trimmed.startsWith("import")) {
-            return "";
-        }
-
-        return processed;
+    private static String trimLowStart(String s) {
+        int i = 0;
+        while (i < s.length() && s.charAt(i) < 33) i++;
+        return s.substring(i);
     }
 
-    private static String removeLowCharsFromStart(String str) {
-        int start = 0;
-        while (start < str.length() && str.charAt(start) < 33) {
-            start++;
-        }
-        return start == 0 ? str : str.substring(start);
-    }
-
-    private static String removeLowCharsFromEnd(String str) {
-        int end = str.length();
-        while (end > 0 && str.charAt(end - 1) < 33) {
-            end--;
-        }
-        return end == str.length() ? str : str.substring(0, end);
+    private static String trimLowEnd(String s) {
+        int i = s.length();
+        while (i > 0 && s.charAt(i - 1) < 33) i--;
+        return s.substring(0, i);
     }
 
     private static class FileData {
-        final int size;
-        final String relativePath;
+        int size;
+        String relativePath;
 
         FileData(int size, String relativePath) {
             this.size = size;

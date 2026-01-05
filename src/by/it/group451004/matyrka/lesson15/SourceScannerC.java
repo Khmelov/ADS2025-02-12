@@ -9,147 +9,128 @@ import java.util.*;
 public class SourceScannerC {
 
     public static void main(String[] args) {
-        String src = System.getProperty("user.dir") + File.separator + "src";
-        List<FileData> fileDataList = new ArrayList<>();
-        Path srcPath = Paths.get(src);
+        String src = System.getProperty("user.dir")
+                + File.separator + "src" + File.separator;
+
+        List<FileData> files = new ArrayList<>();
+        Path root = Paths.get(src);
 
         try {
-            Files.walk(srcPath)
+            Files.walk(root)
                     .filter(p -> p.toString().endsWith(".java"))
-                    .forEach(file -> processJavaFile(file, srcPath, fileDataList));
-        } catch (IOException e) {}
+                    .forEach(p -> process(p, root, files));
+        } catch (IOException ignored) {
+        }
 
-        Map<String, List<String>> copies = findCopiesByHashing(fileDataList);
+        Map<String, List<String>> copies = findCopies(files);
 
-        List<String> sortedFiles = new ArrayList<>(copies.keySet());
-        Collections.sort(sortedFiles);
+        List<String> keys = new ArrayList<>(copies.keySet());
+        Collections.sort(keys);
 
-        for (String filePath : sortedFiles) {
-            System.out.println(filePath);
-            List<String> copyPaths = copies.get(filePath);
-            Collections.sort(copyPaths);
-            for (String copyPath : copyPaths) {
-                System.out.println(copyPath);
+        for (String k : keys) {
+            System.out.println(k);
+            List<String> v = copies.get(k);
+            Collections.sort(v);
+            for (String s : v) {
+                System.out.println(s);
             }
         }
     }
 
-    private static void processJavaFile(Path file, Path srcPath, List<FileData> fileDataList) {
+    private static void process(Path file, Path root, List<FileData> list) {
         try {
             String content = Files.readString(file, StandardCharsets.UTF_8);
             if (content.contains("@Test") || content.contains("org.junit.Test")) return;
-            String processed = processFileContent(content);
-            String relativePath = srcPath.relativize(file).toString();
-            fileDataList.add(new FileData(relativePath, processed));
 
-        } catch (MalformedInputException e) {
-        } catch (IOException e) {}
+            String processed = normalize(content);
+            String relative = root.relativize(file).toString();
+            list.add(new FileData(relative, processed));
+
+        } catch (MalformedInputException ignored) {
+        } catch (IOException ignored) {
+        }
     }
 
-    private static String processFileContent(String content) {
-        String withoutComments = removeComments(content);
-        String[] lines = withoutComments.split("\\R");
-        StringBuilder result = new StringBuilder();
-        for (String line : lines) {
-            String processedLine = processLine(line);
-            if (!processedLine.isEmpty()) {
-                result.append(processedLine).append(" ");
-            }
+    private static String normalize(String s) {
+        s = removeComments(s);
+
+        StringBuilder sb = new StringBuilder();
+        for (String line : s.split("\\R")) {
+            String t = line.trim();
+            if (t.startsWith("package") || t.startsWith("import")) continue;
+            if (!t.isEmpty()) sb.append(t).append(' ');
         }
 
-        String processed = result.toString();
-        processed = processed.replaceAll("\\s+", " ").trim();
-        return processed;
+        return sb.toString().replaceAll("\\s+", " ").trim();
     }
 
-    private static String removeComments(String content) {
-        StringBuilder result = new StringBuilder();
-        int length = content.length();
+    private static String removeComments(String s) {
+        StringBuilder r = new StringBuilder();
         int i = 0;
-
-        while (i < length) {
-            if (i + 1 < length && content.charAt(i) == '/' && content.charAt(i + 1) == '/') {
-                while (i < length && content.charAt(i) != '\n' && content.charAt(i) != '\r') i++;
-            }
-            else if (i + 1 < length && content.charAt(i) == '/' && content.charAt(i + 1) == '*') {
+        while (i < s.length()) {
+            if (i + 1 < s.length() && s.charAt(i) == '/' && s.charAt(i + 1) == '/') {
+                while (i < s.length() && s.charAt(i) != '\n') i++;
+            } else if (i + 1 < s.length() && s.charAt(i) == '/' && s.charAt(i + 1) == '*') {
                 i += 2;
-                while (i + 1 < length && !(content.charAt(i) == '*' && content.charAt(i + 1) == '/')) i++;
+                while (i + 1 < s.length() && !(s.charAt(i) == '*' && s.charAt(i + 1) == '/')) i++;
                 i += 2;
-            }
-            else {
-                result.append(content.charAt(i));
-                i++;
+            } else {
+                r.append(s.charAt(i++));
             }
         }
-        return result.toString();
+        return r.toString();
     }
 
-    private static String processLine(String line) {
-        String trimmed = line.trim();
-        if (trimmed.startsWith("package") || trimmed.startsWith("import")) return "";
-        return trimmed;
-    }
-
-    private static Map<String, List<String>> findCopiesByHashing(List<FileData> fileDataList) {
-        Map<String, List<String>> copies = new HashMap<>();
+    private static Map<String, List<String>> findCopies(List<FileData> files) {
         Map<FileSignature, List<FileData>> groups = new HashMap<>();
-        for (FileData file : fileDataList) {
-            FileSignature signature = new FileSignature(file.content);
-            groups.computeIfAbsent(signature, k -> new ArrayList<>()).add(file);
+        for (FileData f : files) {
+            groups.computeIfAbsent(new FileSignature(f.content), k -> new ArrayList<>()).add(f);
         }
 
-        for (List<FileData> group : groups.values()) {
-            if (group.size() > 1) {
-                for (int i = 0; i < group.size(); i++) {
-                    FileData file1 = group.get(i);
-                    List<String> fileCopies = new ArrayList<>();
-                    for (int j = i + 1; j < group.size(); j++) {
-                        FileData file2 = group.get(j);
-                        if (isCopy(file1.content, file2.content)) {
-                            fileCopies.add(file2.path);
+        Map<String, List<String>> result = new HashMap<>();
+        for (List<FileData> g : groups.values()) {
+            if (g.size() > 1) {
+                for (int i = 0; i < g.size(); i++) {
+                    List<String> c = new ArrayList<>();
+                    for (int j = i + 1; j < g.size(); j++) {
+                        if (similar(g.get(i).content, g.get(j).content)) {
+                            c.add(g.get(j).path);
                         }
                     }
-                    if (!fileCopies.isEmpty()) {
-                        copies.put(file1.path, fileCopies);
-                    }
+                    if (!c.isEmpty()) result.put(g.get(i).path, c);
                 }
             }
         }
-
-        return copies;
+        return result;
     }
 
-    private static boolean isCopy(String s1, String s2) {
-        if (s1.equals(s2)) return true;
-        if (Math.abs(s1.length() - s2.length()) > 20) return false;
-        return calculateSimilarity(s1, s2) > 0.95;
+    private static boolean similar(String a, String b) {
+        if (a.equals(b)) return true;
+        if (Math.abs(a.length() - b.length()) > 20) return false;
+        return similarity(a, b) > 0.95;
     }
 
-    private static double calculateSimilarity(String s1, String s2) {
-        Set<String> ngrams1 = getNgrams(s1, 3);
-        Set<String> ngrams2 = getNgrams(s2, 3);
-        int intersection = 0;
-        for (String ngram : ngrams1) {
-            if (ngrams2.contains(ngram)) {
-                intersection++;
-            }
+    private static double similarity(String a, String b) {
+        Set<String> s1 = ngrams(a);
+        Set<String> s2 = ngrams(b);
+        int i = 0;
+        for (String s : s1) if (s2.contains(s)) i++;
+        int u = s1.size() + s2.size() - i;
+        return u == 0 ? 0 : (double) i / u;
+    }
+
+    private static Set<String> ngrams(String s) {
+        Set<String> r = new HashSet<>();
+        for (int i = 0; i + 2 < s.length(); i++) {
+            r.add(s.substring(i, i + 3));
         }
-
-        int union = ngrams1.size() + ngrams2.size() - intersection;
-        return union == 0 ? 0 : (double) intersection / union;
-    }
-
-    private static Set<String> getNgrams(String str, int n) {
-        Set<String> ngrams = new HashSet<>();
-        for (int i = 0; i <= str.length() - n; i++) {
-            ngrams.add(str.substring(i, i + n));
-        }
-        return ngrams;
+        return r;
     }
 
     private static class FileData {
-        final String path;
-        final String content;
+        String path;
+        String content;
+
         FileData(String path, String content) {
             this.path = path;
             this.content = content;
@@ -157,35 +138,26 @@ public class SourceScannerC {
     }
 
     private static class FileSignature {
-        final int length;
-        final long hash;
+        int len;
+        long hash;
 
-        FileSignature(String content) {
-            this.length = content.length();
-            this.hash = calculateContentHash(content);
-        }
-
-        private long calculateContentHash(String content) {
-            if (content.length() == 0) return 0;
-            long hash = 0;
-            int step = Math.max(1, content.length() / 10);
-            for (int i = 0; i < content.length(); i += step) {
-                hash = hash * 31 + content.charAt(i);
-            }
-            return hash;
+        FileSignature(String s) {
+            len = s.length();
+            long h = 0;
+            int step = Math.max(1, len / 10);
+            for (int i = 0; i < len; i += step) h = h * 31 + s.charAt(i);
+            hash = h;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            FileSignature that = (FileSignature) o;
-            return length == that.length && Math.abs(hash - that.hash) < 1000;
+            if (!(o instanceof FileSignature f)) return false;
+            return len == f.len && Math.abs(hash - f.hash) < 1000;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(length, hash / 1000);
+            return Objects.hash(len, hash / 1000);
         }
     }
 }

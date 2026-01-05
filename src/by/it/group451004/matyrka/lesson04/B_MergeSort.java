@@ -4,54 +4,46 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Scanner;
 
-/*
-Реализуйте сортировку слиянием для одномерного массива.
-Сложность алгоритма должна быть не хуже, чем O(n log n)
-
-Первая строка содержит число 1<=n<=10000,
-вторая - массив A[1…n], содержащий натуральные числа, не превосходящие 10E9.
-Необходимо отсортировать полученный массив.
-
-Sample Input:
-5
-2 3 9 2 9
-Sample Output:
-2 2 3 9 9
-*/
 public class B_MergeSort {
 
     public static void main(String[] args) throws FileNotFoundException {
         InputStream stream = B_MergeSort.class.getResourceAsStream("dataB.txt");
         B_MergeSort instance = new B_MergeSort();
-        //long startTime = System.currentTimeMillis();
         int[] result = instance.getMergeSort(stream);
-        //long finishTime = System.currentTimeMillis();
-        for (int index : result) {
-            System.out.print(index + " ");
+        for (int x : result) {
+            System.out.print(x + " ");
         }
     }
 
     int[] getMergeSort(InputStream stream) throws FileNotFoundException {
-        //подготовка к чтению данных
         Scanner scanner = new Scanner(stream);
-        //!!!!!!!!!!!!!!!!!!!!!!!!!     НАЧАЛО ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
 
-        //размер массива
         int n = scanner.nextInt();
-        //сам массив
         int[] a = new int[n];
         for (int i = 0; i < n; i++) {
             a[i] = scanner.nextInt();
-            System.out.println(a[i]);
         }
 
-        // тут ваше решение (реализуйте сортировку слиянием)
-        // https://ru.wikipedia.org/wiki/Сортировка_слиянием
-
-
-        //!!!!!!!!!!!!!!!!!!!!!!!!!     КОНЕЦ ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
+        mergeSort(a, 0, n - 1, new int[n]);
         return a;
     }
 
+    private void mergeSort(int[] a, int l, int r, int[] temp) {
+        if (l >= r) return;
+        int m = (l + r) >>> 1;
+        mergeSort(a, l, m, temp);
+        mergeSort(a, m + 1, r, temp);
+        merge(a, l, m, r, temp);
+    }
 
+    private void merge(int[] a, int l, int m, int r, int[] temp) {
+        int i = l, j = m + 1, k = l;
+        while (i <= m && j <= r) {
+            if (a[i] <= a[j]) temp[k++] = a[i++];
+            else temp[k++] = a[j++];
+        }
+        while (i <= m) temp[k++] = a[i++];
+        while (j <= r) temp[k++] = a[j++];
+        for (int x = l; x <= r; x++) a[x] = temp[x];
+    }
 }
