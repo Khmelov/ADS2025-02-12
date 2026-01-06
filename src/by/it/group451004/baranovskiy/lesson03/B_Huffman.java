@@ -2,66 +2,70 @@ package by.it.group451004.baranovskiy.lesson03;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.TreeMap;
 
-// Lesson 3. B_Huffman.
-// Восстановите строку по её коду и беспрефиксному коду символов.
+// Урок 3. Алгоритм Хаффмана (декодирование)
+// Восстановление исходной строки по её коду и таблице беспрефиксных кодов символов
 
-// В первой строке входного файла заданы два целых числа
-// kk и ll через пробел — количество различных букв, встречающихся в строке,
-// и размер получившейся закодированной строки, соответственно.
-//
-// В следующих kk строках записаны коды букв в формате "letter: code".
-// Ни один код не является префиксом другого.
-// Буквы могут быть перечислены в любом порядке.
-// В качестве букв могут встречаться лишь строчные буквы латинского алфавита;
-// каждая из этих букв встречается в строке хотя бы один раз.
-// Наконец, в последней строке записана закодированная строка.
-// Исходная строка и коды всех букв непусты.
-// Заданный код таков, что закодированная строка имеет минимальный возможный размер.
-//
-//        Sample Input 1:
-//        1 1
-//        a: 0
-//        0
-
-//        Sample Output 1:
-//        a
-
-
-//        Sample Input 2:
-//        4 14
-//        a: 0
-//        b: 10
-//        c: 110
-//        d: 111
-//        01001100100111
-
-//        Sample Output 2:
-//        abacabad
+// Формат входных данных:
+// В первой строке - два числа: kk (количество различных букв) и ll (длина закодированной строки)
+// В следующих kk строках - коды букв в формате "letter: code"
+// В последней строке - закодированная строка
 
 public class B_Huffman {
 
     public static void main(String[] args) throws FileNotFoundException {
+        // Чтение входного файла
         InputStream inputStream = B_Huffman.class.getResourceAsStream("dataB.txt");
         B_Huffman instance = new B_Huffman();
+        // Декодирование и вывод результата
         String result = instance.decode(inputStream);
         System.out.println(result);
     }
 
     String decode(InputStream inputStream) throws FileNotFoundException {
+        // Карта для хранения соответствий кодов символам (код -> символ)
+        Map<String, Character> codes = new TreeMap<>();
+        // Результирующая строка
         StringBuilder result = new StringBuilder();
-        //прочитаем строку для кодирования из тестового файла
         Scanner scanner = new Scanner(inputStream);
+
+        // Чтение количества символов и длины закодированной строки
         Integer count = scanner.nextInt();
         Integer length = scanner.nextInt();
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! НАЧАЛО ЗАДАЧИ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-        //тут запишите ваше решение
 
+        // Пропуск оставшейся части строки после чисел
+        scanner.nextLine();
 
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! КОНЕЦ ЗАДАЧИ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-        return result.toString(); //01001100100111
+        // Чтение таблицы кодов
+        for (int i = 0; i < count; i++) {
+            String line = scanner.nextLine();
+            // Разделение строки на символ и его код
+            String[] parts = line.split(": ");
+            char ch = parts[0].charAt(0);  // Символ
+            String code = parts[1];         // Его код
+
+            // Добавление в карту соответствия кода символу
+            codes.put(code, ch);
+        }
+
+        // Чтение закодированной строки
+        StringBuilder codedString = new StringBuilder(scanner.nextLine());
+
+        // Декодирование строки
+        while (!codedString.isEmpty()) {
+            StringBuilder subString = new StringBuilder();
+            // Посимвольное чтение закодированной строки до нахождения валидного кода
+            while (!codes.containsKey(subString.toString())) {
+                subString.append(codedString.charAt(0));
+                codedString.deleteCharAt(0);
+            }
+            // Добавление найденного символа в результат
+            result.append(codes.get(subString.toString()));
+        }
+
+        return result.toString();
     }
-
-
 }

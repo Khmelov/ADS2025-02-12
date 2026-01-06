@@ -4,51 +4,35 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.*;
 
-//Lesson 3. A_Huffman.
-//Разработайте метод encode(File file) для кодирования строки (код Хаффмана)
+// Урок 3. Алгоритм Хаффмана.
+// Разработан метод encode(File file) для кодирования строки с использованием кода Хаффмана
 
-// По данным файла (непустой строке ss длины не более 104104),
+// Для входного файла (непустой строки ss длиной не более 10^4 символов),
 // состоящей из строчных букв латинского алфавита,
-// постройте оптимальный по суммарной длине беспрефиксный код.
+// строится оптимальный беспрефиксный код с минимальной избыточностью.
 
-// Используйте Алгоритм Хаффмана — жадный алгоритм оптимального
-// безпрефиксного кодирования алфавита с минимальной избыточностью.
+// Используется алгоритм Хаффмана — жадный алгоритм оптимального
+// беспрефиксного кодирования алфавита.
 
-// В первой строке выведите количество различных букв kk,
-// встречающихся в строке, и размер получившейся закодированной строки.
-// В следующих kk строках запишите коды букв в формате "letter: code".
-// В последней строке выведите закодированную строку. Примеры ниже
-
-//        Sample Input 1:
-//        a
-//
-//        Sample Output 1:
-//        1 1
-//        a: 0
-//        0
-
-//        Sample Input 2:
-//        abacabad
-//
-//        Sample Output 2:
-//        4 14
-//        a: 0
-//        b: 10
-//        c: 110
-//        d: 111
-//        01001100100111
+// В первой строке вывода — количество различных букв kk,
+// встречающихся в строке, и размер закодированной строки.
+// В следующих kk строках — коды букв в формате "letter: code".
+// В последней строке — закодированная строка.
 
 public class A_Huffman {
 
-    //индекс данных из листьев
+    // Карта для хранения кодов символов (отсортированная по ключу)
     static private final Map<Character, String> codes = new TreeMap<>();
 
     public static void main(String[] args) throws FileNotFoundException {
+        // Чтение входного файла
         InputStream inputStream = A_Huffman.class.getResourceAsStream("dataA.txt");
         A_Huffman instance = new A_Huffman();
         long startTime = System.currentTimeMillis();
+        // Кодирование строки
         String result = instance.encode(inputStream);
         long finishTime = System.currentTimeMillis();
+        // Вывод результатов
         System.out.printf("%d %d\n", codes.size(), result.length());
         for (Map.Entry<Character, String> entry : codes.entrySet()) {
             System.out.printf("%s: %s\n", entry.getKey(), entry.getValue());
@@ -56,102 +40,105 @@ public class A_Huffman {
         System.out.println(result);
     }
 
-    //!!!!!!!!!!!!!!!!!!!!!!!!!     НАЧАЛО ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
+    // Основной метод кодирования
     String encode(InputStream inputStream) throws FileNotFoundException {
-        //прочитаем строку для кодирования из тестового файла
         Scanner scanner = new Scanner(inputStream);
         String s = scanner.next();
 
-        //все комментарии от тестового решения были оставлены т.к. это задание A.
-        //если они вам мешают их можно удалить
-
+        // 1. Подсчет частоты встречаемости каждого символа
         Map<Character, Integer> count = new HashMap<>();
-        //1. переберем все символы по очереди и рассчитаем их частоту в Map count
-        //для каждого символа добавим 1 если его в карте еще нет или инкремент если есть.
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (count.containsKey(c)) {
+                count.put(c, count.get(c) + 1); // Увеличиваем счетчик, если символ уже встречался
+            } else {
+                count.put(c, 1); // Иначе добавляем новый символ
+            }
+        }
 
-        //2. перенесем все символы в приоритетную очередь в виде листьев
+        // 2. Создание приоритетной очереди из узлов (листьев) для каждого символа
+        // Очередь сортируется по частоте символов (наименьшая частота — первая)
         PriorityQueue<Node> priorityQueue = new PriorityQueue<>();
+        for (Map.Entry<Character, Integer> entry : count.entrySet()) {
+            priorityQueue.add(new LeafNode(entry.getValue(), entry.getKey()));
+        }
 
-        //3. вынимая по два узла из очереди (для сборки родителя)
-        //и возвращая этого родителя обратно в очередь
-        //построим дерево кодирования Хаффмана.
-        //У родителя частоты детей складываются.
+        // 3. Построение дерева Хаффмана:
+        // Берем два узла с наименьшей частотой и объединяем их в новый узел
+        // Повторяем, пока не останется один корневой узел
+        while (priorityQueue.size() > 1) {
+            Node left = priorityQueue.poll();  // Узел с меньшей частотой
+            Node right = priorityQueue.poll(); // Следующий узел с меньшей частотой
+            InternalNode parentNode = new InternalNode(left, right); // Создаем родительский узел
+            priorityQueue.add(parentNode);     // Добавляем новый узел в очередь
+        }
 
-        //4. последний из родителей будет корнем этого дерева
-        //это будет последний и единственный элемент оставшийся в очереди priorityQueue.
+        // 4. Генерация кодов для каждого символа:
+        // Начинаем с корня дерева (последний оставшийся узел в очереди)
+        // Рекурсивно обходим дерево, строя коды (0 — левая ветвь, 1 — правая)
+        priorityQueue.poll().fillCodes("");
+
+        // 5. Кодирование исходной строки:
+        // Для каждого символа строки добавляем его код в результирующую строку
         StringBuilder sb = new StringBuilder();
-        //.....
+        for (int i = 0; i < s.length(); i++) {
+            sb.append(codes.get(s.charAt(i)));
+        }
 
         return sb.toString();
-        //01001100100111
-        //01001100100111
     }
 
-    //Изучите классы Node InternalNode LeafNode
+    // Абстрактный класс узла дерева Хаффмана
     abstract class Node implements Comparable<Node> {
-        //абстрактный класс элемент дерева
-        //(сделан abstract, чтобы нельзя было использовать его напрямую)
-        //а только через его версии InternalNode и LeafNode
-        private final int frequence; //частота символов
+        private final int frequence; // Частота встречаемости символа/суммарная частота поддерева
 
-        //конструктор по умолчанию
         private Node(int frequence) {
             this.frequence = frequence;
         }
 
-        //генерация кодов (вызывается на корневом узле
-        //один раз в конце, т.е. после построения дерева)
+        // Абстрактный метод для построения кодов символов
         abstract void fillCodes(String code);
 
-        //метод нужен для корректной работы узла в приоритетной очереди
-        //или для сортировок
+        // Сравнение узлов по частоте (для приоритетной очереди)
         @Override
         public int compareTo(Node o) {
             return Integer.compare(frequence, o.frequence);
         }
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////
-    //расширение базового класса до внутреннего узла дерева
+    // Класс внутреннего узла дерева (не лист)
     private class InternalNode extends Node {
-        //внутренный узел дерева
-        Node left;  //левый ребенок бинарного дерева
-        Node right; //правый ребенок бинарного дерева
+        Node left;  // Левое поддерево
+        Node right; // Правое поддерево
 
-        //для этого дерева не существует внутренних узлов без обоих детей
-        //поэтому вот такого конструктора будет достаточно
         InternalNode(Node left, Node right) {
-            super(left.frequence + right.frequence);
+            super(left.frequence + right.frequence); // Частота — сумма частот поддеревьев
             this.left = left;
             this.right = right;
         }
 
+        // Рекурсивное построение кодов:
+        // При движении влево добавляем "0", вправо — "1"
         @Override
         void fillCodes(String code) {
             left.fillCodes(code + "0");
             right.fillCodes(code + "1");
         }
-
     }
-    //!!!!!!!!!!!!!!!!!!!!!!!!!     КОНЕЦ ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
 
-    ////////////////////////////////////////////////////////////////////////////////////
-    //расширение базового класса до листа дерева
+    // Класс листового узла (содержит символ)
     private class LeafNode extends Node {
-        //лист
-        char symbol; //символы хранятся только в листах
+        char symbol; // Символ
 
         LeafNode(int frequence, char symbol) {
             super(frequence);
             this.symbol = symbol;
         }
 
+        // Добавление кода символа в карту codes
         @Override
         void fillCodes(String code) {
-            //добрались до листа, значит рекурсия закончена, код уже готов
-            //и можно запомнить его в индексе для поиска кода по символу.
             codes.put(this.symbol, code);
         }
     }
-
 }
