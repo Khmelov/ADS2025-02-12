@@ -5,92 +5,58 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Scanner;
 
-public class C_QSortOptimized {
+public class A_QSort {
 
     public static void main(String[] args) throws FileNotFoundException {
-        InputStream stream = C_QSortOptimized.class.getResourceAsStream("dataC.txt");
-        C_QSortOptimized instance = new C_QSortOptimized();
-        int[] result = instance.getAccessory2(stream);
+        InputStream stream = A_QSort.class.getResourceAsStream("dataA.txt");
+        A_QSort instance = new A_QSort();
+        int[] result = instance.getAccessory(stream);
         for (int index : result) {
             System.out.print(index + " ");
         }
-
     }
 
-    int[] getAccessory2(InputStream stream) throws FileNotFoundException {
+    int[] getAccessory(InputStream stream) throws FileNotFoundException {
         Scanner scanner = new Scanner(stream);
 
+        // Чтение количества отрезков и точек
         int n = scanner.nextInt();
         Segment[] segments = new Segment[n];
         int m = scanner.nextInt();
         int[] points = new int[m];
         int[] result = new int[m];
 
+        // Чтение отрезков
         for (int i = 0; i < n; i++) {
             int start = scanner.nextInt();
             int stop = scanner.nextInt();
             segments[i] = new Segment(start, stop);
         }
 
+        // Чтение точек
         for (int i = 0; i < m; i++) {
             points[i] = scanner.nextInt();
         }
 
-        quickSort(segments, 0, n - 1);
+        // Сортируем отрезки по началу
+        Arrays.sort(segments);
 
+        // Подсчет количества камер, записавших каждое событие
         for (int i = 0; i < m; i++) {
-            result[i] = countSegments(segments, points[i]);
+            int point = points[i];
+            result[i] = countSegments(segments, point);
         }
 
         return result;
     }
 
-    private void quickSort(Segment[] arr, int left, int right) {
-        while (left < right) {
-            int lt = left, gt = right;
-            int pivot = arr[left].start;
-            int i = left;
-
-            while (i <= gt) {
-                if (arr[i].start < pivot) {
-                    swap(arr, lt++, i++);
-                } else if (arr[i].start > pivot) {
-                    swap(arr, i, gt--);
-                } else {
-                    i++;
-                }
-            }
-
-            quickSort(arr, left, lt - 1);
-            left = gt + 1;
-        }
-    }
-
-    private void swap(Segment[] arr, int i, int j) {
-        Segment temp = arr[i];
-        arr[i] = arr[j];
-        arr[j] = temp;
-    }
-
     private int countSegments(Segment[] segments, int point) {
-        int left = 0, right = segments.length - 1;
-
-        while (left <= right) {
-            int mid = left + (right - left) / 2;
-            if (segments[mid].start <= point) {
-                left = mid + 1;
-            } else {
-                right = mid - 1;
-            }
-        }
-
         int count = 0;
-        for (int i = 0; i < left; i++) {
-            if (segments[i].stop >= point) {
+        for (Segment segment : segments) {
+            if (segment.start <= point && segment.stop >= point) {
                 count++;
             }
         }
-
         return count;
     }
 
