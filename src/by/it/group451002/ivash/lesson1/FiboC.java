@@ -1,9 +1,10 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
+package by.it.group451002.ivash.lesson1;
 
-package by.it.group451002.vysotski.lesson01;
+/*
+ * Даны целые числа 1<=n<=1E18 и 2<=m<=1E5,
+ * необходимо найти остаток от деления n-го числа Фибоначчи на m
+ * время расчета должно быть не более 2 секунд
+ */
 
 public class FiboC {
     private long startTime = System.currentTimeMillis();
@@ -18,7 +19,7 @@ public class FiboC {
         System.out.printf("fasterC(%d)=%d \n\t time=%d \n\n", n, fibo.fasterC((long)n, m), fibo.time());
     }
 
-    public long time() {
+    private long time() {
         return System.currentTimeMillis() - this.startTime;
     }
 

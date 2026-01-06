@@ -1,8 +1,11 @@
-
-
-package by.it.group451002.vysotski.lesson01;
+package by.it.group451002.ivash.lesson06.ivash.lesson1;
 
 import java.math.BigInteger;
+
+/*
+ * Вам необходимо выполнить способ вычисления чисел Фибоначчи со вспомогательным массивом
+ * без ограничений на размер результата (BigInteger)
+ */
 
 public class FiboB {
     private long startTime = System.currentTimeMillis();
@@ -16,7 +19,7 @@ public class FiboB {
         System.out.printf("fastB(%d)=%d \n\t time=%d \n\n", n, fibo.fastB(n), fibo.time());
     }
 
-    public long time() {
+    long time() {
         return System.currentTimeMillis() - this.startTime;
     }
 
