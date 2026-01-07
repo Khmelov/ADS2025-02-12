@@ -4,239 +4,179 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 
+@SuppressWarnings("unchecked")
 public class MyLinkedHashSet<E> implements Set<E> {
-    private static class Node<Object> {
-        private Object o;
-        private Node next;
-        private Node prev;
 
-        Node(Node prev, Object o, Node next) {
-            this.o = o;
-            this.prev = prev;
-            this.next = next;
-        }
+    private static class Node<E> {
+        E value;
+        Node<E> next;    // для цепочек хеш-таблицы
+        Node<E> before, after; // для порядка вставки
+        Node(E value) { this.value = value; }
     }
 
-    private int getHashCode(Object o) {
-        int hashcode = o == null ? 0 : o.hashCode();
-        hashcode = hashcode < 0 ? -hashcode : hashcode;
-        return hashcode % buckets.length;
+    private Node<E>[] table;
+    private int size = 0;
+    private static final int INITIAL_CAPACITY = 16;
+    private Node<E> head, tail; // для порядка вставки
+
+    public MyLinkedHashSet() {
+        table = (Node<E>[]) new Node[INITIAL_CAPACITY];
     }
 
-    private void resize() {
-        Node[] tempBuckets = buckets;
-        buckets = new Node[capacity *= 2];
-        for (Node bucket : tempBuckets) {
-            Node tempNode = bucket;
-            while (tempNode != null) {
-                add((E)tempNode.o);
-                tempNode = tempNode.next;
+    private int index(Object o) {
+        return (o == null ? 0 : o.hashCode() & 0x7fffffff) % table.length;
+    }
+
+    private void resizeIfNeeded() {
+        if (size > table.length * 0.75) {
+            Node<E>[] oldTable = table;
+            table = (Node<E>[]) new Node[table.length * 2];
+            Node<E> curr = head;
+            size = 0;
+            head = tail = null;
+            while (curr != null) {
+                add(curr.value);
+                curr = curr.after;
             }
         }
-        needResize = false;
-    }
-
-    private Node first = null, last = null;
-    private Node[] buckets;
-    private static int capacity = 16;
-    private int length = 0;
-    private Boolean needResize = false;
-
-    private final float DEFAULT_LOAD_FACTOR = 0.75f;
-
-    MyLinkedHashSet() {
-        buckets = new Node[capacity];
-    }
-    public String toString() {
-        StringBuilder strbldr = new StringBuilder();
-        strbldr.append("[");
-        Node temp = first;
-        while (temp != null) {
-            strbldr.append(temp.o + ", ");
-            temp = temp.next;
-        }
-
-        int sbLength = strbldr.length();
-        if (sbLength > 1)
-            strbldr.delete(sbLength - 2, sbLength);
-
-        strbldr.append("]");
-
-        return strbldr.toString();
-    }
-
-    @Override
-    public int size() {
-        return length;
-    }
-
-    @Override
-    public void clear() {
-        capacity = 16;
-        length = 0;
-        buckets = new Node[capacity];
-        last = first = null;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return size() == 0 ;
     }
 
     @Override
     public boolean add(E e) {
-        int h = getHashCode(e);
-        Node prevNode = null, tempNode = buckets[h];
-        while (tempNode != null) {
-            if (e.equals(tempNode.o))
-                return false;
-            prevNode = tempNode;
-            tempNode = tempNode.next;
+        resizeIfNeeded();
+        int idx = index(e);
+        Node<E> curr = table[idx];
+        while (curr != null) {
+            if ((e == null && curr.value == null) || (e != null && e.equals(curr.value))) {
+                return false; // уже есть
+            }
+            curr = curr.next;
+        }
+        Node<E> newNode = new Node<>(e);
+        newNode.next = table[idx];
+        table[idx] = newNode;
+
+        // добавляем в конец связного списка для сохранения порядка
+        if (tail == null) {
+            head = tail = newNode;
+        } else {
+            tail.after = newNode;
+            newNode.before = tail;
+            tail = newNode;
         }
 
-        if (prevNode != null)
-            prevNode.next = new Node(prevNode, e, null);
-        else
-            buckets[h] = new Node(null, e, null);
-
-        if (!needResize) {
-            if (last == null) {
-                last = new Node(null, e, null);
-                first = last;
-            } else {
-                last.next = new Node(last, e, null);
-                last = last.next;
-            }
-            length++;
-
-            if (length > capacity * DEFAULT_LOAD_FACTOR) {
-                needResize = true;
-                resize();
-            }
-        }
-
+        size++;
         return true;
     }
 
     @Override
-    public boolean remove(Object o) {
-        int h = getHashCode(o);
-        Node tempNode = buckets[h];
-
-        while (tempNode != null) {
-            if (tempNode.o.equals(o)) {
-                if (tempNode.prev == null) {
-                    buckets[h] = tempNode.next;
-                    if (buckets[h] != null)
-                        buckets[h].prev = null;
-                }
-                else {
-                    tempNode.prev.next = tempNode.next;
-                    if (tempNode.next != null)
-                        tempNode.next.prev = tempNode.prev;
-                }
-
-                length--;
-
-                Node n = first;
-                while (n != null) {
-                    if (n.o.equals(o)) {
-                        if (first == last)
-                            first = last = null;
-                        else if (n.prev != null) {
-                            n.prev.next = n.next;
-                            if (n.next != null)
-                                n.next.prev = n.prev;
-                            else
-                                last = n.prev;
-                        }
-                        else {
-                            first = first.next;
-                            if (first.next != null)
-                                first.prev = null;
-                        }
-
-                        return true;
-                    }
-                    n = n.next;
-                }
+    public boolean contains(Object o) {
+        int idx = index(o);
+        Node<E> curr = table[idx];
+        while (curr != null) {
+            if ((o == null && curr.value == null) || (o != null && o.equals(curr.value))) {
+                return true;
             }
-            tempNode = tempNode.next;
+            curr = curr.next;
         }
         return false;
     }
 
     @Override
-    public boolean contains(Object o) {
-        int h = getHashCode(o);
-        Node tempNode = buckets[h];
+    public boolean remove(Object o) {
+        int idx = index(o);
+        Node<E> curr = table[idx];
+        Node<E> prev = null;
+        while (curr != null) {
+            if ((o == null && curr.value == null) || (o != null && o.equals(curr.value))) {
+                // удалить из хеш-цепочки
+                if (prev == null) table[idx] = curr.next;
+                else prev.next = curr.next;
 
-        while (tempNode != null) {
-            if (o.equals(tempNode.o))
+                // удалить из связного списка для порядка
+                if (curr.before != null) curr.before.after = curr.after;
+                else head = curr.after;
+
+                if (curr.after != null) curr.after.before = curr.before;
+                else tail = curr.before;
+
+                size--;
                 return true;
-            tempNode = tempNode.next;
+            }
+            prev = curr;
+            curr = curr.next;
         }
         return false;
     }
 
+    @Override
+    public void clear() {
+        for (int i = 0; i < table.length; i++) table[i] = null;
+        head = tail = null;
+        size = 0;
+    }
+
+    @Override
+    public int size() { return size; }
+
+    @Override
+    public boolean isEmpty() { return size == 0; }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[");
+        Node<E> curr = head;
+        boolean first = true;
+        while (curr != null) {
+            if (!first) sb.append(", ");
+            sb.append(curr.value);
+            first = false;
+            curr = curr.after;
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    // =========== Методы Collection ======================
     @Override
     public boolean containsAll(Collection<?> c) {
-        for (Object o : c)
-            if (!contains(o))
-                return false;
+        for (Object o : c) if (!contains(o)) return false;
         return true;
     }
 
     @Override
     public boolean addAll(Collection<? extends E> c) {
-        for (Object o : c) {
-            if (o == null)
-                return false;
-            add((E)o);
-        }
-        return true;
-    }
-
-    @Override
-    public boolean retainAll(Collection<?> c) {
-        Boolean changed = false;
-        Node n = first;
-        while (n != null) {
-            if (!c.contains(n.o)) {
-                remove(n.o);
-                changed = true;
-            }
-            n = n.next;
-        }
+        boolean changed = false;
+        for (E e : c) if (add(e)) changed = true;
         return changed;
     }
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        for (Object o : c) {
-            if (o == null)
-                return false;
-            remove(o);
+        boolean changed = false;
+        for (Object o : c) if (remove(o)) changed = true;
+        return changed;
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        boolean changed = false;
+        Node<E> curr = head;
+        while (curr != null) {
+            Node<E> next = curr.after;
+            if (!c.contains(curr.value)) {
+                remove(curr.value);
+                changed = true;
+            }
+            curr = next;
         }
-        return true;
-    }
-
-    ///////////////////
-    //// необязательные
-    ///////////////////
-
-    @Override
-    public Iterator<E> iterator() {
-        return null;
+        return changed;
     }
 
     @Override
-    public Object[] toArray() {
-        return new Object[0];
-    }
-
+    public Iterator<E> iterator() { throw new UnsupportedOperationException(); }
     @Override
-    public <T> T[] toArray(T[] a) {
-        return null;
-    }
+    public Object[] toArray() { throw new UnsupportedOperationException(); }
+    @Override
+    public <T> T[] toArray(T[] a) { throw new UnsupportedOperationException(); }
 }

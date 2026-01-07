@@ -24,12 +24,12 @@ import java.util.Scanner;
     Sample Input:
     5
     1 3 3 2 6
+
     Sample Output:
     3
 */
 
 public class A_LIS {
-
 
     public static void main(String[] args) throws FileNotFoundException {
         InputStream stream = A_LIS.class.getResourceAsStream("dataA.txt");
@@ -39,29 +39,31 @@ public class A_LIS {
     }
 
     int getSeqSize(InputStream stream) throws FileNotFoundException {
+        //подготовка к чтению данных
         Scanner scanner = new Scanner(stream);
-        // Чтение длины последовательности
+        //!!!!!!!!!!!!!!!!!!!!!!!!!     НАЧАЛО ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
+        //общая длина последовательности
         int n = scanner.nextInt();
         int[] m = new int[n];
-        // Чтение самой последовательности
+        //читаем всю последовательность
         for (int i = 0; i < n; i++) {
             m[i] = scanner.nextInt();
         }
 
-        // Создаем массив для хранения длин LIS, заканчивающихся в каждом индексе
+        // Создаем массив dp, где dp[i] - длина наибольшей возрастающей подпоследовательности,
+        // оканчивающейся на элементе m[i]
         int[] dp = new int[n];
 
-        // Инициализируем массив: минимальная длина LIS для каждого элемента - 1 (сам элемент)
+        // Инициализируем dp: минимальная длина для каждого элемента - 1 (сам элемент)
         for (int i = 0; i < n; i++) {
             dp[i] = 1;
         }
 
         // Заполняем массив dp
         for (int i = 1; i < n; i++) {
-            // Проверяем все предыдущие элементы
             for (int j = 0; j < i; j++) {
-                // Если текущий элемент больше предыдущего и длина LIS может быть увеличена
-                if (m[i] > m[j] && dp[i] < dp[j] + 1) {
+                // Если текущий элемент больше предыдущего и длина подпоследовательности может быть увеличена
+                if (m[j] < m[i] && dp[j] + 1 > dp[i]) {
                     dp[i] = dp[j] + 1;
                 }
             }
@@ -74,7 +76,7 @@ public class A_LIS {
                 result = dp[i];
             }
         }
-
+        //!!!!!!!!!!!!!!!!!!!!!!!!!     КОНЕЦ ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
         return result;
     }
 }

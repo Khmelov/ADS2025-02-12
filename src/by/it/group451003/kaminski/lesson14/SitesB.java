@@ -1,81 +1,112 @@
 package by.it.group451003.kaminski.lesson14;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Scanner;
+import java.util.*;
 
 public class SitesB {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
 
+        // Map для хранения соответствия имени сайта и его индекса
+        Map<String, Integer> siteToIndex = new HashMap<>();
+        List<String> indexToSite = new ArrayList<>();
+
+        // Считываем пары сайтов
+        List<String[]> pairs = new ArrayList<>();
+
+        while (true) {
+            String line = scanner.nextLine();
+            if (line.equals("end")) {
+                break;
+            }
+
+            // Разделяем пару сайтов
+            String[] sites = line.split("\\+");
+            String site1 = sites[0].trim();
+            String site2 = sites[1].trim();
+
+            // Добавляем сайты в map, если их еще нет
+            if (!siteToIndex.containsKey(site1)) {
+                siteToIndex.put(site1, indexToSite.size());
+                indexToSite.add(site1);
+            }
+            if (!siteToIndex.containsKey(site2)) {
+                siteToIndex.put(site2, indexToSite.size());
+                indexToSite.add(site2);
+            }
+
+            pairs.add(new String[]{site1, site2});
+        }
+
+        int n = indexToSite.size(); // общее количество уникальных сайтов
+
+        // Создаем DSU
+        DSU dsu = new DSU(n);
+
+        // Объединяем сайты из пар
+        for (String[] pair : pairs) {
+            int index1 = siteToIndex.get(pair[0]);
+            int index2 = siteToIndex.get(pair[1]);
+            dsu.union(index1, index2);
+        }
+
+        // Собираем размеры кластеров
+        Map<Integer, Integer> clusterSizes = new HashMap<>();
+        for (int i = 0; i < n; i++) {
+            int root = dsu.find(i);
+            clusterSizes.put(root, clusterSizes.getOrDefault(root, 0) + 1);
+        }
+
+        // Сортируем размеры кластеров по УБЫВАНИЮ
+        List<Integer> sizes = new ArrayList<>(clusterSizes.values());
+        Collections.sort(sizes, Collections.reverseOrder());
+
+        // Выводим результат
+        for (int i = 0; i < sizes.size(); i++) {
+            System.out.print(sizes.get(i));
+            if (i < sizes.size() - 1) {
+                System.out.print(" ");
+            }
+        }
+    }
+
+    // Класс DSU с эвристикой по рангу и сжатием путей
     static class DSU {
-        int[] parent;
-        int[] rank;
+        private int[] parent;
+        private int[] rank;
 
-        DSU(int size) {
-            parent = new int[size];
-            rank = new int[size];
-            for (int i = 0; i < size; i++) {
+        public DSU(int n) {
+            parent = new int[n];
+            rank = new int[n];
+            for (int i = 0; i < n; i++) {
                 parent[i] = i;
                 rank[i] = 0;
             }
         }
 
-        void union(int a, int b) {
-            a = find(a);
-            b = find(b);
-            if (a != b) {
-                if (rank[a] < rank[b]) {
-                    int temp = a;
-                    a = b;
-                    b = temp;
+        // Find с path compression
+        public int find(int x) {
+            if (parent[x] != x) {
+                parent[x] = find(parent[x]); // path compression
+            }
+            return parent[x];
+        }
+
+        // Union с union by rank
+        public void union(int x, int y) {
+            int rootX = find(x);
+            int rootY = find(y);
+
+            if (rootX != rootY) {
+                // union by rank
+                if (rank[rootX] < rank[rootY]) {
+                    parent[rootX] = rootY;
+                } else if (rank[rootX] > rank[rootY]) {
+                    parent[rootY] = rootX;
+                } else {
+                    parent[rootY] = rootX;
+                    rank[rootX]++;
                 }
-                parent[b] = a;
-                if (rank[a] == rank[b])
-                    rank[a]++;
             }
         }
-
-        int find(int i) {
-            return i == parent[i] ? i : find(parent[i]);
-        }
-
-        ArrayList<Integer> getSizes() {
-            var componentSizes = new ArrayList<Integer>();
-            for (int i = 0; i < parent.length; i++) {
-                var root = find(i);
-                while (componentSizes.size() <= root)
-                    componentSizes.add(0);
-                componentSizes.set(root, componentSizes.get(root) + 1);
-            }
-            return componentSizes;
-        }
-    }
-
-    public static void main(String[] args) {
-        var points = new ArrayList<String>();
-        var dsu = new DSU(1000);
-
-        try (var scanner = new Scanner(System.in)) {
-            points = new ArrayList<>();
-            String line;
-            while (!(line = scanner.next()).equals("end")) {
-                var pair = line.split("\\+");
-                var x1 = points.indexOf(pair[0]);
-                if (x1 == -1)
-                    points.add(pair[0]);
-                x1 = points.indexOf(pair[0]);
-
-                var x2 = points.indexOf(pair[1]);
-                if (x2 == -1)
-                    points.add(pair[1]);
-                x2 = points.indexOf(pair[1]);
-
-                dsu.union(x1, x2);
-            }
-        }
-
-        var dsuSizes = dsu.getSizes();
-        dsuSizes.sort(Collections.reverseOrder());
-
-        System.out.println(String.join(" ", dsuSizes.stream().map(String::valueOf).toArray(String[]::new)));
     }
 }

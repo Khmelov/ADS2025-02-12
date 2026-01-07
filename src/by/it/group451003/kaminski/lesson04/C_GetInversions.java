@@ -4,33 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Scanner;
 
-/*
-Рассчитать число инверсий одномерного массива.
-Сложность алгоритма должна быть не хуже, чем O(n log n)
-
-Первая строка содержит число 1<=n<=10000,
-вторая - массив A[1…n], содержащий натуральные числа, не превосходящие 10E9.
-Необходимо посчитать число пар индексов 1<=i<j<n, для которых A[i]>A[j].
-
-    (Такая пара элементов называется инверсией массива.
-    Количество инверсий в массиве является в некотором смысле
-    его мерой неупорядоченности: например, в упорядоченном по неубыванию
-    массиве инверсий нет вообще, а в массиве, упорядоченном по убыванию,
-    инверсию образуют каждые (т.е. любые) два элемента.
-    )
-
-Sample Input:
-5
-2 3 9 2 9
-Sample Output:
-2
-Головоломка (т.е. не обязательно).
-Попробуйте обеспечить скорость лучше, чем O(n log n) за счет многопоточности.
-Докажите рост производительности замерами времени.
-Большой тестовый массив можно прочитать свой или сгенерировать его программно.
-*/
-
-
 public class C_GetInversions {
 
     public static void main(String[] args) throws FileNotFoundException {
@@ -43,75 +16,63 @@ public class C_GetInversions {
     }
 
     int calc(InputStream stream) throws FileNotFoundException {
-        //подготовка к чтению данных
         Scanner scanner = new Scanner(stream);
-        //!!!!!!!!!!!!!!!!!!!!!!!!!     НАЧАЛО ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!
-        //размер массива
+        // Чтение размера массива и его элементов
         int n = scanner.nextInt();
-        //сам массив
         int[] a = new int[n];
         for (int i = 0; i < n; i++) {
             a[i] = scanner.nextInt();
         }
-        int result = 0;
-        //!!!!!!!!!!!!!!!!!!!!!!!!     тут ваше решение   !!!!!!!!!!!!!!!!!!!!!!!!
-
-
-        //!!!!!!!!!!!!!!!!!!!!!!!!!     КОНЕЦ ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
-        return countInversions(a, 0, a.length - 1);
+        // Вызов модифицированной сортировки слиянием для подсчета инверсий
+        return mergeSortAndCount(a, 0, a.length - 1);
     }
 
-    private int countInversions(int[] array, int left, int right) {
-        int inversions = 0;
+    // Рекурсивный метод для сортировки слиянием и подсчета инверсий
+    private int mergeSortAndCount(int[] array, int left, int right) {
+        int count = 0;
         if (left < right) {
             int mid = left + (right - left) / 2;
-            inversions += countInversions(array, left, mid);
-            inversions += countInversions(array, mid + 1, right);
-            inversions += mergeAndCount(array, left, mid, right);
+            // Рекурсивный подсчет инверсий в левой и правой частях
+            count += mergeSortAndCount(array, left, mid);
+            count += mergeSortAndCount(array, mid + 1, right);
+            // Подсчет инверсий при слиянии
+            count += mergeAndCount(array, left, mid, right);
         }
-        return inversions;
+        return count;
     }
 
+    // Слияние двух подмассивов и подсчет инверсий
     private int mergeAndCount(int[] array, int left, int mid, int right) {
-        // Sizes of the two subarrays to be merged
-        int n1 = mid - left + 1;
-        int n2 = right - mid;
+        // Временные массивы для левой и правой частей
+        int[] leftArray = new int[mid - left + 1];
+        int[] rightArray = new int[right - mid];
 
-        // Create temporary arrays
-        int[] leftArray = new int[n1];
-        int[] rightArray = new int[n2];
+        // Копирование данных во временные массивы
+        System.arraycopy(array, left, leftArray, 0, leftArray.length);
+        System.arraycopy(array, mid + 1, rightArray, 0, rightArray.length);
 
-        // Copy data to temporary arrays
-        for (int i = 0; i < n1; i++) {
-            leftArray[i] = array[left + i];
-        }
-        for (int j = 0; j < n2; j++) {
-            rightArray[j] = array[mid + 1 + j];
-        }
-
-        // Merge the temporary arrays and count inversions
         int i = 0, j = 0, k = left;
-        int inversions = 0;
+        int swaps = 0; // Счетчик инверсий
 
-        while (i < n1 && j < n2) {
+        // Слияние с подсчетом инверсий
+        while (i < leftArray.length && j < rightArray.length) {
             if (leftArray[i] <= rightArray[j]) {
                 array[k++] = leftArray[i++];
             } else {
                 array[k++] = rightArray[j++];
-                inversions += (mid + 1) - (left + i);
+                // Все оставшиеся элементы в leftArray образуют инверсии с текущим элементом rightArray
+                swaps += (mid + 1) - (left + i);
             }
         }
 
-        // Copy remaining elements of leftArray if any
-        while (i < n1) {
+        // Копирование оставшихся элементов
+        while (i < leftArray.length) {
             array[k++] = leftArray[i++];
         }
-
-        // Copy remaining elements of rightArray if any
-        while (j < n2) {
+        while (j < rightArray.length) {
             array[k++] = rightArray[j++];
         }
 
-        return inversions;
+        return swaps;
     }
 }

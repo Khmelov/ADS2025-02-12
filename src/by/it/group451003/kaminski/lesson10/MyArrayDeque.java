@@ -1,5 +1,4 @@
 package by.it.group451003.kaminski.lesson10;
-
 import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
@@ -7,118 +6,64 @@ import java.util.NoSuchElementException;
 
 public class MyArrayDeque<E> implements Deque<E> {
 
-    private E[] array;
+    private E[] data;
     private int head = 0;
-    private int tail = -1;
-    private static int capacity = 16;
+    private int tail = 0;
+    private int size = 0;
 
-    public MyArrayDeque(Collection<? extends E> c) {
-        array = (E[]) new Object[capacity += c.size()];
-        for (E element : c)
-            add(element);
-    }
-
-    public MyArrayDeque(int size) {
-        array = (E[]) new Object[capacity += size];
-    }
-
+    @SuppressWarnings("unchecked")
     public MyArrayDeque() {
-        this(capacity);
+        data = (E[]) new Object[10];
     }
 
-    ////////////////////////////
-    // Обязательные к реализации
-    ////////////////////////////
-
-    @Override
-    public String toString() {
-        StringBuilder strbldr = new StringBuilder();
-        strbldr.append("[");
-
-        int i = head;
-        while (i <= tail) {
-            strbldr.append(array[i] + ", ");
-            i++;
+    private void grow() {
+        @SuppressWarnings("unchecked")
+        E[] newArr = (E[]) new Object[data.length * 2];
+        for (int i = 0; i < size; i++) {
+            newArr[i] = data[(head + i) % data.length];
         }
-
-        int sbLength = strbldr.length();
-        if (sbLength > 1)
-            strbldr.delete(sbLength - 2, sbLength);
-        strbldr.append("]");
-
-        return strbldr.toString();
+        data = newArr;
+        head = 0;
+        tail = size;
     }
 
     @Override
-    public int size() {
-        return tail - head + 1;
+    public void addFirst(E e) {
+        if (size == data.length) grow();
+        head = (head - 1 + data.length) % data.length;
+        data[head] = e;
+        size++;
     }
 
     @Override
-    public boolean add(E element) {
-        addLast(element);
+    public void addLast(E e) {
+        if (size == data.length) grow();
+        data[tail] = e;
+        tail = (tail + 1) % data.length;
+        size++;
+    }
+
+    @Override
+    public boolean add(E e) {
+        addLast(e);
         return true;
     }
 
     @Override
-    public void addFirst(E element) {
-        if (element == null)
-            throw new NullPointerException();
-
-        if (head == 0) {
-            tail++;
-
-            if (tail == capacity) {
-                E[] tempArr = (E[]) new Object[capacity += 16];
-                for (int i = 0; i < tail; i++)
-                    tempArr[i] = array[i];
-
-                array = tempArr;
-            }
-
-            for (int i = tail; i > 0; i--)
-                array[i] = array[i - 1];
-        }
-        else head--;
-        array[head] = element;
+    public E getFirst() {
+        if (size == 0) throw new NoSuchElementException();
+        return data[head];
     }
 
     @Override
-    public void addLast(E element) {
-        if (element == null)
-            throw new NullPointerException();
-
-        tail++;
-        if (tail == capacity) {
-            E[] tempArr = (E[]) new Object[capacity += 16];
-            for (int i = 0; i < tail; i++)
-                tempArr[i] = array[i];
-
-            array = tempArr;
-        }
-
-        array[tail] = element;
+    public E getLast() {
+        if (size == 0) throw new NoSuchElementException();
+        return data[(tail - 1 + data.length) % data.length];
     }
 
     @Override
     public E element() {
         return getFirst();
-    }
-
-    @Override
-    public E getFirst() {
-        E element = array[head];
-        if (element == null ||  size() == 0)
-            throw new NoSuchElementException();
-        return element;
-    }
-
-    @Override
-    public E getLast() {
-        E element = array[tail];
-        if (element == null ||  size() == 0)
-            throw new NoSuchElementException();
-        return element;
     }
 
     @Override
@@ -128,153 +73,163 @@ public class MyArrayDeque<E> implements Deque<E> {
 
     @Override
     public E pollFirst() {
-        if (size() == 0)
-            return null;
-        else {
-            E element = array[head];
-            head++;
-            return element;
-        }
+        if (size == 0) return null;
+        E value = data[head];
+        data[head] = null;
+        head = (head + 1) % data.length;
+        size--;
+        return value;
     }
 
     @Override
     public E pollLast() {
-        if (size() == 0)
-            return null;
-        else {
-            E element = array[tail];
-            tail--;
-            return element;
-        }
+        if (size == 0) return null;
+        tail = (tail - 1 + data.length) % data.length;
+        E value = data[tail];
+        data[tail] = null;
+        size--;
+        return value;
     }
-
-    ///////////////////////
-    //   Необязательные
-    ///////////////////////
 
     @Override
-    public boolean isEmpty() {
-        return size() == 0;
+    public int size() {
+        return size;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < size; i++) {
+            if (i > 0) sb.append(", ");
+            sb.append(data[(head + i) % data.length]);
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
 
     @Override
     public Iterator<E> iterator() {
-        return null;
-    }
-
-    @Override
-    public Object[] toArray() {
-        return new Object[0];
-    }
-
-    @Override
-    public <T> T[] toArray(T[] a) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Iterator<E> descendingIterator() {
-        return null;
+        throw new UnsupportedOperationException();
     }
-
-    @Override
-    public boolean offer(E e) {
-        return false;
-    }
-
-    @Override
-    public E remove() {
-        return null;
-    }
-
-    @Override
-    public E peek() {
-        return null;
-    }
-
-    @Override
-    public boolean addAll(Collection<? extends E> c) {
-        return false;
-    }
-
-    @Override
-    public boolean removeAll(Collection<?> c) {
-        return false;
-    }
-
-    @Override
-    public boolean retainAll(Collection<?> c) {
-        return false;
-    }
-
-    @Override
-    public void clear() {
-
-    }
-
-    @Override
-    public void push(E e) {
-
-    }
-
-    @Override
-    public E pop() {
-        return null;
-    }
-
-    @Override
-    public boolean remove(Object o) {
-        return false;
-    }
-
-    @Override
-    public boolean containsAll(Collection<?> c) {
-        return false;
-    }
-
-    @Override
-    public boolean contains(Object o) {
-        return false;
-    }
-
 
     @Override
     public boolean offerFirst(E e) {
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean offerLast(E e) {
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public E removeFirst() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public E removeLast() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public E peekFirst() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public E peekLast() {
-        return null;
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean offer(E e) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public E remove() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public E peek() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void push(E e) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public E pop() {
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean removeFirstOccurrence(Object o) {
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean removeLastOccurrence(Object o) {
-        return false;
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean contains(Object o) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean containsAll(Collection<?> c) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends E> c) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void clear() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return size == 0;
+    }
+
+    @Override
+    public Object[] toArray() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T> T[] toArray(T[] a) {
+        throw new UnsupportedOperationException();
     }
 }

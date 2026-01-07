@@ -1,6 +1,6 @@
 # Name
 
-Problem: Optimal arrangement of modules in the device firmware
+Optimal arrangement of modules in the device firmware
 
 # Task
 

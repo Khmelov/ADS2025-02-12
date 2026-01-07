@@ -2,134 +2,101 @@ package by.it.group451003.kaminski.lesson13;
 
 import java.util.*;
 
-public class GraphC extends GraphA{
-    private static class Component {
-        String SCC;
-
-        Component() {
-            this.SCC = "";
-        }
-
-        public void addComponent(String node) {
-            SCC = SCC.concat(node);
-        }
-
-        public void sort() {
-            char[] charArr = SCC.toCharArray();
-            Arrays.sort(charArr);
-            SCC = new String(charArr);
-        }
-
-        public String toString() {
-            return SCC;
-        }
-    }
-
-    protected HashMap<String, ArrayList<String>> graphT;
-
-    GraphC(Scanner scanner) {
-        super(scanner);
-        this.graphT = getTransposed();
-    }
-
-    private HashMap<String, ArrayList<String>> getTransposed() {
-        HashMap<String, ArrayList<String>> graphT = new HashMap<>();
-        Set<String> origKeys = graph.keySet();
-        ArrayList<String> origValues;
-
-        for (String key_valueT : origKeys) {
-            origValues = graph.get(key_valueT);
-            for (String value_keyT : origValues) {
-                if (!graphT.containsKey(value_keyT))
-                    graphT.put(value_keyT, new ArrayList<>());
-
-                graphT.get(value_keyT).add(key_valueT);
-            }
-        }
-
-        return graphT;
-    }
-
-    @Override
-    protected HashMap<String, ArrayList<String>> createGraph(Scanner scanner) {
-        HashMap<String, ArrayList<String>> graph = new HashMap<>();
-        String key, value;
-
-        for (String nodes : scanner.nextLine().split(", ")) {
-            String[] twoNodes = nodes.split("->");
-            key = twoNodes[0];
-            value = twoNodes[1];
-
-            if (graph.get(key) != null && graph.get(key).contains(value)) continue;
-
-            if (!graph.containsKey(key))
-                graph.put(key, new ArrayList<>());
-            graph.get(key).add(value);
-        }
-
-        scanner.close();
-        return graph;
-    }
-
-    @Override
-    protected void DFS(ArrayList<String> order, ArrayList<String> visited, String key) {
-        visited.add(key);
-
-        if (graphT.get(key) != null) {
-            Collections.sort(graphT.get(key));
-            Collections.reverse(graphT.get(key));
-
-            for (String value : graphT.get(key))
-                if (!visited.contains(value))
-                    DFS(order, visited, value);
-        }
-
-        order.add(key);
-    }
-
-    private void componentDFS(Component SCC, ArrayList<String> visited, String key) {
-        visited.add(key);
-        SCC.addComponent(key);
-
-        if (graph.get(key) != null) {
-            for (String value : graph.get(key))
-                if (!visited.contains(value))
-                    componentDFS(SCC, visited ,value);
-        }
-    }
-
-    private ArrayList<Component> findSCC() {
-        ArrayList<Component> components = new ArrayList<>();
-        ArrayList<String> order = new ArrayList<>();
-        ArrayList<String> visited = new ArrayList<>();
-
-        for (String key : graphT.keySet())
-            if (!visited.contains(key))
-                DFS(order, visited, key);
-        Collections.reverse(order);
-
-        visited = new ArrayList<>();
-        for (String key : order) {
-            if (!visited.contains(key)) {
-                Component component = new Component();
-                componentDFS(component, visited, key);
-                component.sort();
-                components.add(component);
-            }
-        }
-
-        Collections.reverse(components);
-        return components;
-    }
-
-    public void getSCC() {
-        ArrayList<Component> strongComponents = findSCC();
-        for (Component component : strongComponents)
-            System.out.println(component);
-    }
-
+public class GraphC {
     public static void main(String[] args) {
-        GraphC myGraphC = new GraphC(new Scanner(System.in));
-        myGraphC.getSCC();
+        // Считываем строку с описанием графа
+        Scanner scanner = new Scanner(System.in);
+        String input = scanner.nextLine();
+        scanner.close();
+
+        // Парсим строку и строим граф
+        Map<String, List<String>> graph = new HashMap<>();
+        Map<String, List<String>> reverseGraph = new HashMap<>();
+
+        // Разбиваем строку по запятым для получения отдельных рёбер
+        String[] edges = input.split(", ");
+
+        for (String edge : edges) {
+            // Разбиваем каждое ребро по "->"
+            String[] parts = edge.split("->");
+            String from = parts[0].trim();
+            String to = parts[1].trim();
+
+            // Добавляем ребро в граф
+            graph.computeIfAbsent(from, k -> new ArrayList<>()).add(to);
+            // Добавляем обратное ребро в обратный граф
+            reverseGraph.computeIfAbsent(to, k -> new ArrayList<>()).add(from);
+
+            // Убеждаемся, что все вершины есть в обоих графах
+            graph.putIfAbsent(to, new ArrayList<>());
+            reverseGraph.putIfAbsent(from, new ArrayList<>());
+        }
+
+        // Находим компоненты сильной связности
+        List<List<String>> scc = kosarajuSCC(graph, reverseGraph);
+
+        // Выводим результат
+        for (List<String> component : scc) {
+            // Сортируем вершины компоненты в лексикографическом порядке
+            Collections.sort(component);
+            // Выводим компоненту без пробелов
+            for (String vertex : component) {
+                System.out.print(vertex);
+            }
+            System.out.println();
+        }
+    }
+
+    private static List<List<String>> kosarajuSCC(Map<String, List<String>> graph,
+                                                  Map<String, List<String>> reverseGraph) {
+        Set<String> visited = new HashSet<>();
+        Stack<String> stack = new Stack<>();
+
+        // Первый проход DFS для заполнения стека
+        for (String node : graph.keySet()) {
+            if (!visited.contains(node)) {
+                dfsFirstPass(node, graph, visited, stack);
+            }
+        }
+
+        // Второй проход DFS по обратному графу
+        visited.clear();
+        List<List<String>> scc = new ArrayList<>();
+
+        while (!stack.isEmpty()) {
+            String node = stack.pop();
+            if (!visited.contains(node)) {
+                List<String> component = new ArrayList<>();
+                dfsSecondPass(node, reverseGraph, visited, component);
+                scc.add(component);
+            }
+        }
+
+        return scc;
+    }
+
+    private static void dfsFirstPass(String node, Map<String, List<String>> graph,
+                                     Set<String> visited, Stack<String> stack) {
+        visited.add(node);
+
+        for (String neighbor : graph.get(node)) {
+            if (!visited.contains(neighbor)) {
+                dfsFirstPass(neighbor, graph, visited, stack);
+            }
+        }
+
+        stack.push(node);
+    }
+
+    private static void dfsSecondPass(String node, Map<String, List<String>> reverseGraph,
+                                      Set<String> visited, List<String> component) {
+        visited.add(node);
+        component.add(node);
+
+        for (String neighbor : reverseGraph.get(node)) {
+            if (!visited.contains(neighbor)) {
+                dfsSecondPass(neighbor, reverseGraph, visited, component);
+            }
+        }
     }
 }

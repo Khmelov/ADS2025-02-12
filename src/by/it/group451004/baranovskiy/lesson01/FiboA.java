@@ -1,10 +1,7 @@
 package by.it.group451004.baranovskiy.lesson01;
 
-import java.math.BigInteger;
 
-/*
- * Вам необходимо выполнить рекурсивный способ вычисления чисел Фибоначчи
- */
+import java.math.BigInteger;
 
 public class FiboA {
 
@@ -29,35 +26,27 @@ public class FiboA {
     }
 
     private int calc(int n) {
-        if (n <= 1) {
-            return n;
-        }
-        int num2 = 1;
-        int num1 = 0;
-        for (int i = 2; i <= n; i++) {
-            int next = num1 + num2;
-            num1 = num2;
-            num2 = next;
-        }
         //здесь простейший вариант, в котором код совпадает
         //с математическим определением чисел Фибоначчи
         //время O(2^n)
-        return num2;
+        if (n < 2)
+            return n;
+        else
+            return calc(n - 1) + calc(n - 2);
     }
 
 
     BigInteger slowA(Integer n) {
-        if (n == 0) {
-            return BigInteger.ZERO;
-        }
-        else if (n == 1) {
-            return BigInteger.ONE;
-        }
         //рекурсия
         //здесь нужно реализовать вариант без ограничения на размер числа,
         //в котором код совпадает с математическим определением чисел Фибоначчи
         //время O(2^n)
+
+        if (n == 0) return BigInteger.ZERO;
+        if (n == 1) return BigInteger.ONE;
         return slowA(n - 1).add(slowA(n - 2));
     }
+
+
 }
 

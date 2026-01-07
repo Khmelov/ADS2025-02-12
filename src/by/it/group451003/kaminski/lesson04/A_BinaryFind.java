@@ -21,6 +21,7 @@ import java.util.Scanner;
 
         Sample Output:
         3 1 -1 1 -1
+
 (!) Обратите внимание на смещение начала индекса массивов JAVA относительно условий задачи
 */
 
@@ -46,7 +47,7 @@ public class A_BinaryFind {
         //сам отсортированный массива
         int[] a = new int[n];
         for (int i = 1; i <= n; i++) {
-            a[i - 1] = scanner.nextInt();
+            a[i - 1] = scanner.nextInt(); // Заполнение массива с индекса 0 (JAVA)
         }
 
         //размер массива индексов
@@ -55,30 +56,29 @@ public class A_BinaryFind {
         for (int i = 0; i < k; i++) {
             int value = scanner.nextInt();
             //тут реализуйте бинарный поиск индекса
-
-
-            result[i] = binarySearch(a, value) + 1; // +1 to convert to 1-based index
+            result[i] = binarySearch(a, value); // Вызов метода бинарного поиска
         }
-
+        //!!!!!!!!!!!!!!!!!!!!!!!!!     КОНЕЦ ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
+        scanner.close(); // Закрытие сканера для избежания утечек
         return result;
     }
+
+    // Метод бинарного поиска с учетом 1-индексации из условия задачи
     private int binarySearch(int[] array, int target) {
-        int left = 0;
-        int right = array.length - 1;
+        int left = 0; // Левая граница поиска
+        int right = array.length - 1; // Правая граница поиска
 
         while (left <= right) {
-            int mid = left + (right - left) / 2;
-
+            int mid = left + (right - left) / 2; // Вычисление середины без переполнения
             if (array[mid] == target) {
-                return mid; // return the 0-based index if found
+                // Возвращаем индекс + 1 (перевод из 0-based в 1-based)
+                return mid + 1;
             } else if (array[mid] < target) {
-                left = mid + 1;
+                left = mid + 1; // Сужаем поиск до правой половины
             } else {
-                right = mid - 1;
+                right = mid - 1; // Сужаем поиск до левой половины
             }
         }
-
-        return -2; // return -2 (which becomes -1 after adding 1) if not found
+        return -1; // Элемент не найден
     }
 }
-

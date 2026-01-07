@@ -16,7 +16,7 @@ public class FiboB {
         System.out.printf("fastB(%d)=%d \n\t time=%d \n\n", n, fibo.fastB(n), fibo.time());
     }
 
-    long time() {
+    public long time() {
         return System.currentTimeMillis() - this.startTime;
     }
 

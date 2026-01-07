@@ -1,320 +1,153 @@
 package by.it.group451003.kaminski.lesson12;
 
-import java.awt.*;
 import java.util.*;
-import java.util.List;
 
-public class MyRbMap<Integer extends Comparable<Integer>, String> implements SortedMap<Integer, String> {
-    enum Color {
-        RED,
-        BLACK
-    }
+@SuppressWarnings("unchecked")
+public class MyRbMap implements SortedMap<Integer, String> {
 
-    private class Node {
-        Color color;
+    private static final boolean RED = true;
+    private static final boolean BLACK = false;
+
+    private static class Node {
         Integer key;
         String value;
-        Node left;
-        Node right;
-        Node parent;
-        Node (Integer key, String value, Node parent) {
+        Node left, right;
+        boolean color;
+
+        Node(Integer key, String value, boolean color) {
             this.key = key;
             this.value = value;
-            this.parent = parent;
-            left = null;
-            right = null;
-            color = Color.RED;
+            this.color = color;
         }
     }
 
-    private Node treeRoot;
-    private int size;
+    private Node root;
+    private int size = 0;
 
-    MyRbMap() {
-        this.treeRoot = null;
-        this.size = 0;
+    private boolean isRed(Node n) {
+        return n != null && n.color == RED;
     }
 
-    void rightRotate(Node parent) {
-        Node nLeft = parent.left;
-        Node bufferParent = parent;
-        Node bufferChild = nLeft.right;
-        parent = nLeft;
-        parent.right = bufferParent;
-        parent.right.left = bufferChild;
+    private Node rotateLeft(Node h) {
+        Node x = h.right;
+        h.right = x.left;
+        x.left = h;
+        x.color = h.color;
+        h.color = RED;
+        return x;
     }
 
-    void leftRotate(Node parent) {
-        Node nRight = parent.right;
-        Node bufferParent = parent;
-        Node bufferChild = nRight.left;
-        parent = nRight;
-        parent.left = bufferParent;
-        parent.left.right = bufferChild;
+    private Node rotateRight(Node h) {
+        Node x = h.left;
+        h.left = x.right;
+        x.right = h;
+        x.color = h.color;
+        h.color = RED;
+        return x;
     }
 
-    void rebalance(Node node) {
-        while (node != treeRoot && node.parent != null && node.parent.color == Color.RED) {
-            if (node.parent.parent != null && node.parent == node.parent.parent.left) {
-                Node uncle = node.parent.parent.right;
-                if (uncle != null && uncle.color == Color.RED) {
-                    node.parent.color = Color.BLACK;
-                    uncle.color = Color.BLACK;
-                    node.parent.parent.color = Color.RED;
-                    node = node.parent.parent;
-                }
-                else if (uncle != null) {
-                    if (node == node.parent.right) {
-                        node = node.parent;
-                        leftRotate(node);
-                    }
-                    node.parent.color = Color.BLACK;
-                    node.parent.parent.color = Color.RED;
-                    rightRotate(node.parent.parent);
-                }
-            }
-            else if (node.parent.parent != null) {
-                Node uncle = node.parent.parent.left;
-                if (uncle != null && uncle.color == Color.RED) {
-                    node.parent.color = Color.BLACK;
-                    uncle.color = Color.BLACK;
-                    node.parent.parent.color = Color.RED;
-                    node = node.parent.parent;
-                }
-                else if (uncle != null) {
-                    if (node == node.parent.left) {
-                        node = node.parent;
-                        rightRotate(node);
-                    }
-                    node.parent.color = Color.BLACK;
-                    node.parent.parent.color = Color.RED;
-                    leftRotate(node.parent.parent);
-                }
-            }
+    private void flipColors(Node h) {
+        h.color = RED;
+        if (h.left != null) h.left.color = BLACK;
+        if (h.right != null) h.right.color = BLACK;
+    }
+
+    private Node put(Node h, Integer key, String value) {
+        if (h == null) {
+            size++;
+            return new Node(key, value, RED);
         }
-        treeRoot.color = Color.BLACK;
+        int cmp = key.compareTo(h.key);
+        if (cmp < 0) h.left = put(h.left, key, value);
+        else if (cmp > 0) h.right = put(h.right, key, value);
+        else h.value = value;
+
+        if (isRed(h.right) && !isRed(h.left)) h = rotateLeft(h);
+        if (isRed(h.left) && isRed(h.left.left)) h = rotateRight(h);
+        if (isRed(h.left) && isRed(h.right)) flipColors(h);
+
+        return h;
     }
 
-    Node insert(Node node, Node parent, Integer key, String value) {
-        if (node == null) {
-            return new Node(key, value, parent);
+    private String get(Node h, Integer key) {
+        while (h != null) {
+            int cmp = key.compareTo(h.key);
+            if (cmp < 0) h = h.left;
+            else if (cmp > 0) h = h.right;
+            else return h.value;
         }
-
-        if (key.compareTo(node.key) > 0)
-            node.right = insert(node.right, node, key, value);
-        else if (key.compareTo(node.key) < 0)
-            node.left = insert(node.left, node, key, value);
-        else {
-            node.value = value;
-            return node;
-        }
-
-        return node;
+        return null;
     }
 
-    Node getMin(Node node) {
-        if (node == null)
-            return null;
-        if (node.left == null)
-            return node;
-        return getMin(node.left);
+    private boolean containsKey(Node h, Integer key) {
+        return get(h, key) != null;
     }
 
-    Node getMax(Node node) {
-        if (node == null)
-            return null;
-        if (node.right == null)
-            return node;
-        return getMax(node.right);
+    private boolean containsValue(Node node, String value) {
+        if (node == null) return false;
+        if (Objects.equals(node.value, value)) return true;
+        return containsValue(node.left, value) || containsValue(node.right, value);
     }
 
-    void getToKeyNodes(MyRbMap tree, Node node, Integer keyTo) {
-        if (node == null)
-            return;
-
-        if(node.key.compareTo(keyTo) >= 0 ) {
-            getToKeyNodes(tree, node.left, keyTo);
-            return;
-        }
-
-        getToKeyNodes(tree, node.left, keyTo);
-        getToKeyNodes(tree, node.right, keyTo);
-        tree.put(node.key, node.value);
-    }
-
-    void getFromKeyNodes(MyRbMap tree, Node node, Integer keyFrom) {
-        if (node == null)
-            return;
-        if(node.key.compareTo(keyFrom) < 0) {
-            getFromKeyNodes(tree, node.right, keyFrom);
-            return;
-        }
-
-        getFromKeyNodes(tree, node.left, keyFrom);
-        getFromKeyNodes(tree, node.right, keyFrom);
-        tree.put(node.key, node.value);
-    }
-
-    boolean findValue(Node node, String value) {
-        if (node != null && (value.equals(node.value) || findValue(node.left, value) || findValue(node.right, value)))
-            return true;
-        return false;
-    }
-
-    void transplantNode(Node parentNodeTo, Node nodeTo, Node nodeFrom) {
-        if (nodeTo == treeRoot)
-            treeRoot = nodeFrom;
-        else if (nodeTo != null && nodeTo == parentNodeTo.left)
-            parentNodeTo.left = nodeFrom;
-        else if (nodeTo != null) {
-            parentNodeTo.right = nodeFrom;
+    private void inOrder(Node node, StringBuilder sb) {
+        if (node != null) {
+            inOrder(node.left, sb);
+            if (sb.length() > 1) sb.append(", ");
+            sb.append(node.key).append("=").append(node.value);
+            inOrder(node.right, sb);
         }
     }
 
-    void deleteFix(Node node) {
-        while (node != treeRoot && node.color == Color.BLACK) {
-            Node brother;
-            if (node == node.parent.left) {
-                brother = node.parent.right;
-                if (brother.color == Color.RED) {
-                    brother.color = Color.BLACK;
-                    node.parent.color = Color.RED;
-                    leftRotate(node.parent);
-                    brother = node.parent.right;
-                }
-
-                if (brother.left.color == Color.BLACK && brother.right.color == Color.BLACK) {
-                    brother.color = Color.RED;
-                    node = node.parent;
-                }
-                else {
-                    if (brother.right.color == Color.BLACK) {
-                        brother.left.color = Color.BLACK;
-                        brother.color = Color.RED;
-                        rightRotate(brother);
-                        brother = node.parent.right;
-                    }
-                    brother.color = node.parent.color;
-                    node.parent.color = Color.BLACK;
-                    brother.right.color = Color.BLACK;
-                    leftRotate(node.parent);
-                    node = treeRoot;
-                }
-            }
-            else {
-                brother = node.parent.left;
-                if (brother.color == Color.RED) {
-                    brother.color = Color.BLACK;
-                    node.parent.color = Color.RED;
-                    rightRotate(node.parent);
-                    brother = node.parent.left;
-                }
-
-                if (brother.left.color == Color.BLACK && brother.right.color == Color.BLACK) {
-                    rightRotate(node.parent);
-                    brother = node.parent.left;
-                }
-                else {
-                    if (brother.left.color == Color.BLACK){
-                        brother.right.color = Color.BLACK;
-                        brother.color = Color.RED;
-                        leftRotate(brother);
-                        brother = node.parent.left;
-                    }
-                    brother.color = node.parent.color;
-                    node.parent.color = Color.BLACK;
-                    brother.left.color = Color.BLACK;
-                    rightRotate(node.parent);
-                    node = treeRoot;
-                }
-            }
-        }
-        node.color = Color.BLACK;
+    private Node min(Node h) {
+        if (h.left == null) return h;
+        return min(h.left);
     }
 
-    void delete(Integer key) {
-
-        Node delNode = null, parent = null, tempNode = treeRoot;
-        while (tempNode != null) {
-            if (tempNode.key.compareTo(key) == 0) {
-                delNode = tempNode;
-                break;
-            }
-            parent = tempNode;
-            tempNode = tempNode.key.compareTo(key) < 0 ? tempNode.right : tempNode.left;
-        }
-
-        if (delNode != null) {
-            Node child = null;
-            Color bufferColor = delNode.color;
-            if (delNode.left == null ^ delNode.right == null) {
-                child = delNode.left == null ? delNode.right : delNode.left;
-                transplantNode(parent, delNode, child);
-            }
-            else {
-                Node minNode = getMin(delNode.right);
-                if (minNode != null) {
-                    delNode.key = minNode.key;
-                    delNode.value = minNode.value;
-                    bufferColor = minNode.color;
-                    child = minNode.left == null ? minNode.right : minNode.left;
-                    if (child == null) {
-                        child = delNode.right;
-                        Node tempMin = delNode.right, tempPar = null;
-                        while (tempMin.left != null) {
-                            tempPar = tempMin;
-                            tempMin = tempMin.left;
-                        }
-                        tempPar.left =  null;
-                    }
-                    transplantNode(delNode, minNode, child);
-                }
-                else {
-                    if (parent.key.compareTo(key) > 0)
-                        parent.left = null;
-                    else parent.right = null;
-                }
-            }
-
-            if (bufferColor == Color.BLACK)
-                deleteFix(child);
-        }
+    private Node max(Node h) {
+        if (h.right == null) return h;
+        return max(h.right);
     }
 
-    Node findNode(Integer key) {
-        Node needNode = treeRoot;
-        while (!needNode.key.equals(key)) {
-            needNode = needNode.key.compareTo(key) > 0 ? needNode.left : needNode.right;
-        }
-
-        return needNode;
-    }
-
-    java.lang.String getLeftRight(Node node) {
-        return node == null ? "" : getLeftRight(node.left) + node.key + "=" + node.value + ", " + getLeftRight(node.right);
-    }
-
-    public java.lang.String toString() {
-        StringBuilder strbldr = new StringBuilder();
-        strbldr.append("{");
-        strbldr.append(getLeftRight(treeRoot));
-
-        int sbLength = strbldr.length();
-        if (sbLength > 1)
-            strbldr.delete(sbLength - 2, sbLength);
-
-        strbldr.append("}");
-        return strbldr.toString();
+    // ================== MAP INTERFACE ==================
+    @Override
+    public String put(Integer key, String value) {
+        String oldValue = get(root, key);
+        root = put(root, key, value);
+        root.color = BLACK;
+        return oldValue;
     }
 
     @Override
-    public Integer firstKey() {
-        return getMin(treeRoot).key;
+    public String get(Object key) {
+        if (!(key instanceof Integer)) return null;
+        return get(root, (Integer) key);
     }
 
     @Override
-    public Integer lastKey() {
-        return getMax(treeRoot).key;
+    public boolean containsKey(Object key) {
+        if (!(key instanceof Integer)) return false;
+        return containsKey(root, (Integer) key);
+    }
+
+    @Override
+    public boolean containsValue(Object value) {
+        if (!(value instanceof String)) return false;
+        return containsValue(root, (String) value);
+    }
+
+
+
+    @Override
+    public void putAll(Map<? extends Integer, ? extends String> m) {
+        for (Entry<? extends Integer, ? extends String> e : m.entrySet()) {
+            put(e.getKey(), e.getValue());
+        }
+    }
+
+    @Override
+    public void clear() {
+        root = null;
+        size = 0;
     }
 
     @Override
@@ -328,105 +161,128 @@ public class MyRbMap<Integer extends Comparable<Integer>, String> implements Sor
     }
 
     @Override
-    public boolean containsKey(Object key) {
-        Node tempNode = treeRoot;
-        while (tempNode != null) {
-            if (tempNode.key.equals(key))
-                return true;
-            tempNode = tempNode.key.compareTo((Integer)key) < 0 ? tempNode.right : tempNode.left;
-        }
+    public String toString() {
+        StringBuilder sb = new StringBuilder("{");
+        inOrder(root, sb);
+        sb.append("}");
+        return sb.toString();
+    }
 
-        return false;
+    // ================== SORTEDMAP METHODS ==================
+    @Override
+    public Comparator<? super Integer> comparator() {
+        return null; // Натуральный порядок
     }
 
     @Override
-    public boolean containsValue(Object value) {
-        return findValue(treeRoot, (String)value);
+    public Integer firstKey() {
+        if (root == null) throw new NoSuchElementException();
+        return min(root).key;
     }
 
     @Override
-    public String get(Object key) {
-        Node tempNode = treeRoot;
-        while (tempNode != null) {
-            if (tempNode.key.equals(key))
-                return tempNode.value;
-            tempNode = tempNode.key.compareTo((Integer)key) < 0 ? tempNode.right : tempNode.left;
-        }
-
-        return null;
-    }
-
-    @Override
-    public String put(Integer key, String value) {
-        String tempValue = get(key);
-        size += tempValue == null ? 1 : 0;
-        treeRoot = insert(treeRoot, null, key, value);
-
-        System.out.println(treeRoot.key);
-        return tempValue;
-    }
-
-    @Override
-    public String remove(Object key) {
-        String tempValue = get(key);
-
-        if (tempValue != null) {
-            size--;
-            delete((Integer)key);
-        }
-
-        return tempValue;
-    }
-
-    @Override
-    public void clear() {
-        treeRoot = null;
-        size = 0;
+    public Integer lastKey() {
+        if (root == null) throw new NoSuchElementException();
+        return max(root).key;
     }
 
     @Override
     public SortedMap<Integer, String> headMap(Integer toKey) {
-        MyRbMap subTree = new MyRbMap();
-        getToKeyNodes(subTree, treeRoot, toKey);
-        return subTree;
+        MyRbMap map = new MyRbMap();
+        headMap(root, toKey, map);
+        return map;
+    }
+
+    private void headMap(Node node, Integer toKey, MyRbMap map) {
+        if (node != null) {
+            if (node.key.compareTo(toKey) < 0) map.put(node.key, node.value);
+            headMap(node.left, toKey, map);
+            headMap(node.right, toKey, map);
+        }
     }
 
     @Override
     public SortedMap<Integer, String> tailMap(Integer fromKey) {
-        MyRbMap subTree = new MyRbMap();
-        getFromKeyNodes(subTree, treeRoot, fromKey);
-        return subTree;
+        MyRbMap map = new MyRbMap();
+        tailMap(root, fromKey, map);
+        return map;
     }
 
-    /////////////////////////////
-
-    @Override
-    public Set<Integer> keySet() {
-        return Set.of();
-    }
-
-    @Override
-    public Collection<String> values() {
-        return List.of();
-    }
-
-    @Override
-    public Set<Entry<Integer, String>> entrySet() {
-        return Set.of();
-    }
-
-    @Override
-    public Comparator<? super Integer> comparator() {
-        return null;
+    private void tailMap(Node node, Integer fromKey, MyRbMap map) {
+        if (node != null) {
+            if (node.key.compareTo(fromKey) >= 0) map.put(node.key, node.value);
+            tailMap(node.left, fromKey, map);
+            tailMap(node.right, fromKey, map);
+        }
     }
 
     @Override
     public SortedMap<Integer, String> subMap(Integer fromKey, Integer toKey) {
-        return null;
+        MyRbMap map = new MyRbMap();
+        subMap(root, fromKey, toKey, map);
+        return map;
+    }
+
+    private void subMap(Node node, Integer fromKey, Integer toKey, MyRbMap map) {
+        if (node != null) {
+            if (node.key.compareTo(fromKey) >= 0 && node.key.compareTo(toKey) < 0)
+                map.put(node.key, node.value);
+            subMap(node.left, fromKey, toKey, map);
+            subMap(node.right, fromKey, toKey, map);
+        }
     }
 
     @Override
-    public void putAll(Map<? extends Integer, ? extends String> m) {
+    public String remove(Object key) {
+        if (!(key instanceof Integer)) return null;
+        if (!containsKey(key)) return null;
 
+        String oldValue = get(key);
+        root = remove(root, (Integer) key);
+        if (root != null) root.color = BLACK;
+        size--;
+        return oldValue;
     }
+
+    // Удаление из красно-черного дерева
+    private Node remove(Node h, Integer key) {
+        if (key.compareTo(h.key) < 0) {
+            if (h.left != null) h.left = remove(h.left, key);
+        } else if (key.compareTo(h.key) > 0) {
+            if (h.right != null) h.right = remove(h.right, key);
+        } else {
+            // Удаляем узел h
+            if (h.right == null) return h.left;
+            if (h.left == null) return h.right;
+
+            Node t = h;
+            h = min(t.right);
+            h.right = deleteMin(t.right);
+            h.left = t.left;
+        }
+        return balance(h);
+    }
+
+    private Node balance(Node h) {
+        if (isRed(h.right) && !isRed(h.left)) h = rotateLeft(h);
+        if (isRed(h.left) && isRed(h.left.left)) h = rotateRight(h);
+        if (isRed(h.left) && isRed(h.right)) flipColors(h);
+        return h;
+    }
+
+    private Node deleteMin(Node h) {
+        if (h.left == null) return h.right;
+        h.left = deleteMin(h.left);
+        return balance(h);
+    }
+
+
+    @Override
+    public Set<Integer> keySet() { throw new UnsupportedOperationException(); }
+
+    @Override
+    public Collection<String> values() { throw new UnsupportedOperationException(); }
+
+    @Override
+    public Set<Entry<Integer, String>> entrySet() { throw new UnsupportedOperationException(); }
 }

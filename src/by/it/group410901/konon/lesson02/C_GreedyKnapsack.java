@@ -1,4 +1,5 @@
 package by.it.group410901.konon.lesson02;
+
 /*
 Даны
 1) объем рюкзака 4
@@ -15,6 +16,7 @@ package by.it.group410901.konon.lesson02;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class C_GreedyKnapsack {
@@ -44,12 +46,20 @@ public class C_GreedyKnapsack {
         //итогом является максимально воможная стоимость вещей в рюкзаке
         //вещи можно резать на кусочки (непрерывный рюкзак)
         double result = 0;
-        //тут реализуйте алгоритм сбора рюкзака
-        //будет особенно хорошо, если с собственной сортировкой
-        //кроме того, можете описать свой компаратор в классе Item
 
-        //ваше решение.
+        Arrays.sort(items);
 
+        for (Item item : items) {
+            if (W == 0) break;
+
+            if (item.weight <= W) {
+                result += item.cost;
+                W -= item.weight;
+            } else {
+                result += (double) item.cost * W / item.weight;
+                W = 0;
+            }
+        }
 
         System.out.printf("Удалось собрать рюкзак на сумму %f\n", result);
         return result;
@@ -67,17 +77,17 @@ public class C_GreedyKnapsack {
         @Override
         public String toString() {
             return "Item{" +
-                   "cost=" + cost +
-                   ", weight=" + weight +
-                   '}';
+                    "cost=" + cost +
+                    ", weight=" + weight +
+                    '}';
         }
 
         @Override
         public int compareTo(Item o) {
-            //тут может быть ваш компаратор
+            double r1 = (double) this.cost / this.weight;
+            double r2 = (double) o.cost / o.weight;
 
-
-            return 0;
+            return Double.compare(r2, r1);
         }
     }
 }

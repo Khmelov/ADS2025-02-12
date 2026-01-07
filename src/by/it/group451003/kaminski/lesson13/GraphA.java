@@ -2,70 +2,79 @@ package by.it.group451003.kaminski.lesson13;
 
 import java.util.*;
 
+
 public class GraphA {
-    protected HashMap<String, ArrayList<String>> graph;
-
-    GraphA(Scanner scanner) {
-        this.graph = createGraph(scanner);
-    }
-
-    protected HashMap<String, ArrayList<String>> createGraph(Scanner scanner) {
-        HashMap<String, ArrayList<String>> graph = new HashMap<>();
-        String key, value;
-
-        for (String nodes : scanner.nextLine().split(", ")) {
-            String[] twoNodes = nodes.split(" -> ");
-            key = twoNodes[0];
-            value = twoNodes[1];
-
-            if (graph.get(key) != null && graph.get(key).contains(value)) continue;
-
-            if (!graph.containsKey(key))
-                graph.put(key, new ArrayList<>());
-            graph.get(key).add(value);
-        }
-
+    public static void main(String[] args) {
+        // Считываем строку с описанием графа
+        Scanner scanner = new Scanner(System.in);
+        String input = scanner.nextLine();
         scanner.close();
-        return graph;
-    }
 
-    protected void DFS(ArrayList<String> order, ArrayList<String> visited, String key) {
-        visited.add(key);
+        // Парсим строку и строим граф
+        Map<String, List<String>> graph = new HashMap<>();
+        Map<String, Integer> inDegree = new HashMap<>();
 
-        if (graph.get(key) != null) {
-            Collections.sort(graph.get(key));
-            Collections.reverse(graph.get(key));
+        // Разбиваем строку по запятым для получения отдельных рёбер
+        String[] edges = input.split(", ");
 
-            for (String value : graph.get(key))
-                if (!visited.contains(value))
-                    DFS(order, visited, value);
+        for (String edge : edges) {
+            // Разбиваем каждое ребро по "->"
+            String[] parts = edge.split(" -> ");
+            String from = parts[0].trim();
+            String to = parts[1].trim();
+
+            // Добавляем ребро в граф
+            graph.computeIfAbsent(from, k -> new ArrayList<>()).add(to);
+
+            // Инициализируем степени входа для всех вершин
+            inDegree.putIfAbsent(from, 0);
+            inDegree.putIfAbsent(to, 0);
+
+            // Увеличиваем степень входа для целевой вершины
+            inDegree.put(to, inDegree.get(to) + 1);
         }
 
-        order.add(key);
+        // Топологическая сортировка с использованием алгоритма Кана
+        List<String> result = topologicalSort(graph, inDegree);
+
+        // Выводим результат
+        for (int i = 0; i < result.size(); i++) {
+            System.out.print(result.get(i));
+            if (i < result.size() - 1) {
+                System.out.print(" ");
+            }
+        }
     }
 
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        ArrayList<String> visited = new ArrayList<>();
-        ArrayList<String> order = new ArrayList<>();
-        for (String key : graph.keySet())
-            if (!visited.contains(key))
-                DFS(order, visited, key);
-        Collections.reverse(order);
+    private static List<String> topologicalSort(Map<String, List<String>> graph,
+                                                Map<String, Integer> inDegree) {
+        List<String> result = new ArrayList<>();
 
-        sb.append("[");
-        for (String element : order)
-            sb.append(element).append(" ");
+        // PriorityQueue для лексикографического порядка при равнозначности
+        PriorityQueue<String> queue = new PriorityQueue<>();
 
-        sb.deleteCharAt(sb.length() - 1);
-        sb.append("]");
+        // Добавляем все вершины с нулевой степенью входа
+        for (Map.Entry<String, Integer> entry : inDegree.entrySet()) {
+            if (entry.getValue() == 0) {
+                queue.offer(entry.getKey());
+            }
+        }
 
-        return sb.toString();
-    }
+        while (!queue.isEmpty()) {
+            String current = queue.poll();
+            result.add(current);
 
-    public static void main(String[] args){
-        GraphA myGraphA  = new GraphA(new Scanner(System.in));
-        System.out.println(myGraphA);
+            // Обрабатываем соседей текущей вершины
+            if (graph.containsKey(current)) {
+                for (String neighbor : graph.get(current)) {
+                    inDegree.put(neighbor, inDegree.get(neighbor) - 1);
+                    if (inDegree.get(neighbor) == 0) {
+                        queue.offer(neighbor);
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 }
-

@@ -4,201 +4,136 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 
+@SuppressWarnings("unchecked")
 public class MyTreeSet<E extends Comparable<E>> implements Set<E> {
 
-    private E[] heap;
+    private E[] data;
     private int size = 0;
-    private static int capacity = 16;
+    private static final int INITIAL_CAPACITY = 10;
 
-    void heapify(int size, int i)
-    {
-        int max = i;
-        int left = 2*i + 1;
-        int right = 2*i + 2;
+    public MyTreeSet() {
+        data = (E[]) new Comparable[INITIAL_CAPACITY];
+    }
 
-        if (left < size && heap[left].compareTo(heap[max]) > 0)
-            max = left;
+    private void grow() {
+        E[] newData = (E[]) new Comparable[data.length * 2];
+        for (int i = 0; i < size; i++) newData[i] = data[i];
+        data = newData;
+    }
 
-        if (right < size && heap[right].compareTo(heap[max]) > 0)
-            max = right;
 
-        if (max != i) {
-            E element = heap[i];
-            heap[i] = heap[max];
-            heap[max] = element;
-
-            heapify(size, max);
+    private int findIndex(E e) {
+        int left = 0, right = size - 1;
+        while (left <= right) {
+            int mid = (left + right) / 2;
+            int cmp = e.compareTo(data[mid]);
+            if (cmp == 0) return mid;
+            else if (cmp < 0) right = mid - 1;
+            else left = mid + 1;
         }
-    }
-
-    void heapsort() {
-
-        for (int i = (size / 2) - 1; i >= 0; i--)
-            heapify(size, i);
-
-        for (int i = size - 1; i >= 0; i--) {
-            E element = heap[0];
-            heap[0] = heap[i];
-            heap[i] = element;
-
-            heapify(i, 0);
-        }
-    }
-
-    MyTreeSet(int capacity) {
-        heap = (E[]) new Comparable[capacity];
-        this.capacity = capacity;
-    }
-
-    MyTreeSet() {
-        this(capacity);
-    }
-
-    public String toString() {
-        StringBuilder strbldr = new StringBuilder();
-        strbldr.append("[");
-        for (int i = 0; i < size; i++)
-            strbldr.append(heap[i] + ", ");
-
-        int sbLength = strbldr.length();
-        if (sbLength > 1)
-            strbldr.delete(sbLength - 2, sbLength);
-
-        strbldr.append("]");
-
-        return strbldr.toString();
+        return -(left + 1);
     }
 
     @Override
-    public int size () {
-        return size;
-    }
-
-    @Override
-    public void clear () {
-        capacity = 16;
-        size = 0;
-        heap = (E[]) new Comparable[capacity];
-    }
-
-    @Override
-    public boolean isEmpty () {
-        return size() == 0;
-    }
-
-    @Override
-    public boolean add (E e) {
-        if (e == null || contains(e))
-            return false;
-
+    public boolean add(E e) {
+        if (e == null) throw new NullPointerException();
+        if (size == data.length) grow();
+        int idx = findIndex(e);
+        if (idx >= 0) return false;
+        int insertPos = -idx - 1;
+        for (int i = size; i > insertPos; i--) data[i] = data[i - 1];
+        data[insertPos] = e;
         size++;
-        if (size >= capacity) {
-            E[] tempHeap = heap;
-            heap = (E[]) new Comparable[capacity *= 2];
-            for (int i = 0; i < size - 1; i++)
-                heap[i] = tempHeap[i];
+        return true;
+    }
+
+    @Override
+    public boolean contains(Object o) {
+        if (o == null) return false;
+        try {
+            E e = (E) o;
+            return findIndex(e) >= 0;
+        } catch (ClassCastException ex) {
+            return false;
         }
-        heap[size - 1] = e;
-        if (size != 1)
-            heapsort();
-
-
-        return true;
     }
 
     @Override
-    public boolean remove (Object o){
-        if (o == null)
+    public boolean remove(Object o) {
+        if (o == null) return false;
+        try {
+            E e = (E) o;
+            int idx = findIndex(e);
+            if (idx < 0) return false;
+            for (int i = idx; i < size - 1; i++) data[i] = data[i + 1];
+            data[size - 1] = null;
+            size--;
+            return true;
+        } catch (ClassCastException ex) {
             return false;
-
-        for (int i = 0; i < size; i++)
-            if (heap[i].equals(o)) {
-                for (int j = i; j < size - 1; j++)
-                    heap[j] = heap[j+1];
-                size--;
-                return true;
-            }
-
-        return false;
-    }
-
-    @Override
-    public boolean contains (Object o){
-        if (o == null)
-            return false;
-
-        for (int i = 0; i < size; i++)
-            if (heap[i].equals(o))
-                return true;
-
-        return false;
-    }
-
-    @Override
-    public boolean containsAll (Collection < ? > c){
-        for (Object o : c)
-            if (!contains(o))
-                return false;
-        return true;
-    }
-
-    @Override
-    public boolean addAll (Collection < ? extends E > c){
-        if (c.size() == 0)
-            return false;
-
-
-        for (Object o : c) {
-            if (o == null)
-                return false;
-            add((E) o);
         }
+    }
+
+    @Override
+    public void clear() {
+        for (int i = 0; i < size; i++) data[i] = null;
+        size = 0;
+    }
+
+    @Override
+    public int size() { return size; }
+
+    @Override
+    public boolean isEmpty() { return size == 0; }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < size; i++) {
+            if (i > 0) sb.append(", ");
+            sb.append(data[i]);
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    // ========== Методы Collection =============
+    @Override
+    public boolean containsAll(Collection<?> c) {
+        for (Object o : c) if (!contains(o)) return false;
         return true;
     }
 
     @Override
-    public boolean retainAll (Collection < ? > c){
-        Boolean changed = false;
-        int i = 0;
-        while(i < size) {
-            if (!c.contains(heap[i])) {
-                remove(heap[i]);
+    public boolean addAll(Collection<? extends E> c) {
+        boolean changed = false;
+        for (E e : c) if (add(e)) changed = true;
+        return changed;
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        boolean changed = false;
+        for (Object o : c) if (remove(o)) changed = true;
+        return changed;
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        boolean changed = false;
+        for (int i = size - 1; i >= 0; i--) {
+            if (!c.contains(data[i])) {
+                remove(data[i]);
                 changed = true;
-                continue;
             }
-            i++;
         }
         return changed;
     }
 
     @Override
-    public boolean removeAll (Collection < ? > c) {
-        if (c.size() == 0)
-            return false;
-        for (Object o : c) {
-            if (o == null)
-                return false;
-            remove(o);
-        }
-        return true;
-    }
-
-    ///////////////////
-    //// необязательные
-    ///////////////////
-
+    public Iterator<E> iterator() { throw new UnsupportedOperationException(); }
     @Override
-    public Iterator<E> iterator () {
-        return null;
-    }
-
+    public Object[] toArray() { throw new UnsupportedOperationException(); }
     @Override
-    public Object[] toArray () {
-        return new Object[0];
-    }
-
-    @Override
-    public <T > T[]toArray(T[]a){
-        return null;
-    }
+    public <T> T[] toArray(T[] a) { throw new UnsupportedOperationException(); }
 }

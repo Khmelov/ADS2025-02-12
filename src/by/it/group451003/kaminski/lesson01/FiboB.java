@@ -4,7 +4,7 @@ import java.math.BigInteger;
 
 /*
  * Вам необходимо выполнить способ вычисления чисел Фибоначчи со вспомогательным массивом
- * без ограничений на размер результата (BigInteger
+ * без ограничений на размер результата (BigInteger)
  */
 
 public class FiboB {
@@ -23,7 +23,6 @@ public class FiboB {
     }
 
     BigInteger fastB(Integer n) {
-        //здесь нужно реализовать вариант с временем O(n) и памятью O(n)
         if (n == 0) return BigInteger.ZERO;
         if (n == 1) return BigInteger.ONE;
         BigInteger[] ArrFib = new BigInteger[n];

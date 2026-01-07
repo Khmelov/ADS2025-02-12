@@ -1,116 +1,122 @@
 package by.it.group451003.kaminski.lesson14;
 
-import java.util.*;
+
+import java.util.Scanner;
 
 public class StatesHanoiTowerC {
-    public static class global{
-        public static int[] rods;
-        public static int[] heightsArr;
-        public static int indexHA;
-    }
-
-    static class DSU {
+    private static class DSU {
         int[] parent;
         int[] size;
 
-        public void makeSet (int value) {
-            parent[value] = value;
-            size[value] = 1;
+        DSU(int size) {
+            parent = new int[size];
+            this.size = new int[size];
         }
 
-        public int findSet (int value) {
-            if (value == parent[value])
-                return value;
-            return parent[value] = findSet(parent[value]);
+        void makeSet(int v) {
+            parent[v] = v;
+            size[v] = 1;
         }
 
-        public void unionSets(int e1, int e2) {
-            e1 = findSet(e1);
-            e2 = findSet(e2);
-            if (e1 != e2) {
-                if (size[e1] < size[e2]) {
-                    int temp = e1;
-                    e1 = e2;
-                    e2 = temp;
+        int size(int v) {
+            return size[findSet(v)];
+        }
+
+        int findSet(int v) {
+            if (v == parent[v])
+                return v;
+            return parent[v] = findSet(parent[v]);
+        }
+
+        void unionSets(int a, int b) {
+            a = findSet(a);
+            b = findSet(b);
+            if (a != b) {
+                if (size[a] < size[b]) {
+                    int temp = a;
+                    a = b;
+                    b = temp;
                 }
-                parent[e2] = e1;
-                size[e1] += size[e2];
+                parent[b] = a;
+                size[a] += size[b];
             }
         }
+    }
 
-        public int getSize(int value) {
-            return size[value];
+    static int[] carryingOver(int N, int step, int k) {
+        int axisX = 0, axisY, axisZ;
+        axisY = (N % 2 == 0) ? 1 : 2;
+        axisZ = (N % 2 == 0) ? 2 : 1;
+
+        int[] result = new int[3];
+        int t = (step / (1 << (k - 1)) - 1) / 2;
+
+        int[] mapping = (k % 2 != 0) ? new int[]{axisX, axisY, axisZ} : new int[]{axisX, axisZ, axisY};
+        int from = mapping[t % 3];
+        int to = mapping[(t + 1) % 3];
+
+        result[from] = -1;
+        result[to] = 1;
+        return result;
+    }
+
+    static int countBits(int num) {
+        int count = 0;
+        while (num % 2 == 0) {
+            count++;
+            num /= 2;
         }
-
-        DSU(int arrSize) {
-            this.parent = new int[arrSize];
-            this.size = new int[arrSize];
-        }
+        return count;
     }
 
-    static void towerOfHanoi(int n, char fromRod, char toRod, char extRod) {
-        if (n == 0) return;
-        towerOfHanoi(n - 1, fromRod, extRod, toRod);
-        global.rods[fromRod - 'A'] -= 1;
-        global.rods[toRod - 'A'] += 1;
-        global.heightsArr[global.indexHA++] = Math.max(Math.max(global.rods[0], global.rods[1]), global.rods[2]);
-        towerOfHanoi(n - 1, extRod, toRod, fromRod);
-    }
-
-    static int findHeight(int[] someArray, int value) {
-        for (int i = 0; i < someArray.length; i++) {
-            if (someArray[i] == value)
-                return i;
-        }
-        return -1;
-    }
-
-    static void groupInSubtrees(DSU someDSU) {
-        int height, index;
-        for (int i = 0; i < global.heightsArr.length; i++) {
-            height = global.heightsArr[i];
-            index = findHeight(global.heightsArr, height);
-            someDSU.unionSets(i, index);
-        }
-    }
-
-    static void printSetSizes (int diskCount, DSU someDSU) {
-        int[] dsuParents = new int[diskCount+1];
-        int[] dsuTreeSizes = new int[diskCount+1];
-        StringBuilder sb = new StringBuilder();
-
-        for (int i = 0; i <= diskCount; i++)
-            dsuParents[i] = findHeight(global.heightsArr, i);
-
-        int k = 0;
-        for (int parent : dsuParents)
-            if (parent != -1)
-                dsuTreeSizes[k++] = someDSU.getSize(someDSU.findSet(parent));
-
-        Arrays.sort(dsuTreeSizes);
-        for (int size : dsuTreeSizes)
-            if (size != 0)
-                sb.append(size).append(' ');
-
-        System.out.println(sb);
-    }
 
     public static void main(String[] args) {
-        int diskCount = new Scanner(System.in).nextInt();
-        int size = (int) Math.pow(2, diskCount) - 1;
+        Scanner scanner = new Scanner(System.in);
+        int N = scanner.nextInt();
+        int max_size = (1 << N) - 1;
+        int[] steps_heights = new int[N];
+        for (int i = 0; i < N; i++)
+            steps_heights[i] = -1;
+        DSU dsu = new DSU(max_size);
+        int[] heights = new int[3];
+        heights[0] = N;
+        for (int i = 0; i < max_size; i++) {
 
-        global.rods = new int[3];
-        global.rods[0] = diskCount;
-        global.indexHA = 0;
-        global.heightsArr = new int[size];
+            int step = i + 1;
+            int[] delta = (step % 2 != 0) ? carryingOver(N, step, 1) : carryingOver(N, step, countBits(step) + 1);
 
-        towerOfHanoi(diskCount, 'A', 'B', 'C');
+            for (int j = 0; j < 3; j++)
+                heights[j] += delta[j];
 
-        DSU myDSU = new DSU(size);
-        for (int i = 0; i < size; i++)
-            myDSU.makeSet(i);
+            int max = Math.max(heights[0], Math.max(heights[1], heights[2]));
+            dsu.makeSet(i);
 
-        groupInSubtrees(myDSU);
-        printSetSizes(diskCount, myDSU);
+            int maxHeightIndex = max - 1;
+            if (steps_heights[maxHeightIndex] == -1)
+                steps_heights[maxHeightIndex] = i;
+            else
+                dsu.unionSets(steps_heights[maxHeightIndex], i);
+        }
+
+        int[] sizes = new int[N];
+        for (int i = 0; i < N; i++)
+            if (steps_heights[i] != -1)
+                sizes[i] = dsu.size(steps_heights[i]);
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < N; i++) {
+            int max = i;
+            for (int j = i + 1; j < N; j++)
+                if (sizes[max] < sizes[j])
+                    max = j;
+            if (sizes[max] == 0)
+                break;
+            int temp = sizes[max];
+            sizes[max] = sizes[i];
+            sizes[i] = temp;
+            sb.insert(0, sizes[i] + " ");
+        }
+        sb.deleteCharAt(sb.length() - 1);
+        System.out.println(sb);
     }
 }

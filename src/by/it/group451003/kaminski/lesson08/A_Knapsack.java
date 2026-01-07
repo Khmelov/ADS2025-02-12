@@ -35,36 +35,35 @@ Sample Output 2:
 
 public class A_Knapsack {
 
-    int getMaxWeight(InputStream stream ) {
-        //!!!!!!!!!!!!!!!!!!!!!!!!!     НАЧАЛО ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
+    int getMaxWeight(InputStream stream) {
         Scanner scanner = new Scanner(stream);
-        int w=scanner.nextInt();
-        int n=scanner.nextInt();
-        int gold[]=new int[n];
+        int W = scanner.nextInt();
+        int n = scanner.nextInt();
+        int[] weights = new int[n];
+
         for (int i = 0; i < n; i++) {
-            gold[i]=scanner.nextInt();
+            weights[i] = scanner.nextInt();
         }
-        boolean[] dp = new boolean[w + 1];
+
+        boolean[] dp = new boolean[W + 1];
         dp[0] = true;
-        for (int weight = 0; weight <= w; weight++) {
-            if (dp[weight]) {
-                for (int i = 0; i < n; i++) {
-                    int newWeight = weight + gold[i];
-                    if (newWeight <= w) {
-                        dp[newWeight] = true;
-                    }
+
+        for (int w = 1; w <= W; w++) {
+            for (int i = 0; i < n; i++) {
+                if (weights[i] <= w && dp[w - weights[i]]) {
+                    dp[w] = true;
                 }
             }
         }
 
         int result = 0;
-        for (int weight = w; weight >= 0; weight--) {
-            if (dp[weight]) {
-                result = weight;
+        for (int w = W; w >= 0; w--) {
+            if (dp[w]) {
+                result = w;
                 break;
             }
         }
-        //!!!!!!!!!!!!!!!!!!!!!!!!!     КОНЕЦ ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
+
         return result;
     }
 

@@ -7,28 +7,24 @@ import java.util.ListIterator;
 
 public class ListC<E> implements List<E> {
 
-    private static final int DEFAULT_CAPACITY = 10;
-    private Object[] elements;
+    private class Node {
+        E data;
+        Node next;
+
+        Node(E data) {
+            this.data = data;
+            this.next = null;
+        }
+    }
+
+    private Node head;
     private int size;
 
     public ListC() {
-        elements = new Object[DEFAULT_CAPACITY];
+        head = null;
         size = 0;
     }
 
-    public ListC(int initialCapacity) {
-        if (initialCapacity < 0) {
-            throw new IllegalArgumentException("Illegal Capacity: " + initialCapacity);
-        }
-        elements = new Object[initialCapacity];
-        size = 0;
-    }
-
-    /////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////
-    //////               Обязательные к реализации методы             ///////
-    /////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////
 
     @Override
     public String toString() {
@@ -37,38 +33,57 @@ public class ListC<E> implements List<E> {
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append('[');
-        for (int i = 0; i < size; i++) {
-            sb.append(elements[i]);
-            if (i < size - 1) {
+        sb.append("[");
+        Node current = head;
+        while (current != null) {
+            sb.append(current.data);
+            if (current.next != null) {
                 sb.append(", ");
             }
+            current = current.next;
         }
-        sb.append(']');
+        sb.append("]");
         return sb.toString();
     }
 
     @Override
     public boolean add(E e) {
-        ensureCapacity(size + 1);
-        elements[size++] = e;
+        Node newNode = new Node(e);
+
+        if (head == null) {
+            head = newNode;
+        } else {
+            Node current = head;
+            while (current.next != null) {
+                current = current.next;
+            }
+            current.next = newNode;
+        }
+
+        size++;
         return true;
     }
 
     @Override
     public E remove(int index) {
-        checkIndex(index);
-
-        @SuppressWarnings("unchecked")
-        E oldValue = (E) elements[index];
-
-        int numMoved = size - index - 1;
-        if (numMoved > 0) {
-            System.arraycopy(elements, index + 1, elements, index, numMoved);
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
         }
-        elements[--size] = null;
+        E removedData;
+        if (index == 0) {
+            removedData = head.data;
+            head = head.next;
+        } else {
+            Node previous = head;
+            for (int i = 0; i < index - 1; i++) {
+                previous = previous.next;
+            }
+            removedData = previous.next.data;
+            previous.next = previous.next.next;
+        }
 
-        return oldValue;
+        size--;
+        return removedData;
     }
 
     @Override
@@ -78,32 +93,64 @@ public class ListC<E> implements List<E> {
 
     @Override
     public void add(int index, E element) {
-        checkIndexForAdd(index);
-        ensureCapacity(size + 1);
+        if (index < 0 || index > size) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
+        }
 
-        System.arraycopy(elements, index, elements, index + 1, size - index);
-        elements[index] = element;
+        Node newNode = new Node(element);
+
+        if (index == 0) {
+            newNode.next = head;
+            head = newNode;
+        } else {
+            Node previous = head;
+            for (int i = 0; i < index - 1; i++) {
+                previous = previous.next;
+            }
+            newNode.next = previous.next;
+            previous.next = newNode;
+        }
         size++;
     }
 
     @Override
     public boolean remove(Object o) {
-        int index = indexOf(o);
-        if (index >= 0) {
-            remove(index);
+        if (head == null) {
+            return false;
+        }
+
+        if (o == null ? head.data == null : o.equals(head.data)) {
+            head = head.next;
+            size--;
             return true;
         }
+        Node current = head;
+        while (current.next != null) {
+            if (o == null ? current.next.data == null : o.equals(current.next.data)) {
+                current.next = current.next.next;
+                size--;
+                return true;
+            }
+            current = current.next;
+        }
+
         return false;
     }
 
     @Override
     public E set(int index, E element) {
-        checkIndex(index);
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
+        }
 
-        @SuppressWarnings("unchecked")
-        E oldValue = (E) elements[index];
-        elements[index] = element;
-        return oldValue;
+        Node current = head;
+        for (int i = 0; i < index; i++) {
+            current = current.next;
+        }
+
+        E oldData = current.data;
+        current.data = element;
+        return oldData;
     }
 
     @Override
@@ -113,59 +160,60 @@ public class ListC<E> implements List<E> {
 
     @Override
     public void clear() {
-        for (int i = 0; i < size; i++) {
-            elements[i] = null;
-        }
+        head = null;
         size = 0;
     }
 
     @Override
     public int indexOf(Object o) {
-        if (o == null) {
-            for (int i = 0; i < size; i++) {
-                if (elements[i] == null) {
-                    return i;
-                }
+        Node current = head;
+        int index = 0;
+
+        while (current != null) {
+            if (o == null ? current.data == null : o.equals(current.data)) {
+                return index;
             }
-        } else {
-            for (int i = 0; i < size; i++) {
-                if (o.equals(elements[i])) {
-                    return i;
-                }
-            }
+            current = current.next;
+            index++;
         }
+
         return -1;
     }
 
     @Override
     public E get(int index) {
-        checkIndex(index);
-        @SuppressWarnings("unchecked")
-        E element = (E) elements[index];
-        return element;
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
+        }
+
+        Node current = head;
+        for (int i = 0; i < index; i++) {
+            current = current.next;
+        }
+
+        return current.data;
     }
 
     @Override
     public boolean contains(Object o) {
-        return indexOf(o) >= 0;
+        return indexOf(o) != -1;
     }
 
     @Override
     public int lastIndexOf(Object o) {
-        if (o == null) {
-            for (int i = size - 1; i >= 0; i--) {
-                if (elements[i] == null) {
-                    return i;
-                }
+        Node current = head;
+        int index = 0;
+        int lastIndex = -1;
+
+        while (current != null) {
+            if (o == null ? current.data == null : o.equals(current.data)) {
+                lastIndex = index;
             }
-        } else {
-            for (int i = size - 1; i >= 0; i--) {
-                if (o.equals(elements[i])) {
-                    return i;
-                }
-            }
+            current = current.next;
+            index++;
         }
-        return -1;
+
+        return lastIndex;
     }
 
     @Override
@@ -184,65 +232,77 @@ public class ListC<E> implements List<E> {
             return false;
         }
 
-        ensureCapacity(size + c.size());
         for (E element : c) {
-            elements[size++] = element;
+            add(element);
         }
         return true;
     }
 
     @Override
     public boolean addAll(int index, Collection<? extends E> c) {
-        checkIndexForAdd(index);
+        if (index < 0 || index > size) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
+        }
 
         if (c.isEmpty()) {
             return false;
         }
 
-        int numNew = c.size();
-        ensureCapacity(size + numNew);
-
-        int numMoved = size - index;
-        if (numMoved > 0) {
-            System.arraycopy(elements, index, elements, index + numNew, numMoved);
-        }
-
         int i = index;
         for (E element : c) {
-            elements[i++] = element;
+            add(i, element);
+            i++;
         }
-        size += numNew;
-
         return true;
     }
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        if (c.isEmpty()) {
-            return false;
+        boolean modified = false;
+        Node current = head;
+        Node previous = null;
+
+        while (current != null) {
+            if (c.contains(current.data)) {
+                if (previous == null) {
+                    // Удаляем первый элемент
+                    head = current.next;
+                } else {
+                    previous.next = current.next;
+                }
+                size--;
+                modified = true;
+            } else {
+                previous = current;
+            }
+            current = current.next;
         }
 
-        boolean modified = false;
-        for (int i = 0; i < size; i++) {
-            if (c.contains(elements[i])) {
-                remove(i);
-                i--; // Adjust index after removal
-                modified = true;
-            }
-        }
         return modified;
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
         boolean modified = false;
-        for (int i = 0; i < size; i++) {
-            if (!c.contains(elements[i])) {
-                remove(i);
-                i--; // Adjust index after removal
+        Node current = head;
+        Node previous = null;
+
+        while (current != null) {
+            if (!c.contains(current.data)) {
+                if (previous == null) {
+                    // Удаляем первый элемент
+                    head = current.next;
+                } else {
+                    previous.next = current.next;
+                }
+                size--;
                 modified = true;
+            } else {
+                previous = current;
             }
+            current = current.next;
         }
+
         return modified;
     }
 
@@ -254,46 +314,197 @@ public class ListC<E> implements List<E> {
 
     @Override
     public List<E> subList(int fromIndex, int toIndex) {
-        checkIndex(fromIndex);
-        checkIndex(toIndex - 1); // toIndex is exclusive
-        if (fromIndex > toIndex) {
-            throw new IllegalArgumentException("fromIndex(" + fromIndex + ") > toIndex(" + toIndex + ")");
+        if (fromIndex < 0 || toIndex > size || fromIndex > toIndex) {
+            throw new IndexOutOfBoundsException();
         }
 
-        ListC<E> subList = new ListC<>(toIndex - fromIndex);
-        for (int i = fromIndex; i < toIndex; i++) {
-            subList.add(get(i));
+        ListC<E> subList = new ListC<>();
+        Node current = head;
+
+        // Пропускаем элементы до fromIndex
+        for (int i = 0; i < fromIndex; i++) {
+            current = current.next;
         }
+
+        // Добавляем элементы в подсписок
+        for (int i = fromIndex; i < toIndex; i++) {
+            subList.add(current.data);
+            current = current.next;
+        }
+
         return subList;
     }
 
     @Override
     public ListIterator<E> listIterator(int index) {
-        checkIndexForAdd(index);
-        return new ListCListIterator(index);
+        if (index < 0 || index > size) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
+        }
+
+        return new ListIterator<E>() {
+            private Node current = getNode(index);
+            private Node lastReturned = null;
+            private int currentIndex = index;
+            private int direction = 0; // 0 - не двигались, 1 - вперед, -1 - назад
+
+            private Node getNode(int index) {
+                if (index == size) return null;
+                Node node = head;
+                for (int i = 0; i < index; i++) {
+                    node = node.next;
+                }
+                return node;
+            }
+
+            @Override
+            public boolean hasNext() {
+                return currentIndex < size;
+            }
+
+            @Override
+            public E next() {
+                if (!hasNext()) {
+                    throw new java.util.NoSuchElementException();
+                }
+                lastReturned = current;
+                E data = current.data;
+                current = current.next;
+                currentIndex++;
+                direction = 1;
+                return data;
+            }
+
+            @Override
+            public boolean hasPrevious() {
+                return currentIndex > 0;
+            }
+
+            @Override
+            public E previous() {
+                if (!hasPrevious()) {
+                    throw new java.util.NoSuchElementException();
+                }
+                if (current == null) {
+                    // Если в конце списка, находим последний элемент
+                    current = getNode(size - 1);
+                } else {
+                    // Находим предыдущий элемент (неэффективно для односвязного списка)
+                    current = getNode(currentIndex - 1);
+                }
+                currentIndex--;
+                lastReturned = current;
+                direction = -1;
+                return current.data;
+            }
+
+            @Override
+            public int nextIndex() {
+                return currentIndex;
+            }
+
+            @Override
+            public int previousIndex() {
+                return currentIndex - 1;
+            }
+
+            @Override
+            public void remove() {
+                if (lastReturned == null) {
+                    throw new IllegalStateException();
+                }
+
+                if (lastReturned == head) {
+                    head = head.next;
+                    current = head;
+                } else {
+                    // Находим предыдущий элемент для lastReturned
+                    Node prev = head;
+                    while (prev != null && prev.next != lastReturned) {
+                        prev = prev.next;
+                    }
+                    if (prev != null) {
+                        prev.next = lastReturned.next;
+                    }
+                    current = lastReturned.next;
+                }
+
+                if (direction == 1) {
+                    currentIndex--;
+                }
+
+                size--;
+                lastReturned = null;
+                direction = 0;
+            }
+
+            @Override
+            public void set(E e) {
+                if (lastReturned == null) {
+                    throw new IllegalStateException();
+                }
+                lastReturned.data = e;
+            }
+
+            @Override
+            public void add(E e) {
+                Node newNode = new Node(e);
+
+                if (current == head) {
+                    newNode.next = head;
+                    head = newNode;
+                    current = head.next;
+                } else {
+                    Node prev = head;
+                    while (prev != null && prev.next != current) {
+                        prev = prev.next;
+                    }
+                    if (prev != null) {
+                        prev.next = newNode;
+                        newNode.next = current;
+                    }
+                }
+
+                currentIndex++;
+                size++;
+                lastReturned = null;
+                direction = 0;
+            }
+        };
     }
 
     @Override
     public ListIterator<E> listIterator() {
-        return new ListCListIterator(0);
+        return listIterator(0);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <T> T[] toArray(T[] a) {
         if (a.length < size) {
-            return (T[]) java.util.Arrays.copyOf(elements, size, a.getClass());
+            a = (T[]) java.lang.reflect.Array.newInstance(a.getClass().getComponentType(), size);
         }
-        System.arraycopy(elements, 0, a, 0, size);
+
+        Node current = head;
+        for (int i = 0; i < size; i++) {
+            a[i] = (T) current.data;
+            current = current.next;
+        }
+
         if (a.length > size) {
             a[size] = null;
         }
+
         return a;
     }
 
     @Override
     public Object[] toArray() {
-        return java.util.Arrays.copyOf(elements, size);
+        Object[] array = new Object[size];
+        Node current = head;
+        for (int i = 0; i < size; i++) {
+            array[i] = current.data;
+            current = current.next;
+        }
+        return array;
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -302,117 +513,52 @@ public class ListC<E> implements List<E> {
     ////////        но они будут нужны для корректной отладки    ////////////
     /////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////
-
     @Override
     public Iterator<E> iterator() {
-        return new ListCIterator();
-    }
+        return new Iterator<E>() {
+            private Node current = head;
+            private Node lastReturned = null;
 
-    /////////////////////////////////////////////////////////////////////////
-    //////////////////////// Вспомогательные методы /////////////////////////
-    /////////////////////////////////////////////////////////////////////////
-
-    private void ensureCapacity(int minCapacity) {
-        if (minCapacity > elements.length) {
-            int newCapacity = elements.length * 2;
-            if (newCapacity < minCapacity) {
-                newCapacity = minCapacity;
+            @Override
+            public boolean hasNext() {
+                return current != null;
             }
-            Object[] newElements = new Object[newCapacity];
-            System.arraycopy(elements, 0, newElements, 0, size);
-            elements = newElements;
-        }
-    }
 
-    private void checkIndex(int index) {
-        if (index < 0 || index >= size) {
-            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
-        }
-    }
-
-    private void checkIndexForAdd(int index) {
-        if (index < 0 || index > size) {
-            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
-        }
-    }
-
-    /////////////////////////////////////////////////////////////////////////
-    //////////////////////// Внутренние классы итераторов ///////////////////
-    /////////////////////////////////////////////////////////////////////////
-
-    private class ListCIterator implements Iterator<E> {
-        protected int currentIndex = 0;
-        protected int lastReturned = -1;
-
-        @Override
-        public boolean hasNext() {
-            return currentIndex < size;
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public E next() {
-            if (!hasNext()) {
-                throw new java.util.NoSuchElementException();
+            @Override
+            public E next() {
+                if (!hasNext()) {
+                    throw new java.util.NoSuchElementException();
+                }
+                lastReturned = current;
+                E data = current.data;
+                current = current.next;
+                return data;
             }
-            lastReturned = currentIndex;
-            return (E) elements[currentIndex++];
-        }
 
-        @Override
-        public void remove() {
-            if (lastReturned == -1) {
-                throw new IllegalStateException();
+            @Override
+            public void remove() {
+                if (lastReturned == null) {
+                    throw new IllegalStateException();
+                }
+
+                if (lastReturned == head) {
+                    head = head.next;
+                    current = head;
+                } else {
+                    // Находим предыдущий элемент для lastReturned
+                    Node prev = head;
+                    while (prev != null && prev.next != lastReturned) {
+                        prev = prev.next;
+                    }
+                    if (prev != null) {
+                        prev.next = lastReturned.next;
+                    }
+                    current = lastReturned.next;
+                }
+
+                size--;
+                lastReturned = null;
             }
-            ListC.this.remove(lastReturned);
-            currentIndex = lastReturned;
-            lastReturned = -1;
-        }
-    }
-
-    private class ListCListIterator extends ListCIterator implements ListIterator<E> {
-        ListCListIterator(int index) {
-            super();
-            currentIndex = index;
-        }
-
-        @Override
-        public boolean hasPrevious() {
-            return currentIndex > 0;
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public E previous() {
-            if (!hasPrevious()) {
-                throw new java.util.NoSuchElementException();
-            }
-            lastReturned = --currentIndex;
-            return (E) elements[currentIndex];
-        }
-
-        @Override
-        public int nextIndex() {
-            return currentIndex;
-        }
-
-        @Override
-        public int previousIndex() {
-            return currentIndex - 1;
-        }
-
-        @Override
-        public void set(E e) {
-            if (lastReturned == -1) {
-                throw new IllegalStateException();
-            }
-            ListC.this.set(lastReturned, e);
-        }
-
-        @Override
-        public void add(E e) {
-            ListC.this.add(currentIndex++, e);
-            lastReturned = -1;
-        }
+        };
     }
 }

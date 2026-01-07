@@ -26,8 +26,8 @@ import java.util.Arrays;
     1 6 11
     Sample Output:
     1 0 0
-*/
 
+*/
 
 public class C_QSortOptimized {
 
@@ -54,33 +54,31 @@ public class C_QSortOptimized {
 
         //читаем сами отрезки
         for (int i = 0; i < n; i++) {
-            int start = scanner.nextInt();
-            int end = scanner.nextInt();
-            segments[i] = new Segment(start, end);
+            //читаем начало и конец каждого отрезка
+            segments[i] = new Segment(scanner.nextInt(), scanner.nextInt());
         }
+        //читаем точки
         for (int i = 0; i < m; i++) {
             points[i] = scanner.nextInt();
         }
 
-        Arrays.sort(segments, (s1, s2) -> Integer.compare(s1.start, s2.start));
+        // 1. Оптимизированная сортировка отрезков
+        // Используем 3-разбиение для быстрой сортировки
+        quickSort3Way(segments, 0, segments.length - 1);
 
+        // 2. Для каждой точки находим подходящие отрезки через бинарный поиск
         for (int i = 0; i < m; i++) {
-            int x = points[i];
-            int left = 0;
-            int right = n - 1;
-            int count = 0;
-
-            while (left <= right) {
-                int mid = left + (right - left) / 2;
-                if (segments[mid].start <= x) {
-                    left = mid + 1;
-                } else {
-                    right = mid - 1;
-                }
+            int point = points[i];
+            // Находим первый подходящий отрезок бинарным поиском
+            int firstMatch = findFirstMatch(segments, point);
+            if (firstMatch == -1) {
+                result[i] = 0;
+                continue;
             }
-
-            for (int j = 0; j <= right; j++) {
-                if (segments[j].stop >= x && segments[j].start <= x) {
+            // Подсчитываем все подходящие отрезки после найденного
+            int count = 0;
+            for (int j = firstMatch; j < segments.length && segments[j].start <= point; j++) {
+                if (segments[j].stop >= point) {
                     count++;
                 }
             }
@@ -91,8 +89,62 @@ public class C_QSortOptimized {
         return result;
     }
 
-    //отрезок
-    private class Segment implements Comparable {
+    // Реализация 3-разбиения для быстрой сортировки (оптимизация)
+    private void quickSort3Way(Segment[] segments, int low, int high) {
+        while (low < high) {
+            int[] pivots = partition3(segments, low, high);
+            quickSort3Way(segments, low, pivots[0] - 1);
+            low = pivots[1] + 1; // Элиминация хвостовой рекурсии
+        }
+    }
+
+    // Метод 3-разбиения
+    private int[] partition3(Segment[] segments, int low, int high) {
+        Segment pivot = segments[low];
+        int lt = low;
+        int gt = high;
+        int i = low + 1;
+
+        while (i <= gt) {
+            int cmp = segments[i].compareTo(pivot);
+            if (cmp < 0) {
+                swap(segments, lt++, i++);
+            } else if (cmp > 0) {
+                swap(segments, i, gt--);
+            } else {
+                i++;
+            }
+        }
+        return new int[]{lt, gt};
+    }
+
+    // Вспомогательный метод для обмена элементов
+    private void swap(Segment[] segments, int i, int j) {
+        Segment temp = segments[i];
+        segments[i] = segments[j];
+        segments[j] = temp;
+    }
+
+    // Бинарный поиск первого подходящего отрезка
+    private int findFirstMatch(Segment[] segments, int point) {
+        int left = 0;
+        int right = segments.length - 1;
+        int result = -1;
+
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            if (segments[mid].start <= point) {
+                result = mid;
+                left = mid + 1;
+            } else {
+                right = mid - 1;
+            }
+        }
+        return result;
+    }
+
+    // Класс отрезка с реализацией Comparable
+    private class Segment implements Comparable<Segment> {
         int start;
         int stop;
 
@@ -102,10 +154,9 @@ public class C_QSortOptimized {
         }
 
         @Override
-        public int compareTo(Object o) {
-            //подумайте, что должен возвращать компаратор отрезков
-            return 0;
+        public int compareTo(Segment o) {
+            // Сравниваем по началу отрезка
+            return Integer.compare(this.start, o.start);
         }
     }
-
 }

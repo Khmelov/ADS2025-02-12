@@ -11,7 +11,8 @@ import java.util.Scanner;
 Первая строка содержит число 1<=n<=10000,
 вторая - массив A[1…n], содержащий натуральные числа, не превосходящие 10E9.
 Необходимо отсортировать полученный массив.
-Sample Inpu3t:
+
+Sample Input:
 5
 2 3 9 2 9
 Sample Output:
@@ -45,37 +46,33 @@ public class B_MergeSort {
         }
 
         // тут ваше решение (реализуйте сортировку слиянием)
-        // https://ru.wikipedia.org/wiki/Сортировка_слиянием
+        mergeSort(a, 0, a.length - 1); // Вызов сортировки слиянием
 
-        mergeSort(a, 0, a.length - 1);
         //!!!!!!!!!!!!!!!!!!!!!!!!!     КОНЕЦ ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
         return a;
     }
 
+    // Рекурсивная функция сортировки слиянием
     private void mergeSort(int[] array, int left, int right) {
         if (left < right) {
-            // Find the middle point
-            int mid = left + (right - left) / 2;
-
-            // Sort first and second halves
-            mergeSort(array, left, mid);
-            mergeSort(array, mid + 1, right);
-
-            // Merge the sorted halves
-            merge(array, left, mid, right);
+            int mid = left + (right - left) / 2; // Находим середину
+            mergeSort(array, left, mid); // Сортируем левую половину
+            mergeSort(array, mid + 1, right); // Сортируем правую половину
+            merge(array, left, mid, right); // Сливаем отсортированные половины
         }
     }
 
+    // Функция слияния двух подмассивов
     private void merge(int[] array, int left, int mid, int right) {
-        // Sizes of the two subarrays to be merged
+        // Размеры временных массивов
         int n1 = mid - left + 1;
         int n2 = right - mid;
 
-        // Create temporary arrays
+        // Создаем временные массивы
         int[] leftArray = new int[n1];
         int[] rightArray = new int[n2];
 
-        // Copy data to temporary arrays
+        // Копируем данные во временные массивы
         for (int i = 0; i < n1; i++) {
             leftArray[i] = array[left + i];
         }
@@ -83,9 +80,10 @@ public class B_MergeSort {
             rightArray[j] = array[mid + 1 + j];
         }
 
-        // Merge the temporary arrays
-        int i = 0, j = 0;
-        int k = left;
+        // Индексы для слияния
+        int i = 0, j = 0, k = left;
+
+        // Сливаем временные массивы обратно в основной массив
         while (i < n1 && j < n2) {
             if (leftArray[i] <= rightArray[j]) {
                 array[k] = leftArray[i];
@@ -97,14 +95,14 @@ public class B_MergeSort {
             k++;
         }
 
-        // Copy remaining elements of leftArray if any
+        // Копируем оставшиеся элементы из leftArray (если есть)
         while (i < n1) {
             array[k] = leftArray[i];
             i++;
             k++;
         }
 
-        // Copy remaining elements of rightArray if any
+        // Копируем оставшиеся элементы из rightArray (если есть)
         while (j < n2) {
             array[k] = rightArray[j];
             j++;

@@ -1,41 +1,38 @@
-package by.it.group451001.khomenkov.lesson09;
+package by.it.group451001.tsurko.lesson09;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-public class ListC<E> implements List<E> {
-
-    //Создайте аналог списка БЕЗ использования других классов СТАНДАРТНОЙ БИБЛИОТЕКИ
-
-    /////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////
-    //////               Обязательные к реализации методы             ///////
-    /////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////
+public class ListC<E> implements List<E>{
     private Object[] array;
     private int size;
     private final int DEFAULT_CAPACITY = 16;
     //Создайте аналог списка БЕЗ использования других классов СТАНДАРТНОЙ БИБЛИОТЕКИ
 
-    /////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////
-    //////               Обязательные к реализации методы             ///////
-    /////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////
+    /// //////////////////////////////////////////////////////////////////////
+    /// //////////////////////////////////////////////////////////////////////
+    /// ///               Обязательные к реализации методы             ///////
+    /// //////////////////////////////////////////////////////////////////////
+    /// //////////////////////////////////////////////////////////////////////
     @Override
     public String toString() {
-        if (array == null || size == 0){
+        if (array == null || size == 0) {
             return "[]";
         }
         String result = "[";
         for (Object object : array) {
-            if (object != null){
-                result = result + object.toString() + ", ";;
+            if (object == null) {
+                continue;
             }
+            result = result + object.toString() + ", ";
         }
-        result = result.substring(0, result.length() - 2);
+        if (result.length() <= 3) {
+            result = result.substring(0, result.length() - 1);
+        } else {
+            result = result.substring(0, result.length() - 2);
+        }
         result += "]";
         return result;
     }
@@ -46,7 +43,7 @@ public class ListC<E> implements List<E> {
 
     @Override
     public boolean add(E e) {
-        if (size == array.length){
+        if (size == array.length) {
             Object[] array = new Object[this.array.length * 2];
             for (int i = 0; i < size; i++) {
                 array[i] = this.array[i];
@@ -60,15 +57,16 @@ public class ListC<E> implements List<E> {
 
     @Override
     public E remove(int index) {
-        if (size == 0){
+        if (size == 0) {
+            size = 0;
             return null;
         }
         size--;
         Object[] array = new Object[size + 1];
-        for (int i = 0; i < index; i++){
+        for (int i = 0; i < index; i++) {
             array[i] = this.array[i];
         }
-        for (int i = index + 1; i <= size; i++){
+        for (int i = index + 1; i <= size; i++) {
             array[i - 1] = this.array[i];
         }
         E oldValue = (E) this.array[index];
@@ -83,7 +81,7 @@ public class ListC<E> implements List<E> {
 
     @Override
     public void add(int index, E element) {
-        if (size == array.length){
+        if (size == array.length) {
             Object[] array = new Object[this.array.length * 2];
             for (int i = 0; i < size; i++) {
                 array[i] = this.array[i];
@@ -91,12 +89,12 @@ public class ListC<E> implements List<E> {
             this.array = array;
         }
         Object[] ostArray = new Object[this.array.length - index];
-        for (int i = 0; i < ostArray.length; i++){
+        for (int i = 0; i < ostArray.length; i++) {
             ostArray[i] = this.array[index + i];
         }
         this.array[index] = element;
         size++;
-        for(int i = index + 1; i < size; i++){
+        for (int i = index + 1; i < size; i++) {
             this.array[i] = ostArray[i - index - 1];
         }
     }
@@ -104,15 +102,15 @@ public class ListC<E> implements List<E> {
     @Override
     public boolean remove(Object o) {
         boolean result = false;
-        for (int i = 0; i < size; i++){
-            if (array[i].equals(o)){
+        for (int i = 0; i < size; i++) {
+            if (array[i].equals(o)) {
                 result = true;
                 size--;
                 Object[] array = new Object[size + 1];
-                for (int j = 0; j < i; j++){
+                for (int j = 0; j < i; j++) {
                     array[j] = this.array[j];
                 }
-                for (int j = i + 1; j <= size; j++){
+                for (int j = i + 1; j <= size; j++) {
                     array[j - 1] = this.array[j];
                 }
                 this.array = array;
@@ -144,8 +142,8 @@ public class ListC<E> implements List<E> {
 
     @Override
     public int indexOf(Object o) {
-        for (int i = 0; i < size; i++){
-            if (array[i].equals(o)){
+        for (int i = 0; i < size; i++) {
+            if (array[i].equals(o)) {
                 return i;
             }
         }
@@ -159,8 +157,8 @@ public class ListC<E> implements List<E> {
 
     @Override
     public boolean contains(Object o) {
-        for (int i = 0; i < size; i++){
-            if (array[i].equals(o)){
+        for (int i = 0; i < size; i++) {
+            if (array[i].equals(o)) {
                 return true;
             }
         }
@@ -170,8 +168,8 @@ public class ListC<E> implements List<E> {
     @Override
     public int lastIndexOf(Object o) {
         int lastIndex = -1;
-        for (int i = 0; i < size; i++){
-            if (array[i].equals(o)){
+        for (int i = 0; i < size; i++) {
+            if (array[i].equals(o)) {
                 lastIndex = i;
             }
         }
@@ -220,7 +218,11 @@ public class ListC<E> implements List<E> {
             if (index < 0 || index > size) {
                 throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
             }
-        } 
+        } else {
+            if (index < 0 || index >= size) {
+                throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
+            }
+        }
     }
 
     private void ensureCapacity(int minCapacity) {
@@ -292,11 +294,11 @@ public class ListC<E> implements List<E> {
         return modified;
     }
 
-    /////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////
-    //////               Опциональные к реализации методы             ///////
-    /////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////
+    /// //////////////////////////////////////////////////////////////////////
+    /// //////////////////////////////////////////////////////////////////////
+    /// ///               Опциональные к реализации методы             ///////
+    /// //////////////////////////////////////////////////////////////////////
+    /// //////////////////////////////////////////////////////////////////////
 
     @Override
     public List<E> subList(int fromIndex, int toIndex) {
@@ -323,12 +325,12 @@ public class ListC<E> implements List<E> {
         return new Object[0];
     }
 
-    /////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////
-    ////////        Эти методы имплементировать необязательно    ////////////
-    ////////        но они будут нужны для корректной отладки    ////////////
-    /////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////
+    /// //////////////////////////////////////////////////////////////////////
+    /// //////////////////////////////////////////////////////////////////////
+    /// /////        Эти методы имплементировать необязательно    ////////////
+    /// /////        но они будут нужны для корректной отладки    ////////////
+    /// //////////////////////////////////////////////////////////////////////
+    /// //////////////////////////////////////////////////////////////////////
     @Override
     public Iterator<E> iterator() {
         return null;

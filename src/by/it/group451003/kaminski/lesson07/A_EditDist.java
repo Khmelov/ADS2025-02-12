@@ -33,36 +33,61 @@ import java.util.Scanner;
     editing
     Sample Output 3:
     5
+
 */
 
 public class A_EditDist {
 
-
     int getDistanceEdinting(String one, String two) {
-        return editDistRec(one, two, one.length(), two.length());
+        //!!!!!!!!!!!!!!!!!!!!!!!!!     НАЧАЛО ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
+
+        // Создаем матрицу для хранения расстояний
+        int m = one.length();
+        int n = two.length();
+        int[][] dp = new int[m + 1][n + 1];
+
+        // Базовые случаи:
+        // Пустая строка -> нужно n вставок
+        for (int i = 0; i <= m; i++) {
+            dp[i][0] = i;
+        }
+        // Нужно m удалений для получения пустой строки
+        for (int j = 0; j <= n; j++) {
+            dp[0][j] = j;
+        }
+
+        // Заполняем матрицу
+        for (int i = 1; i <= m; i++) {
+            for (int j = 1; j <= n; j++) {
+                // Если символы совпадают, берем значение из диагонали
+                if (one.charAt(i - 1) == two.charAt(j - 1)) {
+                    dp[i][j] = dp[i - 1][j - 1];
+                } else {
+                    // Иначе выбираем минимальное из трех возможных операций:
+                    // 1. Вставка (левый элемент + 1)
+                    // 2. Удаление (верхний элемент + 1)
+                    // 3. Замена (диагональный элемент + 1)
+                    dp[i][j] = 1 + Math.min(Math.min(
+                                    dp[i][j - 1],   // Вставка
+                                    dp[i - 1][j]),  // Удаление
+                            dp[i - 1][j - 1] // Замена
+                    );
+                }
+            }
+        }
+
+        // Результат - значение в правом нижнем углу матрицы
+        int result = dp[m][n];
+        //!!!!!!!!!!!!!!!!!!!!!!!!!     КОНЕЦ ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
+        return result;
     }
 
-    int editDistRec(String a, String b, int i, int j) {
-        // Базовые случаи
-        if (i == 0) return j;
-        if (j == 0) return i;
-
-        int cost = (a.charAt(i - 1) == b.charAt(j - 1)) ? 0 : 1;
-
-        // Возвращаем минимум из трех операций
-        return Math.min(
-                Math.min(
-                        editDistRec(a, b, i - 1, j) + 1,     // удаление
-                        editDistRec(a, b, i, j - 1) + 1      // вставка
-                ),
-                editDistRec(a, b, i - 1, j - 1) + cost       // замена
-        );
-    }
-
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
+        InputStream stream = A_EditDist.class.getResourceAsStream("dataABC.txt");
         A_EditDist instance = new A_EditDist();
-        System.out.println(instance.getDistanceEdinting("ab", "ab"));         // 0
-        System.out.println(instance.getDistanceEdinting("short", "ports"));   // 3
-        System.out.println(instance.getDistanceEdinting("distance", "editing")); // 5
+        Scanner scanner = new Scanner(stream);
+        System.out.println(instance.getDistanceEdinting(scanner.nextLine(), scanner.nextLine()));
+        System.out.println(instance.getDistanceEdinting(scanner.nextLine(), scanner.nextLine()));
+        System.out.println(instance.getDistanceEdinting(scanner.nextLine(), scanner.nextLine()));
     }
 }

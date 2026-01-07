@@ -1,100 +1,97 @@
 package by.it.group451003.kaminski.lesson14;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Scanner;
+import java.util.*;
 
 public class PointsA {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+
+        double maxDistance = scanner.nextDouble();
+        int n = scanner.nextInt();
+
+
+        double[][] points = new double[n][3];
+
+        for (int i = 0; i < n; i++) {
+            points[i][0] = scanner.nextDouble(); // x
+            points[i][1] = scanner.nextDouble(); // y
+            points[i][2] = scanner.nextDouble(); // z
+        }
+
+        DSU dsu = new DSU(n);
+
+
+        for (int i = 0; i < n; i++) {
+            for (int j = i + 1; j < n; j++) {
+                double distance = calculateDistance(points[i], points[j]);
+                if (distance < maxDistance) {
+                    dsu.union(i, j);
+                }
+            }
+        }
+
+
+        Map<Integer, Integer> clusterSizes = new HashMap<>();
+        for (int i = 0; i < n; i++) {
+            int root = dsu.find(i);
+            clusterSizes.put(root, clusterSizes.getOrDefault(root, 0) + 1);
+        }
+
+
+        List<Integer> sizes = new ArrayList<>(clusterSizes.values());
+        Collections.sort(sizes, Collections.reverseOrder());
+
+        // Выводим результат
+        for (int i = 0; i < sizes.size(); i++) {
+            System.out.print(sizes.get(i));
+            if (i < sizes.size() - 1) {
+                System.out.print(" ");
+            }
+        }
+    }
+
+    private static double calculateDistance(double[] p1, double[] p2) {
+        double dx = p1[0] - p2[0];
+        double dy = p1[1] - p2[1];
+        double dz = p1[2] - p2[2];
+        return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    }
 
     static class DSU {
-        int[] parent;
-        int[] rank;
+        private int[] parent;
+        private int[] size;
 
-        DSU(int size) {
-            parent = new int[size];
-            rank = new int[size];
-            for (int i = 0; i < size; i++) {
+        public DSU(int n) {
+            parent = new int[n];
+            size = new int[n];
+            for (int i = 0; i < n; i++) {
                 parent[i] = i;
-                rank[i] = 0;
+                size[i] = 1;
             }
         }
 
-        void union(int a, int b) {
-            a = find(a);
-            b = find(b);
-            if (a != b) {
-                if (rank[a] < rank[b]) {
-                    int temp = a;
-                    a = b;
-                    b = temp;
+        public int find(int x) {
+            if (parent[x] != x) {
+                parent[x] = find(parent[x]); // path compression
+            }
+            return parent[x];
+        }
+
+        public void union(int x, int y) {
+            int rootX = find(x);
+            int rootY = find(y);
+
+            if (rootX != rootY) {
+
+                if (size[rootX] < size[rootY]) {
+                    parent[rootX] = rootY;
+                    size[rootY] += size[rootX];
+                } else {
+                    parent[rootY] = rootX;
+                    size[rootX] += size[rootY];
                 }
-                parent[b] = a;
-                if (rank[a] == rank[b])
-                    rank[a]++;
             }
         }
-
-        int find(int i) {
-            return i == parent[i] ? i : find(parent[i]);
-        }
-
-        ArrayList<Integer> getSizes() {
-            var componentSizes = new ArrayList<Integer>();
-            for (int i = 0; i < parent.length; i++) {
-                var root = find(i);
-                while (componentSizes.size() <= root)
-                    componentSizes.add(0);
-                componentSizes.set(root, componentSizes.get(root) + 1);
-            }
-            return componentSizes;
-        }
-    }
-
-    private static class Point {
-        final int x, y, z;
-
-        Point(int x, int y, int z) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
-
-        double distanceTo(Point other) {
-            return Math.hypot(Math.hypot(this.x - other.x, this.y - other.y), this.z - other.z);
-        }
-    }
-
-    private static ArrayList<Integer> calculateClusterSizes(int distance, int size, ArrayList<Point> points) {
-        var dsu = new DSU(size);
-
-        for (int i = 0; i < size; i++)
-            for (int j = i + 1; j < size; j++)
-                if (points.get(i).distanceTo(points.get(j)) < distance)
-                    dsu.union(i, j);
-
-        var dsuSizes = dsu.getSizes();
-
-        dsuSizes.removeIf(s -> s == 0);
-        dsuSizes.sort(Collections.reverseOrder());
-
-        return dsuSizes;
-    }
-
-    public static void main(String[] args) {
-        int distance, length;
-        var points = new ArrayList<Point>();
-
-        try (var scanner = new Scanner(System.in)) {
-            distance = scanner.nextInt();
-            length = scanner.nextInt();
-
-            for (int i = 0; i < length; i++)
-                points.add(new Point(scanner.nextInt(), scanner.nextInt(), scanner.nextInt()));
-        }
-
-        var dsuSizes = calculateClusterSizes(distance, length, points);
-
-        var result = String.join(" ", dsuSizes.stream().map(String::valueOf).toArray(String[]::new));
-        System.out.println(result);
     }
 }

@@ -7,20 +7,23 @@ import java.util.ListIterator;
 
 public class ListB<E> implements List<E> {
 
-    private static final int DEFAULT_CAPACITY = 10;
-    private Object[] elements;
-    private int size;
+    // Внутренний класс для узла списка
+    private class Node {
+        E data;
+        Node next;
 
-    public ListB() {
-        elements = new Object[DEFAULT_CAPACITY];
-        size = 0;
+        Node(E data) {
+            this.data = data;
+            this.next = null;
+        }
     }
 
-    public ListB(int initialCapacity) {
-        if (initialCapacity < 0) {
-            throw new IllegalArgumentException("Illegal Capacity: " + initialCapacity);
-        }
-        elements = new Object[initialCapacity];
+    private Node head;    // Первый элемент списка
+    private int size;     // Размер списка
+
+    // Конструктор
+    public ListB() {
+        head = null;
         size = 0;
     }
 
@@ -37,38 +40,62 @@ public class ListB<E> implements List<E> {
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append('[');
-        for (int i = 0; i < size; i++) {
-            sb.append(elements[i]);
-            if (i < size - 1) {
+        sb.append("[");
+        Node current = head;
+        while (current != null) {
+            sb.append(current.data);
+            if (current.next != null) {
                 sb.append(", ");
             }
+            current = current.next;
         }
-        sb.append(']');
+        sb.append("]");
         return sb.toString();
     }
 
     @Override
     public boolean add(E e) {
-        ensureCapacity(size + 1);
-        elements[size++] = e;
+        Node newNode = new Node(e);
+
+        if (head == null) {
+            head = newNode;
+        } else {
+            Node current = head;
+            while (current.next != null) {
+                current = current.next;
+            }
+            current.next = newNode;
+        }
+
+        size++;
         return true;
     }
 
     @Override
     public E remove(int index) {
-        checkIndex(index);
-
-        @SuppressWarnings("unchecked")
-        E oldValue = (E) elements[index];
-
-        int numMoved = size - index - 1;
-        if (numMoved > 0) {
-            System.arraycopy(elements, index + 1, elements, index, numMoved);
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
         }
-        elements[--size] = null; // help garbage collection
 
-        return oldValue;
+        E removedData;
+
+        if (index == 0) {
+            // Удаляем первый элемент
+            removedData = head.data;
+            head = head.next;
+        } else {
+            // Ищем элемент перед удаляемым
+            Node previous = head;
+            for (int i = 0; i < index - 1; i++) {
+                previous = previous.next;
+            }
+
+            removedData = previous.next.data;
+            previous.next = previous.next.next;
+        }
+
+        size--;
+        return removedData;
     }
 
     @Override
@@ -76,40 +103,73 @@ public class ListB<E> implements List<E> {
         return size;
     }
 
-    /////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////
-    //////               Опциональные к реализации методы             ///////
-    /////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////
-
     @Override
     public void add(int index, E element) {
-        checkIndexForAdd(index);
-        ensureCapacity(size + 1);
+        if (index < 0 || index > size) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
+        }
 
-        System.arraycopy(elements, index, elements, index + 1, size - index);
-        elements[index] = element;
+        Node newNode = new Node(element);
+
+        if (index == 0) {
+            // Вставка в начало
+            newNode.next = head;
+            head = newNode;
+        } else {
+            // Ищем элемент перед позицией вставки
+            Node previous = head;
+            for (int i = 0; i < index - 1; i++) {
+                previous = previous.next;
+            }
+
+            newNode.next = previous.next;
+            previous.next = newNode;
+        }
+
         size++;
     }
 
     @Override
     public boolean remove(Object o) {
-        int index = indexOf(o);
-        if (index >= 0) {
-            remove(index);
+        if (head == null) {
+            return false;
+        }
+
+        // Если удаляем первый элемент
+        if (o == null ? head.data == null : o.equals(head.data)) {
+            head = head.next;
+            size--;
             return true;
         }
+
+        // Ищем элемент для удаления
+        Node current = head;
+        while (current.next != null) {
+            if (o == null ? current.next.data == null : o.equals(current.next.data)) {
+                current.next = current.next.next;
+                size--;
+                return true;
+            }
+            current = current.next;
+        }
+
         return false;
     }
 
     @Override
     public E set(int index, E element) {
-        checkIndex(index);
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
+        }
 
-        @SuppressWarnings("unchecked")
-        E oldValue = (E) elements[index];
-        elements[index] = element;
-        return oldValue;
+        Node current = head;
+        for (int i = 0; i < index; i++) {
+            current = current.next;
+        }
+
+        E oldData = current.data;
+        current.data = element;
+        return oldData;
     }
 
     @Override
@@ -119,147 +179,159 @@ public class ListB<E> implements List<E> {
 
     @Override
     public void clear() {
-        for (int i = 0; i < size; i++) {
-            elements[i] = null;
-        }
+        head = null;
         size = 0;
     }
 
     @Override
     public int indexOf(Object o) {
-        if (o == null) {
-            for (int i = 0; i < size; i++) {
-                if (elements[i] == null) {
-                    return i;
-                }
+        Node current = head;
+        int index = 0;
+
+        while (current != null) {
+            if (o == null ? current.data == null : o.equals(current.data)) {
+                return index;
             }
-        } else {
-            for (int i = 0; i < size; i++) {
-                if (o.equals(elements[i])) {
-                    return i;
-                }
-            }
+            current = current.next;
+            index++;
         }
+
         return -1;
     }
 
     @Override
     public E get(int index) {
-        checkIndex(index);
-        @SuppressWarnings("unchecked")
-        E element = (E) elements[index];
-        return element;
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
+        }
+
+        Node current = head;
+        for (int i = 0; i < index; i++) {
+            current = current.next;
+        }
+
+        return current.data;
     }
 
     @Override
     public boolean contains(Object o) {
-        return indexOf(o) >= 0;
+        return indexOf(o) != -1;
     }
 
     @Override
     public int lastIndexOf(Object o) {
-        if (o == null) {
-            for (int i = size - 1; i >= 0; i--) {
-                if (elements[i] == null) {
-                    return i;
-                }
+        Node current = head;
+        int index = 0;
+        int lastIndex = -1;
+
+        while (current != null) {
+            if (o == null ? current.data == null : o.equals(current.data)) {
+                lastIndex = index;
             }
-        } else {
-            for (int i = size - 1; i >= 0; i--) {
-                if (o.equals(elements[i])) {
-                    return i;
-                }
-            }
+            current = current.next;
+            index++;
         }
-        return -1;
+
+        return lastIndex;
     }
 
     /////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////
-    ////////        Эти методы имплементировать необязательно    ////////////
-    ////////        но они будут нужны для корректной отладки    ////////////
+    //////               Опциональные к реализации методы             ///////
     /////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////
-
-    @Override
-    public Iterator<E> iterator() {
-        return new Iterator<E>() {
-            private int currentIndex = 0;
-
-            @Override
-            public boolean hasNext() {
-                return currentIndex < size;
-            }
-
-            @Override
-            @SuppressWarnings("unchecked")
-            public E next() {
-                return (E) elements[currentIndex++];
-            }
-
-            @Override
-            public void remove() {
-                throw new UnsupportedOperationException();
-            }
-        };
-    }
-
-    /////////////////////////////////////////////////////////////////////////
-    //////////////////////// Вспомогательные методы /////////////////////////
-    /////////////////////////////////////////////////////////////////////////
-
-    private void ensureCapacity(int minCapacity) {
-        if (minCapacity > elements.length) {
-            int newCapacity = elements.length * 2;
-            if (newCapacity < minCapacity) {
-                newCapacity = minCapacity;
-            }
-            Object[] newElements = new Object[newCapacity];
-            System.arraycopy(elements, 0, newElements, 0, size);
-            elements = newElements;
-        }
-    }
-
-    private void checkIndex(int index) {
-        if (index < 0 || index >= size) {
-            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
-        }
-    }
-
-    private void checkIndexForAdd(int index) {
-        if (index < 0 || index > size) {
-            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
-        }
-    }
-
-    /////////////////////////////////////////////////////////////////////////
-    //////////////// Не реализованные методы (оставлены как есть) //////////
     /////////////////////////////////////////////////////////////////////////
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return false;
+        for (Object element : c) {
+            if (!contains(element)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
     public boolean addAll(Collection<? extends E> c) {
-        return false;
+        if (c.isEmpty()) {
+            return false;
+        }
+
+        for (E element : c) {
+            add(element);
+        }
+        return true;
     }
 
     @Override
     public boolean addAll(int index, Collection<? extends E> c) {
-        return false;
+        if (index < 0 || index > size) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
+        }
+
+        if (c.isEmpty()) {
+            return false;
+        }
+
+        int i = index;
+        for (E element : c) {
+            add(i, element);
+            i++;
+        }
+        return true;
     }
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        return false;
+        boolean modified = false;
+        Node current = head;
+        Node previous = null;
+
+        while (current != null) {
+            if (c.contains(current.data)) {
+                if (previous == null) {
+                    // Удаляем первый элемент
+                    head = current.next;
+                } else {
+                    previous.next = current.next;
+                }
+                size--;
+                modified = true;
+            } else {
+                previous = current;
+            }
+            current = current.next;
+        }
+
+        return modified;
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        return false;
+        boolean modified = false;
+        Node current = head;
+        Node previous = null;
+
+        while (current != null) {
+            if (!c.contains(current.data)) {
+                if (previous == null) {
+                    // Удаляем первый элемент
+                    head = current.next;
+                } else {
+                    previous.next = current.next;
+                }
+                size--;
+                modified = true;
+            } else {
+                previous = current;
+            }
+            current = current.next;
+        }
+
+        return modified;
     }
+
+    // Остальные методы оставлены без реализации
 
     @Override
     public List<E> subList(int fromIndex, int toIndex) {
@@ -283,6 +355,40 @@ public class ListB<E> implements List<E> {
 
     @Override
     public Object[] toArray() {
-        return new Object[0];
+        Object[] array = new Object[size];
+        Node current = head;
+        for (int i = 0; i < size; i++) {
+            array[i] = current.data;
+            current = current.next;
+        }
+        return array;
+    }
+
+    /////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////
+    ////////        Эти методы имплементировать необязательно    ////////////
+    ////////        но они будут нужны для корректной отладки    ////////////
+    /////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////
+    @Override
+    public Iterator<E> iterator() {
+        return new Iterator<E>() {
+            private Node current = head;
+
+            @Override
+            public boolean hasNext() {
+                return current != null;
+            }
+
+            @Override
+            public E next() {
+                if (!hasNext()) {
+                    throw new java.util.NoSuchElementException();
+                }
+                E data = current.data;
+                current = current.next;
+                return data;
+            }
+        };
     }
 }

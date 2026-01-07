@@ -1,0 +1,86 @@
+package by.it.group451002.karbanovich.lesson15;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Stream;
+
+public class SourceScannerB {
+    public static void main(String[] args) {
+        ArrayList<Path> myFiles = new ArrayList<>();
+
+        Path src = Path.of(System.getProperty("user.dir") + File.separator + "src" + File.separator);
+        try (Stream<Path> files = Files.walk(src)) {
+            files.filter(f -> f.toString().endsWith(".java")).
+                    forEach(myFiles::add);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        HashMap<Path, Integer> filesAndSizes = new HashMap<>();
+        for (int i = 0; i < myFiles.size(); i++) {
+            try {
+                List<String> lines = Files.readAllLines(myFiles.get(i));
+
+                boolean isTestFile = false;
+                for (int j = 0; j < lines.size(); j++) {
+                    if (lines.get(j).contains("@Test") || lines.get(j).contains("org.junit.Test")) {
+                        isTestFile = true;
+                        myFiles.remove(i--);
+                        break;
+                    }
+                    if (lines.get(j).contains("package") || lines.get(j).contains("import"))
+                        lines.remove(j--);
+                }
+                if (isTestFile) continue;
+
+                for (int j = 0; j < lines.size(); j++) {
+                    int ind = lines.get(j).indexOf("//");
+                    if (ind == -1) continue;
+                    lines.set(j, lines.get(j).substring(0, ind));
+                }
+
+                StringBuilder sb = new StringBuilder();
+                for (String line: lines) {
+                    if (!line.isEmpty())
+                        sb.append(line).append(File.separator);
+                }
+
+                while (true) {
+                    int begin = sb.indexOf("/*");
+                    int end = sb.indexOf("*/");
+                    if (begin == -1 || end == -1) break;
+                    sb.replace(begin, end + 2, "");
+                }
+
+                byte[] text = sb.toString().getBytes();
+                int start = 0, end = text.length - 1;
+                while (start < text.length && text[start] < 33)
+                    start++;
+                while (end >= 0 && text[end] < 33)
+                    end--;
+
+                filesAndSizes.put(myFiles.get(i), (end >= start) ? end - start + 1 : 0);
+            } catch (IOException e) {
+                filesAndSizes.put(myFiles.get(i), 0);
+            }
+        }
+
+        myFiles.sort((o1, o2) -> {
+            if (filesAndSizes.get(o1) > filesAndSizes.get(o2))
+                return 1;
+            else if (filesAndSizes.get(o1) < filesAndSizes.get(o2))
+                return -1;
+            else return o1.compareTo(o2);
+        });
+
+        for (Path file: myFiles) {
+            System.out.println(filesAndSizes.get(file) + " " + src.relativize(file));
+        }
+    }
+}
+

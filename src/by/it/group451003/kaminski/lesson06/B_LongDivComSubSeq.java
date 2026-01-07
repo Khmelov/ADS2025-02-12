@@ -22,12 +22,12 @@ import java.util.Scanner;
     Sample Input:
     4
     3 6 7 12
+
     Sample Output:
     3
 */
 
 public class B_LongDivComSubSeq {
-
 
     public static void main(String[] args) throws FileNotFoundException {
         InputStream stream = B_LongDivComSubSeq.class.getResourceAsStream("dataB.txt");
@@ -37,29 +37,31 @@ public class B_LongDivComSubSeq {
     }
 
     int getDivSeqSize(InputStream stream) throws FileNotFoundException {
+        //подготовка к чтению данных
         Scanner scanner = new Scanner(stream);
-        // Чтение длины последовательности
+        //!!!!!!!!!!!!!!!!!!!!!!!!!     НАЧАЛО ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
+        //общая длина последовательности
         int n = scanner.nextInt();
         int[] m = new int[n];
-        // Чтение самой последовательности
+        //читаем всю последовательность
         for (int i = 0; i < n; i++) {
             m[i] = scanner.nextInt();
         }
 
-        // Создаем массив для хранения длин наибольших кратных подпоследовательностей
+        // Создаем массив dp, где dp[i] - длина наибольшей кратной подпоследовательности,
+        // оканчивающейся на элементе m[i]
         int[] dp = new int[n];
 
-        // Инициализируем массив: минимальная длина подпоследовательности для каждого элемента - 1 (сам элемент)
+        // Инициализируем dp: минимальная длина для каждого элемента - 1 (сам элемент)
         for (int i = 0; i < n; i++) {
             dp[i] = 1;
         }
 
         // Заполняем массив dp
         for (int i = 1; i < n; i++) {
-            // Проверяем все предыдущие элементы
             for (int j = 0; j < i; j++) {
                 // Если текущий элемент делится на предыдущий и длина подпоследовательности может быть увеличена
-                if (m[i] % m[j] == 0 && dp[i] < dp[j] + 1) {
+                if (m[i] % m[j] == 0 && dp[j] + 1 > dp[i]) {
                     dp[i] = dp[j] + 1;
                 }
             }
@@ -72,7 +74,7 @@ public class B_LongDivComSubSeq {
                 result = dp[i];
             }
         }
-
+        //!!!!!!!!!!!!!!!!!!!!!!!!!     КОНЕЦ ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
         return result;
     }
 }

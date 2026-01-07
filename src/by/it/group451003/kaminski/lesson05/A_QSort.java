@@ -3,35 +3,7 @@ package by.it.group451003.kaminski.lesson05;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Scanner;
-
-/*
-Видеорегистраторы и площадь.
-На площади установлена одна или несколько камер.
-Известны данные о том, когда каждая из них включалась и выключалась (отрезки работы)
-Известен список событий на площади (время начала каждого события).
-Вам необходимо определить для каждого события сколько камер его записали.
-
-В первой строке задано два целых числа:
-    число включений камер (отрезки) 1<=n<=50000
-    число событий (точки) 1<=m<=50000.
-
-Следующие n строк содержат по два целых числа ai и bi (ai<=bi) -
-координаты концов отрезков (время работы одной какой-то камеры).
-Последняя строка содержит m целых чисел - координаты точек.
-Все координаты не превышают 10E8 по модулю (!).
-
-Точка считается принадлежащей отрезку, если она находится внутри него или на границе.
-
-Для каждой точки в порядке их появления во вводе выведите,
-скольким отрезкам она принадлежит.
-    Sample Input:
-    2 3
-    0 5
-    7 10
-    1 6 11
-    Sample Output:
-    1 0 0
-*/
+import java.util.Arrays;
 
 public class A_QSort {
 
@@ -45,67 +17,56 @@ public class A_QSort {
     }
 
     int[] getAccessory(InputStream stream) throws FileNotFoundException {
-        //подготовка к чтению данных
         Scanner scanner = new Scanner(stream);
-        //!!!!!!!!!!!!!!!!!!!!!!!!!     НАЧАЛО ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
-        //число отрезков отсортированного массива
+        // Чтение числа отрезков (камер) и числа событий (точек)
         int n = scanner.nextInt();
         Segment[] segments = new Segment[n];
-        //число точек
         int m = scanner.nextInt();
         int[] points = new int[m];
         int[] result = new int[m];
 
-        //читаем сами отрезки
+        // Чтение отрезков работы камер
         for (int i = 0; i < n; i++) {
-            //читаем начало и конец каждого отрезка
-            segments[i] = new Segment(scanner.nextInt(), scanner.nextInt());
+            int start = scanner.nextInt();
+            int end = scanner.nextInt();
+            // Упорядочивание начала и конца отрезка, если они заданы в обратном порядке
+            if (start > end) {
+                int temp = start;
+                start = end;
+                end = temp;
+            }
+            segments[i] = new Segment(start, end);
         }
-        //читаем точки
+
+        // Чтение точек событий
         for (int i = 0; i < m; i++) {
             points[i] = scanner.nextInt();
         }
-        //тут реализуйте логику задачи с применением быстрой сортировки
-        //в классе отрезка Segment реализуйте нужный для этой задачи компаратор
 
+        // Сортировка отрезков по начальной точке с помощью быстрой сортировки
+        Arrays.sort(segments);
 
-        int[] starts = new int[n];
-        for (int i = 0; i < n; i++) {
-            starts[i] = segments[i].start;
-        }
-
+        // Для каждой точки события определяем количество отрезков, которые её покрывают
         for (int i = 0; i < m; i++) {
-            int x = points[i];
+            int point = points[i];
             int count = 0;
-            int left = 0;
-            int right = n - 1;
-            int lastPossible = -1;
-
-            while (left <= right) {
-                int mid = left + (right - left) / 2;
-                if (segments[mid].start <= x) {
-                    lastPossible = mid;
-                    left = mid + 1;
-                } else {
-                    right = mid - 1;
+            // Перебираем все отрезки, у которых начало <= точке
+            // Поскольку отрезки отсортированы, можно использовать бинарный поиск для оптимизации
+            for (Segment segment : segments) {
+                if (segment.start > point) {
+                    break; // Отрезки дальше будут иметь начало больше точки, их можно не проверять
                 }
-            }
-
-            if (lastPossible != -1) {
-                for (int j = 0; j <= lastPossible; j++) {
-                    if (segments[j].stop >= x) {
-                        count++;
-                    }
+                if (segment.stop >= point) {
+                    count++;
                 }
             }
             result[i] = count;
         }
 
-        //!!!!!!!!!!!!!!!!!!!!!!!!!     КОНЕЦ ЗАДАЧИ     !!!!!!!!!!!!!!!!!!!!!!!!!
         return result;
     }
 
-    //отрезок
+    // Класс отрезка с реализацией интерфейса Comparable для сортировки
     private class Segment implements Comparable<Segment> {
         int start;
         int stop;
@@ -113,16 +74,12 @@ public class A_QSort {
         Segment(int start, int stop) {
             this.start = start;
             this.stop = stop;
-            //тут вообще-то лучше доделать конструктор на случай если
-            //концы отрезков придут в обратном порядке
         }
 
         @Override
         public int compareTo(Segment o) {
-            //подумайте, что должен возвращать компаратор отрезков
-
-            return 0;
+            // Сравниваем отрезки по начальной точке
+            return Integer.compare(this.start, o.start);
         }
     }
-
 }
