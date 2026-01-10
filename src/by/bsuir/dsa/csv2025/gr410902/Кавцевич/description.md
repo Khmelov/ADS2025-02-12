@@ -32,16 +32,16 @@ print the result — **one number per line**.
 ## Example
 
 ### Sample Input:
-5 4
-1 2 3 4 5
-1 1 5
-3 2 4
-4 1 3
-2 3 10
+5 4  
+1 2 3 4 5  
+1 1 5  
+3 2 4  
+4 1 3  
+2 3 10  
 ### Sample Output:
-15
-2
-3
+15  
+2  
+3  
 
 
 

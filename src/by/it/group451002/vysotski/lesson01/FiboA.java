@@ -19,13 +19,13 @@ public class FiboA {
         System.out.printf("slowA(%d)=%d \n\t time=%d \n\n", n, fibo.slowA(n), fibo.time());
     }
 
-    private long time() {
+    public long time() {
         long res = System.currentTimeMillis() - this.startTime;
         this.startTime = System.currentTimeMillis();
         return res;
     }
 
-    private int calc(int n) {
+    public int calc(int n) {
         int var10000;
         switch (n) {
             case 0 -> var10000 = 0;

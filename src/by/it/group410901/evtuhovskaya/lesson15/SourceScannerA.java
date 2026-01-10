@@ -1,120 +1,83 @@
 package by.it.group410901.evtuhovskaya.lesson15;
 
-import java.io.*;
-import java.nio.charset.Charset;
+import java.io.File;
+import java.io.IOException;
 import java.nio.charset.MalformedInputException;
-import java.nio.file.*;
-import java.util.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Stream;
 
 public class SourceScannerA {
-
     public static void main(String[] args) {
-        // Создаем final переменные для использования в лямбде
-        final Path root = getRootDirectory();
-        final List<FileInfo> fileList = new ArrayList<>();
+        String src = System.getProperty("user.dir") + File.separator + "src" + File.separator;
+        Path root = Paths.get(src);
+        List<FileInfo> fileList = new ArrayList<>();
 
-        try {
-            Files.walk(root)
-                    .filter(path -> path.toString().endsWith(".java"))
-                    .forEach(path -> {
-                        // Используем final переменные из внешней области
-                        processFile(path, root, fileList);
-                    });
-        } catch (IOException e) {
-            // Игнорируем ошибки обхода директории
+        try (Stream<Path> walk = Files.walk(root)) {
+            walk.filter(p -> p.toString().endsWith(".java")).forEach(p -> {
+                try {
+                    // Игнорируем MalformedInputException через try-catch
+                    String content = Files.readString(p, StandardCharsets.UTF_8);
+
+                    if (content.contains("@Test") || content.contains("org.junit.Test")) {
+                        return;
+                    }
+
+                    // 1. Удаление package и import
+                    String cleaned = removePackageAndImports(content);
+                    // 2. Удаление символов < 33 в начале и конце
+                    cleaned = trimLowChars(cleaned);
+
+                    if (!cleaned.isEmpty() || !content.isEmpty()) {
+                        int size = cleaned.getBytes(StandardCharsets.UTF_8).length;
+                        // Используем системный toString(), чтобы слэши совпали с тестом
+                        String relPath = root.relativize(p).toString();
+                        fileList.add(new FileInfo(relPath, size));
+                    }
+                } catch (MalformedInputException ignored) {
+                    // По условию: найти способ игнорировать MalformedInputException
+                } catch (IOException ignored) {}
+            });
+        } catch (IOException ignored) {}
+
+        // Сортировка по размеру, затем лексикографически
+        fileList.sort(Comparator.comparingInt((FileInfo f) -> f.size).thenComparing(f -> f.path));
+
+        for (FileInfo info : fileList) {
+            System.out.println(info.size + " " + info.path);
         }
-
-        // Сортировка
-        fileList.sort((f1, f2) -> {
-            int sizeCompare = Integer.compare(f1.size, f2.size);
-            return sizeCompare != 0 ? sizeCompare : f1.relativePath.compareTo(f2.relativePath);
-        });
-
-        // Вывод результатов
-        for (FileInfo fileInfo : fileList) {
-            System.out.println(fileInfo.size + " " + fileInfo.relativePath);
-        }
-    }
-
-    private static Path getRootDirectory() {
-        // Пробуем разные возможные пути
-        String[] possiblePaths = {
-                "D:/ASD/ADS2025-02-12/src",
-                "D:/ASD/src",
-                System.getProperty("user.dir") + File.separator + "src",
-                System.getProperty("user.dir")
-        };
-
-        for (String path : possiblePaths) {
-            Path testPath = Paths.get(path);
-            if (Files.exists(testPath) && Files.isDirectory(testPath)) {
-                return testPath;
-            }
-        }
-        return Paths.get(System.getProperty("user.dir"));
-    }
-
-    private static void processFile(Path file, Path root, List<FileInfo> fileList) {
-        String content;
-        try {
-            content = Files.readString(file, Charset.defaultCharset());
-        } catch (MalformedInputException e) {
-            return;
-        } catch (IOException e) {
-            return;
-        }
-
-        if (content.contains("@Test") || content.contains("org.junit.Test")) {
-            return;
-        }
-
-        String cleanedContent = removePackageAndImports(content);
-        cleanedContent = trimLowChars(cleanedContent);
-        int size = cleanedContent.getBytes().length;
-
-        String relativePath;
-        try {
-            relativePath = root.relativize(file).toString();
-        } catch (IllegalArgumentException e) {
-            relativePath = file.getFileName().toString();
-        }
-
-        fileList.add(new FileInfo(relativePath, size));
     }
 
     private static String removePackageAndImports(String content) {
-        StringBuilder result = new StringBuilder();
-        String[] lines = content.split("\n", -1);
-
+        String[] lines = content.split("\n");
+        StringBuilder sb = new StringBuilder();
         for (String line : lines) {
-            String trimmedLine = line.trim();
-            if (!trimmedLine.startsWith("package ") && !trimmedLine.startsWith("import ")) {
-                result.append(line).append("\n");
+            String trimmed = line.trim();
+            if (trimmed.startsWith("package ") || trimmed.startsWith("import ")) {
+                continue;
             }
+            sb.append(line).append("\n");
         }
-
-        return result.toString();
+        return sb.toString();
     }
 
     private static String trimLowChars(String s) {
-        if (s == null || s.isEmpty()) return s;
-
         int start = 0;
         int end = s.length() - 1;
-
         while (start <= end && s.charAt(start) < 33) start++;
         while (end >= start && s.charAt(end) < 33) end--;
-
         return start > end ? "" : s.substring(start, end + 1);
     }
 
-    static class FileInfo {
-        String relativePath;
+    private static class FileInfo {
+        String path;
         int size;
-
-        FileInfo(String relativePath, int size) {
-            this.relativePath = relativePath;
-            this.size = size;
-        }
+        FileInfo(String path, int size) { this.path = path; this.size = size; }
     }
 }

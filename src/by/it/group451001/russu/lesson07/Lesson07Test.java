@@ -8,9 +8,9 @@ public class Lesson07Test {
     @Test
     public void A() throws Exception {
         A_EditDist instance = new A_EditDist();
-        assertEquals("A1 failed", instance.getDistanceEdinting("ab","ab"),0);
-        assertEquals("A2 failed", instance.getDistanceEdinting("short","ports"),3);
-        assertEquals("A3 failed", instance.getDistanceEdinting("distance","editing"),5);
+        assertEquals("A1 failed", instance.getDistanceEditing("ab","ab"),0);
+        assertEquals("A2 failed", instance.getDistanceEditing("short","ports"),3);
+        assertEquals("A3 failed", instance.getDistanceEditing("distance","editing"),5);
     }
 
 

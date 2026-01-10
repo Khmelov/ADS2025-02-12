@@ -15,17 +15,14 @@ public class SourceScannerC {
         Path root = Paths.get(src);
         List<FileInfo> files = new ArrayList<>();
 
-        // Чтение всех java-файлов
         try {
             Files.walk(root)
                     .filter(p -> p.toString().endsWith(".java"))
                     .forEach(p -> processFile(p, root, files));
         } catch (IOException ignored) {}
 
-        // Дистанции и поиск копий
         Map<String, List<String>> copies = findCopies(files);
 
-        // Печать
         List<String> keys = new ArrayList<>(copies.keySet());
         Collections.sort(keys);
 
@@ -62,7 +59,6 @@ public class SourceScannerC {
         result.add(new FileInfo(relative, cleaned));
     }
 
-    // ------------------- НОРМАЛИЗАЦИЯ --------------------
 
     private static String cleanComments(String text) {
         StringBuilder out = new StringBuilder(text.length());
@@ -84,7 +80,7 @@ public class SourceScannerC {
                     if (!inBlock && !inLine
                             && i + 1 < line.length()
                             && line.charAt(i) == '/' && line.charAt(i + 1) == '/') {
-                        break; // // комментарий — игнорируем остаток строки
+                        break;// комментарий — игнорируем остаток строки
                     }
                     if (!inBlock && !inLine
                             && i + 1 < line.length()
@@ -158,7 +154,7 @@ public class SourceScannerC {
         int m = b.length();
 
         if (Math.abs(n - m) > limit)
-            return limit; // невозможно быть <limit
+            return limit;
 
         int[] prev = new int[m + 1];
         int[] curr = new int[m + 1];
@@ -178,7 +174,7 @@ public class SourceScannerC {
                 if (curr[j] < min) min = curr[j];
             }
 
-            if (min > limit) return limit; // раннее прерывание
+            if (min > limit) return limit;
 
             int[] tmp = prev;
             prev = curr;
