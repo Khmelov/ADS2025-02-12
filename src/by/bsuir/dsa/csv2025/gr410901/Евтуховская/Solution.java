@@ -20,7 +20,8 @@ public class Solution {
         long w;
         Edge(int t, long w) { this.to = t; this.w = w; }
     }
-     static class Dijkstra {
+
+    static class Dijkstra {
         final List<List<Edge>> g;
         final int n;
 
@@ -30,9 +31,9 @@ public class Solution {
             for (int i = 0; i <= n; i++) g.add(new ArrayList<>());
         }
 
+        // Логика исправлена: граф ориентированный (ребро только в одну сторону)
         void addEdge(int u, int v, long w) {
             g.get(u).add(new Edge(v, w));
-            g.get(v).add(new Edge(u, w));
         }
 
         long[] full(int start) {
@@ -89,28 +90,38 @@ public class Solution {
     }
 
     public static void main(String[] args) throws IOException {
-
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         PrintWriter out = new PrintWriter(System.out);
 
-        StringTokenizer st = new StringTokenizer(br.readLine());
+        String line = br.readLine();
+        if (line == null) return;
+        StringTokenizer st = new StringTokenizer(line);
         int n = Integer.parseInt(st.nextToken());
         int m = Integer.parseInt(st.nextToken());
 
         Dijkstra d = new Dijkstra(n);
 
         for (int i = 0; i < m; i++) {
-            st = new StringTokenizer(br.readLine());
+            String edgeLine = br.readLine();
+            if (edgeLine == null) break;
+            st = new StringTokenizer(edgeLine);
             int u = Integer.parseInt(st.nextToken());
             int v = Integer.parseInt(st.nextToken());
             long w = Long.parseLong(st.nextToken());
             d.addEdge(u, v, w);
         }
 
-        int q = Integer.parseInt(br.readLine());
+        String qLine = br.readLine();
+        if (qLine == null) {
+            out.flush();
+            return;
+        }
+        int q = Integer.parseInt(qLine);
 
         for (int i = 0; i < q; i++) {
-            st = new StringTokenizer(br.readLine());
+            String queryLine = br.readLine();
+            if (queryLine == null) break;
+            st = new StringTokenizer(queryLine);
             int s = Integer.parseInt(st.nextToken());
             int t = Integer.parseInt(st.nextToken());
 
@@ -127,9 +138,9 @@ public class Solution {
                 out.println(ans);
             }
         }
-
         out.flush();
     }
+
     @Before
     public void setUpStreams() {
         System.setOut(new PrintStream(outContent));
@@ -142,32 +153,35 @@ public class Solution {
     }
 
     private List<String> runMainAndCaptureOutput(String input) throws Exception {
+        outContent.reset(); // Очистка буфера перед каждым тестом
         InputStream in = new ByteArrayInputStream(input.getBytes());
         System.setIn(in);
 
         Solution.main(new String[0]);
         String output = outContent.toString().trim();
         if (output.isEmpty()) return List.of();
-        return List.of(output.split(System.lineSeparator()));
+        return List.of(output.split("\\r?\\n"));
     }
+
     @Test
     public void testProvidedExample() throws Exception {
         String input =
                 "5 6\n" +
-                "1 2 4\n" +
-                "1 3 2\n" +
-                "2 3 1\n" +
-                "2 4 5\n" +
-                "3 4 8\n" +
-                "4 5 3\n" +
-                "3\n" +
-                "1 -1\n" +
-                "1 5\n" +
-                "5 1\n";
+                        "1 2 4\n" +
+                        "1 3 2\n" +
+                        "2 3 1\n" +
+                        "2 4 5\n" +
+                        "3 4 8\n" +
+                        "4 5 3\n" +
+                        "3\n" +
+                        "1 -1\n" +
+                        "1 5\n" +
+                        "5 1\n";
 
+        // Исправлено под ориентированный граф
         List<String> expected = List.of(
-                "0 3 2 8 11",
-                "11",
+                "0 4 2 9 12",
+                "12",
                 "-1"
         );
         assertEquals(expected, runMainAndCaptureOutput(input));
@@ -177,11 +191,11 @@ public class Solution {
     public void testDisconnected() throws Exception {
         String input =
                 "4 1\n" +
-                "1 2 10\n" +
-                "3\n" +
-                "1 -1\n" +
-                "1 3\n" +
-                "3 4\n";
+                        "1 2 10\n" +
+                        "3\n" +
+                        "1 -1\n" +
+                        "1 3\n" +
+                        "3 4\n";
 
         List<String> expected = List.of(
                 "0 10 -1 -1",
@@ -195,8 +209,8 @@ public class Solution {
     public void testSingleNode() throws Exception {
         String input =
                 "1 0\n" +
-                "1\n" +
-                "1 -1\n";
+                        "1\n" +
+                        "1 -1\n";
 
         List<String> expected = List.of("0");
         assertEquals(expected, runMainAndCaptureOutput(input));
@@ -206,12 +220,12 @@ public class Solution {
     public void testTriangleGraph() throws Exception {
         String input =
                 "3 3\n" +
-                "1 2 5\n" +
-                "2 3 1\n" +
-                "1 3 10\n" +
-                "2\n" +
-                "1 3\n" +
-                "1 -1\n";
+                        "1 2 5\n" +
+                        "2 3 1\n" +
+                        "1 3 10\n" +
+                        "2\n" +
+                        "1 3\n" +
+                        "1 -1\n";
 
         List<String> expected = List.of(
                 "6",
@@ -224,11 +238,11 @@ public class Solution {
     public void testHeavyWeights() throws Exception {
         String input =
                 "3 2\n" +
-                "1 2 1000000000000\n" +
-                "2 3 1000000000000\n" +
-                "2\n" +
-                "1 3\n" +
-                "1 -1\n";
+                        "1 2 1000000000000\n" +
+                        "2 3 1000000000000\n" +
+                        "2\n" +
+                        "1 3\n" +
+                        "1 -1\n";
 
         List<String> expected = List.of(
                 "2000000000000",
@@ -241,11 +255,11 @@ public class Solution {
     public void testEarlyStopSimple() throws Exception {
         String input =
                 "4 3\n" +
-                "1 2 5\n" +
-                "2 3 5\n" +
-                "3 4 5\n" +
-                "1\n" +
-                "1 4\n";
+                        "1 2 5\n" +
+                        "2 3 5\n" +
+                        "3 4 5\n" +
+                        "1\n" +
+                        "1 4\n";
 
         List<String> expected = List.of("15");
         assertEquals(expected, runMainAndCaptureOutput(input));
@@ -255,21 +269,22 @@ public class Solution {
     public void testMultipleQueries() throws Exception {
         String input =
                 "5 4\n" +
-                "1 2 1\n" +
-                "2 3 1\n" +
-                "3 4 1\n" +
-                "4 5 1\n" +
-                "4\n" +
-                "1 5\n" +
-                "5 1\n" +
-                "2 -1\n" +
-                "3 1\n";
+                        "1 2 1\n" +
+                        "2 3 1\n" +
+                        "3 4 1\n" +
+                        "4 5 1\n" +
+                        "4\n" +
+                        "1 5\n" +
+                        "5 1\n" +
+                        "2 -1\n" +
+                        "3 1\n";
 
+        //исправлено под ориентированный граф
         List<String> expected = List.of(
                 "4",
-                "4",
-                "1 0 1 2 3",
-                "2"
+                "-1",
+                "-1 0 1 2 3",
+                "-1"
         );
         assertEquals(expected, runMainAndCaptureOutput(input));
     }
@@ -278,11 +293,11 @@ public class Solution {
     public void testUnreachableTarget() throws Exception {
         String input =
                 "5 2\n" +
-                "1 2 7\n" +
-                "4 5 9\n" +
-                "2\n" +
-                "1 5\n" +
-                "4 -1\n";
+                        "1 2 7\n" +
+                        "4 5 9\n" +
+                        "2\n" +
+                        "1 5\n" +
+                        "4 -1\n";
 
         List<String> expected = List.of(
                 "-1",
@@ -301,7 +316,7 @@ public class Solution {
         List<String> expected = List.of(
                 "6",
                 "0 2 3 4 5 6",
-                "6"
+                "-1"
         );
         assertEquals(expected, runMainAndCaptureOutput(sb.toString()));
     }

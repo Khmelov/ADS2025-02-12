@@ -42,7 +42,7 @@ public class B_Sheduler {
 
         for (Event event : events) {
             if (event.start >= lastEndTime) {
-                result.addLast(event);
+                result.add(event);
                 lastEndTime = event.stop;
             }
         }

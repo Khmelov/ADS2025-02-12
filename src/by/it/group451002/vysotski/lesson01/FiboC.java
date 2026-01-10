@@ -18,7 +18,7 @@ public class FiboC {
         System.out.printf("fasterC(%d)=%d \n\t time=%d \n\n", n, fibo.fasterC((long)n, m), fibo.time());
     }
 
-    private long time() {
+    public long time() {
         return System.currentTimeMillis() - this.startTime;
     }
 

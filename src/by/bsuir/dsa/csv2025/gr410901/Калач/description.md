@@ -4,14 +4,12 @@ Graph k-coloring
 
 # Task
 
-Problem: Graph k-coloring
-
 You are given an undirected graph ( G = (V, E) ) with ( n ) vertices and a set of edges.
 You are also given a number ( k ).
 
 You must determine whether it is possible to color each vertex of the graph with one of the ( k ) colors such that:
 
-1. No two adjacent vertices share the same color.
+No two adjacent vertices share the same color.
 
 ---
 

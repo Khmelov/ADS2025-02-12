@@ -18,7 +18,7 @@ Given the dimension `n` of a square matrix and the matrix itself of size `n × n
 
 ## Output Format 
 
--Single line with `n²` integers separated by spaces - elements in spiral traversal order
+- Single line with `n²` integers separated by spaces - elements in spiral traversal order
 
 # Theory
 

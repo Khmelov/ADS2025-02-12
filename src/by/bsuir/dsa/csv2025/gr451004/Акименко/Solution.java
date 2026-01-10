@@ -13,14 +13,11 @@ public class Solution {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("=== Слияние двух BST в сбалансированное дерево ===");
 
         // Ввод первого дерева
-        System.out.println("Введите элементы первого BST через пробел:");
         int[] tree1 = readIntArray(scanner);
 
         // Ввод второго дерева
-        System.out.println("Введите элементы второго BST через пробел:");
         int[] tree2 = readIntArray(scanner);
 
         // Построение деревьев
@@ -32,7 +29,7 @@ public class Solution {
 
         // Вывод результата
         List<Integer> inOrderResult = BSTMerge.getInOrder(result);
-        System.out.println("Результат слияния (in-order обход): " + inOrderResult);
+        System.out.println(inOrderResult);
 
         scanner.close();
     }
