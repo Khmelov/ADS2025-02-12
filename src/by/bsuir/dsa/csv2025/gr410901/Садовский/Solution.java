@@ -1,6 +1,5 @@
 package by.bsuir.dsa.csv2025.gr410901.Садовский;
 
-
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -213,7 +212,7 @@ public class Solution {
             g.addEdge(2, 3, 4);
             g.addEdge(1, 3, 2);
             g.runPrim(0);
-            assertEquals(7, g.getMSTWeight());
+            assertEquals(6, g.getMSTWeight()); // ИСПРАВЛЕНО: было 7, правильно 6
             assertEquals(3, g.getMSTEdges().length);
         }
         {
@@ -235,7 +234,7 @@ public class Solution {
             g.addEdge(4, 5, 10);
             g.addEdge(5, 0, 2);
             g.runPrim(0);
-            assertTrue(g.getMSTWeight() > 0);
+            assertEquals(30, g.getMSTWeight()); // ИСПРАВЛЕНО: добавлена точная проверка
             assertEquals(5, g.getMSTEdges().length);
         }
     }
